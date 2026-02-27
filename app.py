@@ -184,8 +184,8 @@ def seed_admin():
     volunteer = Volunteer.query.filter_by(email=email).first()
     if not volunteer:
         volunteer = Volunteer(
-            first_name="Aaron",
-            last_name="Garza",
+            first_name= first_name,
+            last_name= last_name,
             email=email
         )
         db.session.add(volunteer)
