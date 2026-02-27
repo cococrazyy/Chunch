@@ -28,12 +28,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
-GOOGLE_CLIENT_ID = os.environ["GOOGLE_CLIENT_ID"]
-
-idinfo = id_token.verify_oauth2_token(
-    token, grequests.Request(),
-    GOOGLE_CLIENT_ID
-)
 # creating a volunteer class
 #class Volunteer(db.Model, SoftDeleteMixin):
 class Volunteer(db.Model):
@@ -128,6 +122,7 @@ def static_files(path):
 
 @app.route("/api/google-login", methods=["POST"])
 def google_login():
+    GOOGLE_CLIENT_ID = os.environ["GOOGLE_CLIENT_ID"]
     token = request.json.get("credential")
 
     if not token:
@@ -138,7 +133,7 @@ def google_login():
         idinfo = id_token.verify_oauth2_token(
             token,
             grequests.Request(),
-            "483439290581-t6qm63e9rcuvm62l6j3cghvj71eo5h1k.apps.googleusercontent.com"
+            GOOGLE_CLIENT_ID
         )
 
         email = idinfo["email"]
@@ -181,10 +176,19 @@ def admin_page():
 
 @app.route("/seed-admin")
 def seed_admin():
-    from models import db, UserAccount
-
+    
     email = "garza22@southwestern.edu"   # must match Google email
     name = "Aaron Garza"
+    
+    volunteer = Volunteer.query.filter_by(email=email).first()
+    if not volunteer:
+        volunteer = Volunteer(
+            first_name="Aaron",
+            last_name="Garza",
+            email=email
+        )
+        db.session.add(volunteer)
+        db.session.commit()
 
     existing = UserAccount.query.filter_by(email=email).first()
 
@@ -192,9 +196,9 @@ def seed_admin():
         return "User already exists."
 
     admin = UserAccount(
-        name=name,
-        email=email,
-        role="admin"   # or however you mark admins
+        volunteer_id = volunteer.id,
+        password = "testing",
+        role="admin"
     )
 
     db.session.add(admin)
