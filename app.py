@@ -177,9 +177,9 @@ def admin_page():
 @app.route("/seed-admin")
 def seed_admin():
     
-    email = "garza22@southwestern.edu"   # must match Google email
-    first_name = "Aaron"
-    last_name = "Garza"
+    email = "williamsr@southwestern.edu"   # must match Google email
+    first_name = "Reid"
+    last_name = "Williams"
     
     volunteer = Volunteer.query.filter_by(email=email).first()
     if not volunteer:
