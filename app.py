@@ -182,7 +182,7 @@ def admin_page():
 @app.route("/seed-admin")
 def seed_admin():
     
-    email = "garza22@southwestern.edu"   # must match Google email
+    email = "agarza6044@gmail.com"   # must match Google email
     first_name = "Aaron"
     last_name = "Garza"
     
