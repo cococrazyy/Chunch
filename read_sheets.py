@@ -29,4 +29,4 @@ rows = sheet.get_all_records()
 with open("data/sheet_data.json", "w", encoding="utf-8") as f:
     json.dump(rows, f, indent=4, ensure_ascii=False)
 
-print(f"Saved {len(rows)} rows to sheet_data.json")
+print(f"Saved {len(rows)} rows to data/sheet_data.json")
