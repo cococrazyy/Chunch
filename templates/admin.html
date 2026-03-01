@@ -1,26 +1,6 @@
 <!DOCTYPE html>
 <html>
 <body>
-  <h2 id="welcome"></h2>
-<script>
-const user = localStorage.getItem("chunchUser");
-
-if (!user) {
-  window.location.href = "index.html";
-}
-</script>
-
-
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const name = localStorage.getItem("chunchName");
-  if (name) {
-    document.getElementById("welcome").innerText = 
-      "Welcome, " + name;
-  }
-});
-                          
-</script>
   <table border="1" cellpadding="6">
         <tr>
             <th>Name</th>
