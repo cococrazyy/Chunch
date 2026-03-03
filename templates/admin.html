@@ -1,7 +1,257 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Scheduler</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background: #f3f6fb;
+    color: #1e293b;
+}
+
+/* HEADER */
+.header {
+    background: #0f172a;
+    color: white;
+    padding: 20px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.header button {
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: none;
+    background: #2563eb;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.icon {
+    font-size: 25px;
+}
+
+.label {
+    font-size: 20px;
+    font-weight: 500;
+}
+
+.header button:hover {
+    background: #1d4ed8;
+}
+
+.secondary-btn {
+    background: #475569 !important;
+}
+
+.secondary-btn:hover {
+    background: #334155 !important;
+}
+
+/* GRID */
+.grid {
+    padding: 40px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 30px;
+}
+
+/* CARD */
+.card {
+    border-radius: 20px;
+    padding: 30px;
+    color: white;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    transition: 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card h2 {
+    font-size: 22px;
+    margin-bottom: 20px;
+}
+
+.volunteer {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+/* STATION COLORS (ALL 14) */
+.setup { background: linear-gradient(135deg,#0ea5e9,#0284c7); }
+.teardown { background: linear-gradient(135deg,#6366f1,#4f46e5); }
+.servers { background: linear-gradient(135deg,#ef4444,#dc2626); }
+.kitchen { background: linear-gradient(135deg,#22c55e,#16a34a); }
+.drinks { background: linear-gradient(135deg,#f97316,#ea580c); }
+.desserts { background: linear-gradient(135deg,#facc15,#eab308); color:#1e293b; }
+.busboys { background: linear-gradient(135deg,#ec4899,#db2777); }
+.dishes { background: linear-gradient(135deg,#06b6d4,#0891b2); }
+.reserve { background: linear-gradient(135deg,#94a3b8,#64748b); }
+.manager { background: linear-gradient(135deg,#111827,#1f2937); }
+.greeters { background: linear-gradient(135deg,#14b8a6,#0d9488); }
+.potato { background: linear-gradient(135deg,#a16207,#854d0e); }
+.salad { background: linear-gradient(135deg,#65a30d,#4d7c0f); }
+.absent { background: linear-gradient(135deg,#dc2626,#7f1d1d); }
+
+.date-picker {
+    padding: 8px;
+    border-radius: 10px;
+    border: none;
+    font-size: 14px;
+}
+</style>
+</head>
+
 <body>
-  <table border="1" cellpadding="6">
+
+<div class="header">
+    <div class="header-top">
+        <h1>Admin View</h1>
+        <div>
+            <input type="date" id="datePicker" class="date-picker">
+            <button onclick="loadSchedule()">Load</button>
+        </div>
+    </div>
+
+    <div class="header-actions">
+        <button onclick="openInbox()">
+            <span class="icon">📬</span>
+            <span class="label">Inbox</span>
+        </button>
+    
+        <button onclick="enableEdit()">
+            <span class="icon">✏️</span>
+            <span class="label">Edit</span>
+        </button>
+    
+        <button onclick="window.print()">
+            <span class="icon">🖨️</span>
+            <span class="label">Print</span>
+        </button>
+    
+        <button onclick="toggleView()">
+            <span class="icon">⏱️</span>
+            <span class="label">Hourly View</span>
+        </button>
+    
+        <button class="secondary-btn" onclick="requestCoverage()">
+            <span class="icon">🚨</span>
+            <span class="label">Need Coverage</span>
+        </button>
+    </div>
+</div>
+
+<div class="grid" id="scheduleGrid"></div>
+
+<script>
+let hourlyView = false;
+
+const stationClassMap = {
+    "Setup Team": "setup",
+    "Teardown Team": "teardown",
+    "Line Servers": "servers",
+    "Kitchen": "kitchen",
+    "Drink Station": "drinks",
+    "Desserts": "desserts",
+    "Busboys/sanitation": "busboys",
+    "Dishwashers": "dishes",
+    "Reserve": "reserve",
+    "General Manager": "manager",
+    "Greeters": "greeters",
+    "Baked Potato Bar": "potato",
+    "Salad Bar": "salad",
+    "Absent": "absent"
+};
+
+async function loadSchedule() {
+    const date = document.getElementById("datePicker").value;
+    if (!date) {
+        alert("Please select a date.");
+        return;
+    }
+
+    const response = await fetch(`/api/schedule?date=${date}`);
+    const data = await response.json();
+
+    const grid = document.getElementById("scheduleGrid");
+    grid.innerHTML = "";
+
+    data.forEach(station => {
+        const card = document.createElement("div");
+        const cssClass = stationClassMap[station.stationName] || "reserve";
+        card.className = `card ${cssClass}`;
+
+        let volunteerHTML = "";
+        station.volunteers.forEach(v => {
+            volunteerHTML += `
+                <div class="volunteer">
+                    <span>${v.firstName} ${v.lastName}</span>
+                    <span>${v.time}</span>
+                    <span>${v.phone || ""}</span>
+                </div>
+            `;
+        });
+
+        card.innerHTML = `
+            <h2>${station.stationName}</h2>
+            ${volunteerHTML || "<p>No volunteers assigned</p>"}
+        `;
+
+        grid.appendChild(card);
+    });
+}
+
+function toggleView() {
+    hourlyView = !hourlyView;
+    loadSchedule();
+}
+
+function openInbox() {
+    alert("Inbox placeholder.");
+}
+
+function enableEdit() {
+    alert("Edit mode placeholder.");
+}
+
+function requestCoverage() {
+    alert("Coverage request placeholder.");
+}
+</script>
+<table border="1" cellpadding="6">
         <tr>
             <th>Name</th>
             <th>Email</th>
@@ -14,5 +264,5 @@
         </tr>
         {% endfor %}
     </table>
-  </body>
+</body>
 </html>
