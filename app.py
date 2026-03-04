@@ -196,7 +196,7 @@ def add_volunteer():
     existing = Volunteer.query.filter_by(email=email).first()
     if existing:
         flash("Volunteer with that email already exists.")
-        return redirect("/admin")
+        return redirect("/admin/master-list")
 
     new_volunteer = Volunteer(
         first_name=first_name,
