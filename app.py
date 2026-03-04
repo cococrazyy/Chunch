@@ -177,7 +177,7 @@ def me():
 def admin_page():
     if "user_id" not in session:
         return redirect("/")
-
+@app.route("/master-list")
 def master_list():
     volunteers = Volunteer.query.order_by(Volunteer.last_name).all()
     return render_template("master-list.html", volunteers=volunteers)
