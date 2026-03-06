@@ -206,8 +206,6 @@ def add_volunteer():
 
     db.session.add(new_volunteer)
     db.session.commit()
-
-    flash("Volunteer added successfully!")
     return redirect("/admin/master-list")
 
     
