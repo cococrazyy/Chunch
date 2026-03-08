@@ -134,8 +134,7 @@ class Availability(db.Model):
 
     volunteer_id = Column(Integer, ForeignKey("volunteers.id"))
 
-    day = Column(String(20))     # Example: Monday
-    hour = Column(Integer)       # Example: 8, 9, 10, 11
+    hour = Column(String(50))       # Example: 8, 9, 10, 11
 
     volunteer = relationship("Volunteer", backref="availability")
 
@@ -236,14 +235,21 @@ def add_volunteer():
 # Adding route to new volunteer hours page
 @app.route("/admin/volunteer-hours")
 def volunteer_hours():
-    #if "user_id" not in session:
-     #   return redirect("/")
-    
-    # Get all volunteers sorted by last name
+    # Get all volunteers
     volunteers = Volunteer.query.order_by(Volunteer.last_name).all()
     
-    return render_template("volunteer-hours.html", volunteers=volunteers)
-
+    volunteer_data = []
+    for v in volunteers:
+        # If you don’t have an Availability table, just use v.availability
+        # For now, fallback to empty string if None
+        availability_text = getattr(v, "availability", "") or ""
+        volunteer_data.append({
+            "name": f"{v.first_name} {v.last_name}",
+            "email": v.email,
+            "availability": availability_text
+        })
+    
+    return render_template("volunteer-hours.html", volunteer_data=volunteer_data)
     
 @app.route("/seed-admin")
 def seed_admin():

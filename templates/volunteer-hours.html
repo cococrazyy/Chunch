@@ -1,32 +1,24 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Volunteer Hours (Test)</title>
-  </head>
-  <body>
-    <h1>Volunteer Hours (Test)</h1>
+<head>
+    <title>Volunteer Hours</title>
+</head>
+<body>
+    <h1>Volunteer Hours</h1>
 
-    <table border="1">
-      <thead>
+    <table border="1" cellpadding="5">
         <tr>
-          <th>Volunteer</th>
-          <th>First Available Hour</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Typical Shift</th>
         </tr>
-      </thead>
-      <tbody>
-        {% for volunteer in volunteers %}
+        {% for volunteer in volunteer_data %}
         <tr>
-          <td>{{ volunteer.first_name }} {{ volunteer.last_name }}</td>
-          <td>
-            {% if volunteer.availability %}
-              {{ volunteer.availability[0].hour }}
-            {% else %}
-              None
-            {% endif %}
-          </td>
+            <td>{{ volunteer.name }}</td>
+            <td>{{ volunteer.email }}</td>
+            <td>{{ volunteer.availability }}</td>
         </tr>
         {% endfor %}
-      </tbody>
     </table>
-  </body>
+</body>
 </html>
