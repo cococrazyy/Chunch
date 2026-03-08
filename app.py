@@ -8,6 +8,9 @@ from sqlalchemy import ForeignKey
 import os
 from flask import request, jsonify, session, redirect, url_for
 from google.oauth2 import id_token
+import json
+from google.oauth2.service_account import Credentials
+from googleapiclient.discovery import build
 from google.auth.transport import requests as grequests
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask import render_template
@@ -125,6 +128,33 @@ class Assignment(db.Model):
     station = relationship("Station", backref = "assignments")
     schedule = relationship("Schedule", backref = "assignments")
 
+def sync_drive_access(email):
+    """
+    Give a volunteer view-only access to the Google Drive folder.
+    """
+    # Load the service account credentials from your JSON file
+    with open("chunchdriveaccess-489601-02c473410f26.json") as f:
+        creds_dict = json.load(f)
+
+    scopes = ["https://www.googleapis.com/auth/drive"]
+    credentials = Credentials.from_service_account_info(creds_dict, scopes=scopes)
+    
+    service = build('drive', 'v3', credentials=credentials)
+
+    # Folder ID of your Drive folder
+    folder_id = "1IwmKyFWKEvAB86WKg9I7C9N1BBvrSzD-"
+
+    # Give the volunteer view-only access
+    service.permissions().create(
+        fileId=folder_id,
+        body={
+            'type': 'user',
+            'role': 'reader',   # view-only
+            'emailAddress': email
+        },
+        fields='id'
+    ).execute()
+
 
 if os.environ.get("RUN_DB_INIT") == "1":
     with app.app_context():
@@ -218,6 +248,7 @@ def add_volunteer():
 
     db.session.add(new_volunteer)
     db.session.commit()
+    sync_drive_access(email)
     return redirect("/admin/master-list")
 
     
