@@ -137,7 +137,7 @@ class Availability(db.Model):
     day = Column(String(20))     # Example: Monday
     hour = Column(Integer)       # Example: 8, 9, 10, 11
 
-    volunteer = relationship("Volunteer", backref="availability")
+    volunteer = relationship("Volunteer", backref=backref("availability", cascade = "all, delete-orphan"))
 
 if os.environ.get("RUN_DB_INIT") == "1":
     with app.app_context():
@@ -330,7 +330,7 @@ def sync_volunteers():
         # Remove old availability so we don’t duplicate
         Availability.query.filter_by(volunteer_id=volunteer.id).delete()
 
-        availability_text = str(row.get("Availability", ""))
+        availability_text = str(row.get("What is your typical shift? Select all hours that you work from when you come in until you leave. (Ex. if you work 11-2, you would select 11AM, 12PM, 1PM, 2PM)", ""))
         entries = availability_text.split(",")
 
         for entry in entries:
