@@ -398,6 +398,12 @@ def create_admin(email, first_name, last_name):
         role="admin"
     )
     db.session.add(admin)
+
+
     db.session.commit()
 
     click.echo(f"admin privileges given to {email}")
+
+
+with app.app_context():
+    db.create_all()
