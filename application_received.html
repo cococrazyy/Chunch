@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Volunteer Confirmation</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color: white;
+    text-align: center;
+}
+
+.card {
+    background: white;
+    color: #1f2937;
+    padding: 50px;
+    border-radius: 20px;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+    max-width: 500px;
+    width: 90%;
+}
+
+.card h1 {
+    margin-bottom: 20px;
+}
+
+.card p {
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+.next-step-btn {
+    padding: 14px 35px;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: white;
+    transition: 0.3s ease;
+}
+
+.next-step-btn:hover {
+    transform: scale(1.05);
+}
+</style>
+</head>
+<body>
+
+<script>
+// 🔐 Secret key check
+const params = new URLSearchParams(window.location.search);
+const key = params.get("key");
+
+if (key !== "chunch-volunteer-2026") {
+    window.location.href = "volunteer-intro-vids.html";
+}
+</script>
+
+<div class="card">
+    <h1>🎉 Application Submitted!</h1>
+    <p>
+        Thank you for applying to volunteer.
+        Our team will review your submission and contact you soon.
+    </p>
+    <p>
+        In the meantime, you can explore more about our mission below.
+    </p>
+    <button class="next-step-btn" onclick="window.location.href='index.html'">
+        Return to Home
+    </button>
+</div>
+
+</body>
+</html>

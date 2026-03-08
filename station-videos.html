@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Volunteer Training Videos</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background: #f4f6f9;
+    color: #1f2937;
+}
+
+/* Navbar */
+.navbar {
+    background: #0f172a;
+    padding: 18px 40px;
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    flex-wrap: wrap;
+}
+
+.navbar a {
+    text-decoration: none;
+    color: white;
+    font-weight: 600;
+    padding: 10px 18px;
+    border-radius: 8px;
+    transition: 0.3s ease;
+}
+
+.navbar a:hover {
+    background: #2563eb;
+}
+
+/* Page header */
+.header {
+    text-align: center;
+    padding: 60px 20px 30px;
+}
+
+.header h1 {
+    font-size: 36px;
+    margin-bottom: 10px;
+}
+
+/* Video grid */
+.video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 40px;
+    padding: 40px 60px 80px;
+}
+
+.video-card {
+    background: white;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+    transition: 0.3s ease;
+}
+
+.video-card:hover {
+    transform: translateY(-5px);
+}
+
+.video-card h3 {
+    margin-bottom: 15px;
+}
+
+video {
+    width: 100%;
+    border-radius: 15px;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .video-grid {
+        padding: 20px;
+    }
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="index.html">HOME</a>
+    <a href="station-videos.html">MEET THE TEAM</a>
+    <a href="contribute.html">CONTRIBUTE</a>
+    <a href="volunteer-intro-vids.html">VOLUNTEER</a>
+    <a href="student-spotlight.html">STUDENTS</a>
+</nav>
+
+<div class="header">
+    <h1>Volunteer Training Library</h1>
+    <p>Please watch all required training videos below.</p>
+</div>
+
+<div class="video-grid">
+
+    <!-- Video 1 -->
+    <div class="video-card">
+        <h3>Welcome & Mission Overview</h3>
+        <video controls>
+            <source src="videos/intro.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <!-- Video 2 -->
+    <div class="video-card">
+        <h3>Working with Students</h3>
+        <video controls>
+            <source src="videos/intro.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <!-- Video 3 -->
+    <div class="video-card">
+        <h3>Safety & Expectations</h3>
+        <video controls>
+            <source src="videos/intro.mp4" type="video/mp4">
+        </video>
+    </div>
+
+</div>
+
+</body>
+</html>

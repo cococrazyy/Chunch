@@ -1,0 +1,36 @@
+<!DOCTYPE HTML>
+<HTML>
+  <body>
+    <h1>This is the master list</h1>
+    <button onclick = "toggleForm()">Add Volunteer</button>
+
+    <div id="addForm" style ="display:none; margin-top:15px;">
+      <form method="POST" action ="/admin/master-list/add-volunteer">
+        <input type="text" name="first_name" placeholder="First Name" required>
+        <input type="text" name="last_name" placeholder="Last Name" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <button type="submit">Save</button>
+      </form>
+    </div>
+
+    <script>
+      function toggleForm() {
+        const form = document.getElementById("addForm");
+        form.style.display = form.style.display === "none" ? "block" : "none";
+      }
+    </script>
+      <table border="1" cellpadding="6">
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+        </tr>
+
+        {% for v in volunteers %}
+        <tr>
+            <td>{{ v.first_name }} {{ v.last_name }}</td>
+            <td>{{ v.email }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+  </body>
+</HTML>

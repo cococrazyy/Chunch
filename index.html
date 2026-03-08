@@ -1,9 +1,267 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What is Chunch?</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<!-- Google Identity Services -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://apis.google.com/js/platform.js" async defer></script>
+<meta name="google-signin-client_id" content="483439290581-t6qm63e9rcuvm62l6j3cghvj71eo5h1k.apps.googleusercontent.com">
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background: #f4f6f9;
+    color: #1f2937;
+    line-height: 1.6;
+}
+
+/* NAVBAR */
+.navbar {
+    background: #0f172a;
+    padding: 18px 40px;
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+}
+
+.navbar a {
+    text-decoration: none;
+    color: white;
+    font-weight: 600;
+    padding: 10px 18px;
+    border-radius: 8px;
+    transition: 0.3s ease;
+}
+
+.navbar a:hover {
+    background: #2563eb;
+}
+
+/* MAIN CONTENT */
+.container {
+    max-width: 900px;
+    margin: 80px auto;
+    text-align: center;
+    padding: 0 20px;
+}
+
+h1 {
+    font-size: 48px;
+    margin-bottom: 30px;
+    font-weight: 700;
+    color: #111827;
+}
+
+p {
+    margin-bottom: 18px;
+    font-size: 18px;
+    color: #374151;
+}
+
+/* PRIMARY BUTTON */
+.primary-btn {
+    margin-top: 50px;
+    padding: 18px 40px;
+    font-size: 20px;
+    font-weight: 600;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: white;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+    transition: all 0.3s ease;
+}
+
+.primary-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(37, 99, 235, 0.4);
+}
+
+/* ADMIN BUTTON */
+.admin-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    padding: 12px 24px;
+    border-radius: 30px;
+    border: none;
+    background: #e5e7eb;
+    color: #111827;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.admin-btn:hover {
+    background: #d1d5db;
+}
+
+/* LOGIN MODAL */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.2s ease;
+    z-index: 999;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-content {
+    position: relative;
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    width: 360px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+
+/* FIXED X BUTTON */
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 18px;
+    font-size: 22px;
+    font-weight: 600;
+    cursor: pointer;
+    color: #6b7280;
+    transition: 0.2s ease;
+}
+
+.close-btn:hover {
+    color: #111827;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 36px;
+    }
+
+    .navbar {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+}
+</style>
+</head>
 
 <body>
-  <h1>YOUR NAME</h1>
-  <p>Welcome to my website!</p>
-  <img src="https://content.codecademy.com/articles/github-pages-via-web-app/happy-ice-cream.gif" />
-</body>
 
+<nav class="navbar">
+    <a href="index.html">HOME</a>
+    <a href="station-videos.html">MEET THE TEAM</a>
+    <a href="contribute.html">CONTRIBUTE</a>
+    <a href="volunteer-intro-vids.html">VOLUNTEER</a>
+    <a href="student-spotlight.html">STUDENTS</a>
+</nav>
+
+<div class="container">
+    <h1>What is Chunch?</h1>
+
+    <p>From the first Monday of the fall semester at Southwestern University, murmurs of excitement spread across campus. Often, the source of this joy is two words: church lunch, or “chunch,” as it’s fondly called by students, is a staple of student life.</p>
+
+    <p>Cheryl and Bryan Scott, leaders of the College Ministry at Crestview Baptist Church, can answer that question: church lunch is a free meal for Southwestern students hosted in the gym at Crestview.</p>
+
+    <p>Now, from 11:00 a.m. to 2:00 p.m. on Mondays, the doors are open to serve lunch. Anyone is allowed to come, regardless of religious affiliation. As long as a student needs a good meal, they’re welcome.</p>
+
+    <button class="primary-btn" onclick="window.location.href='volunteer-intro-vids.html'">Apply to Volunteer</button>
+
+</div>
+
+<button class="admin-btn" onclick="openModal()">Admin / Captain Sign In</button>
+
+<!-- LOGIN MODAL -->
+<div class="modal" id="loginModal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">✕</span>
+        <h2>Admin / Captain Login</h2>
+
+        <div id="g_id_onload"
+             data-client_id="483439290581-t6qm63e9rcuvm62l6j3cghvj71eo5h1k.apps.googleusercontent.com"
+             data-callback="handleCredentialResponse"
+             data-auto_prompt="false">
+        </div>
+
+        <div class="g_id_signin"
+             data-type="standard"
+             data-shape="pill"
+             data-theme="outline"
+             data-size="large">
+        </div>
+    </div>
+</div>
+
+<script>
+const modal = document.getElementById("loginModal");
+
+function openModal() {
+    modal.style.display = "flex";
+}
+
+function closeModal() {
+    modal.style.display = "none";
+}
+
+// Close when clicking outside modal
+window.onclick = function(event) {
+    if (event.target === modal) {
+        closeModal();
+    }
+};
+
+// Close with ESC key
+document.addEventListener("keydown", function(event) {
+    if (event.key === "Escape") {
+        closeModal();
+    }
+});
+
+async function handleCredentialResponse(response) {
+   const res = await fetch("/api/google-login", {
+       method: "POST", 
+       headers: {
+           "Content-Type": "application/json"
+       },
+       body: JSON.stringify({
+           credential: response.credential
+       })
+   });
+
+    const data = await res.json();
+
+    if (data.success) {
+        window.location.href = "/admin";
+    } else {
+        alert("You are not authorized.");
+        closeModal();
+    }
+}
+
+function parseJwt(token) {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    return JSON.parse(atob(base64));
+}
+
+</script>
+
+</body>
 </html>
