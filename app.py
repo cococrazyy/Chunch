@@ -293,7 +293,7 @@ def get_sheet():
     credentials = Credentials.from_service_account_info(creds_dict, scopes=scopes)
 
     client = gspread.authorize(credentials)
-    sheet = client.open("Chunch Volunteer Info").sheet1
+    sheet = client.open("Volunteer Information - new").sheet1
     return sheet
 
     
