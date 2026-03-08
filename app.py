@@ -129,33 +129,33 @@ class Assignment(db.Model):
     station = relationship("Station", backref = "assignments")
     schedule = relationship("Schedule", backref = "assignments")
 
-def sync_drive_access(email):
+##def sync_drive_access(email):
 
-    if not os.path.exists("chunchdriveaccess-489601-02c473410f26.json"):
-        raise Exception("Service account JSON file not found")
+    ##if not os.path.exists("chunchdriveaccess-489601-02c473410f26.json"):
+   ##     raise Exception("Service account JSON file not found")
 
-    with open("chunchdriveaccess-489601-02c473410f26.json") as f:
-        creds_dict = json.load(f)
+   ## with open("chunchdriveaccess-489601-02c473410f26.json") as f:
+       ## creds_dict = json.load(f)
 
-    scopes = ["https://www.googleapis.com/auth/drive"]
+   ## scopes = ["https://www.googleapis.com/auth/drive"]
 
-    credentials = Credentials.from_service_account_info(
-        creds_dict,
-        scopes=scopes
-    )
+   ## credentials = Credentials.from_service_account_info(
+      ##  creds_dict,
+       ## scopes=scopes
+    ##)
 
-    service = build("drive", "v3", credentials=credentials)
+    ##service = build("drive", "v3", credentials=credentials)
 
-    folder_id = "1IwmKyFWKEvAB86WKg9I7C9N1BBvrSzD-"
+    ##folder_id = "1IwmKyFWKEvAB86WKg9I7C9N1BBvrSzD-"
 
-    service.permissions().create(
-        fileId=folder_id,
-        body={
-            "type": "user",
-            "role": "reader",
-            "emailAddress": email
-        }
-    ).execute()
+    ##service.permissions().create(
+        ##fileId=folder_id,
+       ## body={
+      ##      "type": "user",
+        ##    "role": "reader",
+      ##      "emailAddress": email
+    ##    }
+   ## ).execute()
 
 if os.environ.get("RUN_DB_INIT") == "1":
     with app.app_context():
@@ -249,14 +249,14 @@ def add_volunteer():
 
     db.session.add(new_volunteer)
     db.session.commit()
-    error_message = None
-    try:
-        sync_drive_access(email)
-    except Exception as e:
-        error_message = str(e)
+  ##  error_message = None
+   ## try:
+      ##  sync_drive_access(email)
+   ## except Exception as e:
+       ## error_message = str(e)
 
-    if error_message:
-        return f"Drive error: {error_message}"
+   ## if error_message:
+      ##  return f"Drive error: {error_message}"
     return redirect("/admin/master-list")
 
     
