@@ -241,7 +241,7 @@ def volunteer_hours():
     # Get all volunteers sorted by last name
     volunteers = Volunteer.query.order_by(Volunteer.last_name).all()
     
-    return render_template("volunteer_hours.html", volunteers=volunteers)
+    return render_template("volunteer-hours.html", volunteers=volunteers)
 
     
 @app.route("/seed-admin")
