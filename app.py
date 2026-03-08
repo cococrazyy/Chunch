@@ -125,6 +125,18 @@ class Assignment(db.Model):
     station = relationship("Station", backref = "assignments")
     schedule = relationship("Schedule", backref = "assignments")
 
+# creating a class that will store the availiablity hours for each person
+class Availability(db.Model):
+    __tablename__ = "availability"
+
+    availability_id = Column(Integer, primary_key=True)
+
+    volunteer_id = Column(Integer, ForeignKey("volunteers.id"))
+
+    day = Column(String(20))     # Example: Monday
+    hour = Column(Integer)       # Example: 8, 9, 10, 11
+
+    volunteer = relationship("Volunteer", backref="availability")
 
 if os.environ.get("RUN_DB_INIT") == "1":
     with app.app_context():
