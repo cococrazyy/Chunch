@@ -307,7 +307,7 @@ def sync_volunteers():
     rows = sheet.get_all_records()
 
     for row in rows:
-        email = row["Email"].strip()
+        email = row["Email (enter N/A) if you do not have one"].strip()
 
         volunteer = Volunteer.query.filter_by(email=email).first()
 
@@ -323,7 +323,7 @@ def sync_volunteers():
 
     # Trying to get the hours added to the data table
     for row in rows:
-        email = row["Email"].strip()
+        email = row["Email (enter N/A) if you do not have one"].strip()
         volunteer = Volunteer.query.filter_by(email=email).first()
         if not volunteer:
             continue  # just in case
