@@ -249,6 +249,7 @@ def add_volunteer():
 
     db.session.add(new_volunteer)
     db.session.commit()
+    flash("DEBUG: route reached")
     try:
         sync_drive_access(email)
         flash("Drive access granted.")
