@@ -129,10 +129,8 @@ class Assignment(db.Model):
     schedule = relationship("Schedule", backref = "assignments")
 
 def sync_drive_access(email):
-    """
-    Give a volunteer view-only access to the Google Drive folder.
-    """
-    # Load the service account credentials from your JSON file
+    print("SYNC DRIVE CALLED FOR:", email)
+
     with open("chunchdriveaccess-489601-02c473410f26.json") as f:
         creds_dict = json.load(f)
 
@@ -141,20 +139,23 @@ def sync_drive_access(email):
     
     service = build('drive', 'v3', credentials=credentials)
 
-    # Folder ID of your Drive folder
     folder_id = "1IwmKyFWKEvAB86WKg9I7C9N1BBvrSzD-"
 
-    # Give the volunteer view-only access
-    service.permissions().create(
-        fileId=folder_id,
-        body={
-            'type': 'user',
-            'role': 'reader',   # view-only
-            'emailAddress': email
-        },
-        fields='id'
-    ).execute()
+    try:
+        result = service.permissions().create(
+            fileId=folder_id,
+            body={
+                "type": "user",
+                "role": "reader",
+                "emailAddress": email
+            },
+            fields="id"
+        ).execute()
 
+        print("DRIVE PERMISSION CREATED:", result)
+
+    except Exception as e:
+        print("DRIVE PERMISSION FAILED:", e)
 
 if os.environ.get("RUN_DB_INIT") == "1":
     with app.app_context():
