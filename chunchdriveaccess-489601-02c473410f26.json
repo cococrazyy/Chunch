@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "chunchdriveaccess-489601",
+  "private_key_id": "02c473410f26f122920db6f41c7e55b54e85795c",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC5LcS+V1RkZJQj\nnjP8h6/ThvkZJxHNQLZ24hB+HwsEtsxjsjE3ab1k+Z/l7e5EipKNr0nTPif+36GO\nlpDz0jK7e3QmyBqXId1oJdJ1cRpE+pd7dAyWkP6d5AtrW/Z9HXBrPNAP/p4R48UK\nj7p/1tKi2dcyDBwZ3EgMHAyCDd2LsMlTkkV1EfQ63ryiRmULcpqlZfqtQ5pHA/5a\nh9Kqxjal+qI84mjnCx15a/umU5EYSpOpk5TWJIcGYrfGkWGxUStnFk8+WX5EJRpT\nsfJg4uUNEICcig9MQfpMdgU0SwCrpIRNTSP1v5VA6oUy4n2KzK0kjl5DwrPPq+O6\nUMTHR7m1AgMBAAECggEABkV2Cco0WfgMCk7DzPQdcMj7662mjTB5XXpXe6X6fgzg\nzCmPQCStHNvVXfiaXqjgwLqkgepzeU7Cjm0r+I3wWOgb7WpOeDrV4D6Tq5WKgbaI\n5c3u1TSQ4vEDr/2b0e3qzj7vfvMtEEcJ98sZUlYIqSo+fvvpAbkzmXFjvQ3SKHZj\n7grqp1uG7dwjjvajozIttwU2KQb2DlH7/3e041LkUml4fhWiTL8M9tj+rkHt1eeK\nFawfQgRsJ70kDGCM3+V3zU4fWPy9gNyfZVkELUIrPBm+dhDzwL+0/1uLIWhWtTs2\nRpIerPQzDZ9h9+78pPhBPw7Nyq5yXzAI3MUxRyp0ewKBgQDyVyIG4FM9o5n0PgwG\nONxs2U6VSp4eb8geMK6dmHagC24YJpSGHRhOh0AGt80X2JKb1bCUjEbAIJGM3AmA\nBs9skx8F+W0zxCVqRxROTfghhYh2G8vT6PHTeg10HOVJLWINeLNddQT31owaDCmO\nCu8IjA74EtDOkIyjLHMlgey8LwKBgQDDndGR4i0BDoYTSzvbstTRyiOZ9BPp2Alg\nizsIi9ksdGUai7UDrMjMxCe+WKBqKIyonxgfs/Wh+EuRvabSVPEVpgLcQlFUwOvg\nfvyfI+PYFjYGt/GjLAL1vJqvFfWIttgA3IN8cfrNL/SyoFrdoGdV5Zj28jq6NXG3\nJcOMqN47WwKBgQCFCcSKVdgcvJWl+fIL8GdB8kIrvxzyxJbty/fwWGS3E89KvtNG\nlO5lHebOSVT0RFan6jXYNvIYQ0jkNV+ZwyNYDaQ4WWfTxVhs8bx6CF+xt2bkv/mz\nyewIFrcQCVTuSVXM43hEVBt4G3YqTob5jZMP9CO7mEi9PamXYq2L57mYzQKBgDzy\nd/Au+vygTM/IGf9KiZpPk6YM8QNjxxAocR0pjWGXZkTOEHjzpaB+4S8iJ+DLf3+u\nCfMeu8JaPRlMcKSJyI+JKMz9cJ+qeBN7HTRsFzolOXIAb636MXXk7IDuo5CT/1rN\nWb41OQIjFedtpMH2jxupLG6MbBXGPwbkIjg6CPuPAoGAaBs+RF0LnJfXa0TBA8mc\nODHp3jkxmgYgJxt4k0RJWlwmHaCn44m1GqJ76GVVFAH0twtLqy8YyjTxnHhTPgnH\nEtaZ2BkPoopvjJE/AovHrL8oKUaHb5G6OhWR+TM/dSFCUm2oNU3AOiNB3h/RSgW/\n7/pg/SPI5g/LHyvTSpJ+56Y=\n-----END PRIVATE KEY-----\n",
+  "client_email": "drive-access-bot@chunchdriveaccess-489601.iam.gserviceaccount.com",
+  "client_id": "110378472347928967946",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/drive-access-bot%40chunchdriveaccess-489601.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
