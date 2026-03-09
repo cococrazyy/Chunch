@@ -14,6 +14,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from flask import render_template
 from googleapiclient.discovery import build
 from flask_softdelete import SoftDeleteMixin
+from flask_migrate import Migrate
 
 app = Flask(__name__, static_folder='.', static_url_path='')
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
@@ -28,6 +29,7 @@ class Base(DeclarativeBase):
     pass
 
 db = SQLAlchemy(model_class=Base)
+migrate = Migrate(app, db)
 db_url = os.environ.get("DATABASE_URL")
 
 #render sometimes gives postgres://, sqlalchemy needs postgresql://
