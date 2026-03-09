@@ -2,7 +2,7 @@ from flask import Flask, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy import Column, Integer, String
-from sqlalchemy import Column, Integer, String, Enum, Date, Time
+from sqlalchemy import Column, Integer, String, Enum, Date, Time, Boolean
 from sqlalchemy.orm import DeclarativeBase, relationship
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship, backref
@@ -13,6 +13,7 @@ from google.auth.transport import requests as grequests
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask import render_template
 from googleapiclient.discovery import build
+from flask_softdelete import SoftDeleteMixIn
 
 app = Flask(__name__, static_folder='.', static_url_path='')
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
@@ -39,7 +40,7 @@ db.init_app(app)
 
 # creating a volunteer class
 #class Volunteer(db.Model, SoftDeleteMixin):
-class Volunteer(db.Model):
+class Volunteer(db.Model, SoftDeleteMixin):
 
     __tablename__ = "volunteers"
 
@@ -51,7 +52,7 @@ class Volunteer(db.Model):
     email = Column(String(100), unique=True)
 
 # for people signing up to volunteer that will be placed in inbox
-class Applicant(db.Model):
+class Applicant(db.Model, SoftDeleteMixin):
     __tablename__ = "applicants"
 
     id = Column(Integer, primary_key=True)
@@ -63,7 +64,7 @@ class Applicant(db.Model):
     
 # creating user account class
 # only admins and captains should have be on this table
-class UserAccount(db.Model):
+class UserAccount(db.Model, SoftDeleteMixin):
     __tablename__ = "user_account"
 
     user_id = Column(Integer, primary_key=True)
@@ -81,7 +82,7 @@ class UserAccount(db.Model):
     volunteer = relationship("Volunteer", backref="account")
 
 # creating a stations table
-class Station(db.Model):
+class Station(db.Model, SoftDeleteMixin):
     __tablename__ = "station"
     station_id = Column(Integer, primary_key=True)
 
@@ -107,14 +108,14 @@ class Station(db.Model):
     )
 
 # creating schedule table
-class Schedule(db.Model):
+class Schedule(db.Model, SoftDeleteMixin):
     __tablename__ = "schedule"
     schedule_id = Column(Integer, primary_key=True)
     date = Column(Date)
     time = Column(Time)
 
 # creating assignment table
-class Assignment(db.Model):
+class Assignment(db.Model, SoftDeleteMixin):
     __tablename__ = "assignments"
     assignment_id = Column(Integer, primary_key=True)
     
@@ -129,7 +130,7 @@ class Assignment(db.Model):
     schedule = relationship("Schedule", backref = "assignments")
 
 # creating a class that will store the availiablity hours for each person
-class Availability(db.Model):
+class Availability(db.Model, SoftDeleteMixin):
     __tablename__ = "availability"
 
     availability_id = Column(Integer, primary_key=True)
@@ -143,6 +144,7 @@ class Availability(db.Model):
 if os.environ.get("RUN_DB_INIT") == "1":
     with app.app_context():
         db.create_all()
+        
 # Serve your existing HTML pages
 @app.route("/")
 def home():
@@ -207,7 +209,7 @@ def admin_page():
 
 @app.route("/admin/master-list")
 def master_list():
-    volunteers = Volunteer.query.order_by(Volunteer.last_name).all()
+    volunteers = Volunteer.query.filter_by(deleted_at = None).order_by(Volunteer.last_name).all()
     return render_template("master-list.html", volunteers=volunteers)
     
 @app.route("/admin/master-list/add-volunteer", methods=["POST"])
@@ -233,6 +235,18 @@ def add_volunteer():
     db.session.add(new_volunteer)
     db.session.commit()
     grant_drive_access(new_volunteer.email)
+    return redirect("/admin/master-list")
+
+#soft deleting a user
+@app.route("/admin/master-list/delete-volunteer/<int:volunteer_id>", methods=["POST"])
+def delete_volunteer(volunteer_id):
+    if "user_id" not in session:
+        return redirect("/")
+
+    volunteer = Volunteer.query.get_or_404(volunteer_id)
+    volunteer.soft_delete()
+    db.session.commit()
+
     return redirect("/admin/master-list")
 
 # Adding route to new volunteer hours page
@@ -352,7 +366,7 @@ def sync_volunteers():
     for row in rows:
         email = row["Email (enter N/A) if you do not have one"].strip()
 
-        volunteer = Volunteer.query.filter_by(email=email).first()
+        volunteer = Volunteer.query.filter_by(email=email, deleted_at=None).first()
 
         if not volunteer:
             volunteer = Volunteer(
