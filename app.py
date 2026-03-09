@@ -12,6 +12,7 @@ from google.oauth2 import id_token
 from google.auth.transport import requests as grequests
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask import render_template
+from googleapiclient.discovery import build
 
 app = Flask(__name__, static_folder='.', static_url_path='')
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
@@ -231,6 +232,7 @@ def add_volunteer():
 
     db.session.add(new_volunteer)
     db.session.commit()
+    grant_drive_access(new_volunteer.email)
     return redirect("/admin/master-list")
 
 # Adding route to new volunteer hours page
@@ -302,6 +304,41 @@ def get_sheet():
     client = gspread.authorize(credentials)
     sheet = client.open("Volunteer Information - new").sheet1
     return sheet
+
+
+def get_drive_service():
+    creds_dict = json.loads(os.environ["GOOGLE_DRIVE_JSON"])
+
+    scopes = ["https://www.googleapis.com/auth/drive"]
+
+    credentials = Credentials.from_service_account_info(
+        creds_dict,
+        scopes=scopes
+    )
+
+    service = build("drive", "v3", credentials=credentials)
+
+    return service
+
+DRIVE_FOLDER_ID = "1IwmKyFWKEvAB86WKg9I7C9N1BBvrSzD-"
+
+def grant_drive_access(email):
+    service = get_drive_service()
+
+    permission = {
+        "type": "user",
+        "role": "reader",
+        "emailAddress": email
+    }
+
+    try:
+        service.permissions().create(
+            fileId=DRIVE_FOLDER_ID,
+            body=permission,
+            sendNotificationEmail=False
+        ).execute()
+    except Exception as e:
+        print(f"Drive permission error for {email}: {e}")
 
     
 @app.route("/admin/sync-volunteers", methods=["POST"])
