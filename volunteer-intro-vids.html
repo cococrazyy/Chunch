@@ -67,7 +67,7 @@ body {
 }
 
 /* Video styling */
-#introVideo {
+#volunteerInfo {
     width: 100%;
     max-width: 700px;
     height: auto;
@@ -146,8 +146,8 @@ body {
 
     <!-- Right video -->
     <div class="video-section">
-        <video id="introVideo" controls>
-            <source src="videos/intro.mp4" type="video/mp4">
+        <video id="volunteerInfo" controls>
+            <source src="/src/assets/videos/volunteer-info.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
         <button class="next-btn" id="nextButton" onclick="window.open('https://docs.google.com/forms/d/e/1FAIpQLSdtGQnJA_nq1lhP6xkpLDxxXegEY-QkyDjpbx38Iwdk2W_EvA/viewform?usp=header')">Next</button>
@@ -160,7 +160,7 @@ body {
 
 <script>
 // Show Next button after video ends
-const video = document.getElementById("introVideo");
+const video = document.getElementById("volunteerInfo");
 const nextButton = document.getElementById("nextButton");
 
 video.addEventListener("ended", () => {

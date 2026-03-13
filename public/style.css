@@ -1,0 +1,166 @@
+/* Custom font: Atkinson Hyperlegible from the internet */
+@font-face {
+    font-family: 'Atkinson Hyperlegible', sans-serif;
+    src: url('../src/assets/fonts/Atkinson-Hyperlegible-Regular.woff2') format('woff2'),
+         url('../src/assets/fonts/Atkinson-Hyperlegible-Regular.woff') format('woff');
+}
+@font-face {
+    font-family: 'Atkinson Hyperlegible', sans-serif;
+    src: url('../src/assets/fonts/Atkinson-Hyperlegible-Bold.woff2') format('woff2'),
+         url('../src/assets/fonts/Atkinson-Hyperlegible-Bold.woff') format('woff');
+    font-weight: bold;
+}
+@font-face {
+    font-family: 'Atkinson Hyperlegible', sans-serif;
+    src: url('../src/assets/fonts/Atkinson-Hyperlegible-Italic.woff2') format('woff2'),
+         url('../src/assets/fonts/Atkinson-Hyperlegible-Italic.woff') format('woff');
+    font-style: italic;
+}
+@font-face {
+    font-family: 'Atkinson Hyperlegible', sans-serif;
+    src: url('../src/assets/fonts/Atkinson-Hyperlegible-BoldItalic.woff2') format('woff2'),
+         url('../src/assets/fonts/Atkinson-Hyperlegible-BoldItalic.woff') format('woff');
+    font-weight: bold; /* 700 */
+    font-style: italic;
+}
+
+/* Document style */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Atkinson Hyperlegible', sans-serif;
+}
+body {
+    background: #f4f6f9;
+    color: #1f2937;
+    line-height: 1.6;
+}
+
+/* NAVBAR */
+.navbar {
+    background: #0f172a;
+    padding: 18px 40px;
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+}
+.navbar a {
+    text-decoration: none;
+    color: white;
+    font-weight: 600;
+    padding: 10px 18px;
+    border-radius: 8px;
+    transition: 0.3s ease;
+}
+.navbar a:hover {
+    background: #2563eb;
+}
+
+/* MAIN CONTENT */
+.container {
+    max-width: 900px;
+    margin: 80px auto;
+    text-align: justify;
+    text-align-last: left;
+    padding: 0 20px;
+}
+h1 {
+    font-size: 48px;
+    margin-bottom: 30px;
+    font-weight: 700;
+    color: #111827;
+}
+p {
+    margin-bottom: 18px;
+    font-size: 18px;
+    color: #374151;
+}
+
+/* PRIMARY BUTTON */
+.primary-btn {
+    margin-top: 50px;
+    padding: 18px 40px;
+    font-size: 20px;
+    font-weight: 600;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: white;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+    transition: all 0.3s ease;
+}
+.primary-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(37, 99, 235, 0.4);
+}
+
+/* ADMIN BUTTON */
+.admin-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    padding: 12px 24px;
+    border-radius: 30px;
+    border: none;
+    background: #e5e7eb;
+    color: #111827;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+.admin-btn:hover {
+    background: #d1d5db;
+}
+
+/* LOGIN MODAL */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.2s ease;
+    z-index: 999;
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+.modal-content {
+    position: relative;
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    width: 360px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+
+/* FIXED X BUTTON */
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 18px;
+    font-size: 22px;
+    font-weight: 600;
+    cursor: pointer;
+    color: #6b7280;
+    transition: 0.2s ease;
+}
+.close-btn:hover {
+    color: #111827;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 36px;
+    }
+    .navbar {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+}

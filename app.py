@@ -15,6 +15,7 @@ from flask import render_template
 from googleapiclient.discovery import build
 from flask_softdelete import SoftDeleteMixin
 from flask_migrate import Migrate
+from flask import render_template
 
 app = Flask(__name__, static_folder='.', static_url_path='')
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
@@ -206,6 +207,17 @@ def me():
     
 @app.route("/admin")
 def admin_page():
+    if "user_id" not in session:
+        return redirect("/")
+    return render_template("admin.html")
+
+@app.route("/admin/master-list")
+def master_list():
+    volunteers = Volunteer.query.order_by(Volunteer.last_name).all()
+    return render_template("master-list.html", volunteers=volunteers)
+    
+@app.route("/admin/master-list/add-volunteer", methods=["POST"])
+def add_volunteer():
     if "user_id" not in session:
         return redirect("/")
     return render_template("admin.html")

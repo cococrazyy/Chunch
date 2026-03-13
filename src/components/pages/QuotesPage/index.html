@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Student Spotlight</title>
+
+        <!-- <link rel="stylesheet" href="style.css"> -->
+        <!-- TODO: Import .css file -->
+        <!-- TODO: Delete temporary font import -->
+        
+        <!-- Temporary font import -->
+        <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
+        <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Atkinson Hyperlegible', sans-serif;
+        }
+
+        body {
+            background: #f4f6f9;
+            color: #1f2937;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: #0f172a;
+            padding: 18px 40px;
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+        .navbar a {
+            text-decoration: none;
+            color: white;
+            font-weight: 600;
+            padding: 10px 18px;
+            border-radius: 8px;
+            transition: 0.3s ease;
+        }
+        .navbar a:hover {
+            background: #2563eb;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 900px;
+            margin: 100px auto;
+            padding: 0 20px;
+            text-align: center;
+        }
+
+        .review {
+            margin: 60px auto;
+            background: white; /* White card background */
+            padding: 30px; /* Space inside card */
+            width: 80%; /* Card width */
+            text-align: left;
+        }
+        .student {
+            text-align: right;
+            padding-right: 60px;
+            padding-bottom: 5px;
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #111827;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #6b7280;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+
+            .navbar {
+                gap: 12px;
+                padding: 15px 20px;
+            }
+
+            .container {
+                margin: 60px auto;
+            }
+
+            h1 {
+                font-size: 34px;
+            }
+
+            .subtitle {
+                font-size: 16px;
+            }
+        }
+
+        </style>
+    </head>
+
+    <body>
+
+        <nav class="navbar">
+            <a href="../../../../public/index.html">HOME</a>
+            <a href="../MeetTheTeamPage/index.html">MEET THE TEAM</a>
+            <a href="../DonatePage/index.html">CONTRIBUTE</a>
+            <a href="../VolunteerPage/index.html">VOLUNTEER</a>
+            <a href="index.html">STUDENTS</a>
+        </nav>
+
+        <div class="container">
+            <h1>Student Spotlight</h1>
+            <p class="subtitle">Hear directly from students about what Chunch means to them.</p>
+            <div class="review">
+                <p>"What's up Chunch"</p>
+                <div class="student">
+                    <p>~ Name</p>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

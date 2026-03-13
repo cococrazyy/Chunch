@@ -1,0 +1,71 @@
+<!--
+    Initial log-in page from home.
+-->
+<!DOCTYPE html>
+<html lang="en-US">
+    <head> 
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Sign In</title>
+
+        <!-- Temporary font import -->
+        <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+        <!-- <link rel="stylesheet" href="style.css"> -->
+
+        <style>
+        * {
+            margin: 0;
+            text-align: center;
+        }
+        h1 {
+            margin-top: 50px;
+        }
+        .sign-in {
+            height: 40px;
+            width: 100px;
+            display: block;
+            margin: 40px auto;
+        }
+        #form {
+            display: none;
+            text-align: left;
+            margin-top: 50px;
+        }
+        
+        </style>
+    </head>
+    <body>  
+        <h1>Log-In to View Schedule</h1>
+        <div id="form">
+            <form>
+                <label for="username">Username:</label><br>
+                <input type="text" id="username"><br>
+                <label for="password">Password:</label><br>
+                <input type="text" id="password"><br><br>
+				<button type="button" class="back" onclick="hideForm()">Back</button>
+                <input type="submit" value="Submit">
+            </form>
+        </div>
+        <div id="loginType">
+            <button type="button" class="sign-in" onclick="showForm()">Admin</button>
+            <button type="button" class="sign-in" onclick="showForm()">Captain</button>
+        </div>
+
+        <script> 
+        function showForm() {
+            var x = document.getElementById("loginType");
+            var y = document.getElementById("form");
+            y.style.display = "block";
+            x.style.display = "none";
+        }
+        </script>
+        <script>
+        function hideForm() {
+            var x = document.getElementById("loginType");
+            var y = document.getElementById("form");
+            y.style.display = "none";
+            x.style.display = "block";
+        }
+        </script>
+    </body>
+</html>

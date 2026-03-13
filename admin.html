@@ -1,0 +1,229 @@
+<!--
+  Home page of administrator/their dashboard
+-->
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Home</title>
+
+    <!-- <link rel="stylesheet" href="style.css"> -->
+    <!-- TODO: Import .css file -->
+    <!-- TODO: Delete temporary font import -->
+    
+    <!-- Temporary font import -->
+    <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
+    <!-- TODO: Move into a .css file -->
+    <style>
+      * {
+        box-sizing: border-box;
+        font-family: 'Atkinson Hyperlegible', sans-serif;
+      }
+      body {
+        margin: 0;
+      }
+      header {
+        padding: 20px;
+        text-align: center;
+        background: #595959;
+        color: white;
+      }
+      .navbar {
+        display: flex;
+        background-color: #E5E5E5;
+      }
+      .navbar a {
+        color: #595959;
+        padding: 14px 20px;
+        text-decoration: none;
+        text-align: center;
+      }
+      .navbar a:hover {
+        background-color: #888;
+        color: black;
+      }
+
+      .container {
+        display: flex;
+        flex-wrap: wrap;
+      }
+      .side {
+        height: 100%;
+        width: 10vw;
+        position: fixed;
+        z-index: 1;
+        background-color: #e5e3e3ff;
+      }
+      .main {
+        margin-left: 10vw;
+        background-color: white;
+        padding: 20px;
+        border: 1px dashed #AAA;
+      }
+      .schedule {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        padding: 15px;
+      }
+      .schedule div {
+        display: grid;
+        border: 1px solid black;
+        padding: 15px;
+        margin: 10px;
+        text-align: center;
+      }
+
+      .schedule div table {
+        margin-top: 15px;
+        font-size: 12px;
+      }
+      /* Responsive layout - when the screen is less than 700px wide, make the two columns stack on top of each other instead of next to each other */
+      @media screen and (max-width: 700px) {
+        .container, .navbar {   
+          flex-direction: column;
+        }
+      }
+      /* Responsive layout - when the screen is less than 450 px wide,  */
+      @media screen and (max-height: 450px) {
+        .side {padding-top: 15px;}
+        .side a {font-size: 18px;}
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Maybe change all of these to buttons instead -->
+    <nav class="navbar"> <!-- vertical navigation menus -->
+      <a href="admin.html">Home</a>
+      <a href="schedule.html">Show Schedule</a>
+      <a href="inbox.html">Inbox</a>
+    </nav>
+
+    <!-- not needed rn -->
+    <!-- <button type="button" class="inbox" onclick="window.location.href='inbox.html'">Inbox</button> -->
+    
+    
+    <!-- Contains all of center view -->
+    <div class="container">
+      <div class="side">
+        <p>Thing 1</p>
+        <p>Thing 2</p>
+      </div>
+      <!-- Contains all of center view -->
+      <div class="main">
+        <!-- Contains station schedule -->
+      <div class="schedule">
+        <div>
+          <h3>Servers</h3>
+          <!-- Tables with columns for names, shift times, and contact information -->
+          <table>
+            <tr>
+              <th>Name</th>
+              <th>Time</th>
+              <th>Contact</th>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+          </table>
+        </div>
+        <div>
+          <h3>Drinks</h3>
+          <table>
+            <tr>
+              <th>Name</th>
+              <th>Time</th>
+              <th>Contact</th>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+          </table>
+        </div>
+        <div>
+          <h3>Desserts</h3>
+          <table>
+            <tr>
+              <th>Name</th>
+              <th>Time</th>
+              <th>Contact</th>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+          </table>
+        </div>
+        <div>
+          <h3>Kitchen</h3>
+          <table>
+            <tr>
+              <th>Name</th>
+              <th>Time</th>
+              <th>Contact</th>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+          </table>
+        </div>
+        <div>
+          <h3>Dishes</h3>
+          <table>
+            <tr>
+              <th>Name</th>
+              <th>Time</th>
+              <th>Contact</th>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+          </table>
+        </div>
+        <div>
+          <h3>Bussboys</h3>
+          <table>
+            <tr>
+              <th>Name</th>
+              <th>Time</th>
+              <th>Contact</th>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    <script>
+    const user = localStorage.getItem("chunchUser");
+
+    if (!user) {
+      window.location.href = "index.html";
+    }
+    </script>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const name = localStorage.getItem("chunchName");
+      if (name) {
+        document.getElementById("welcome").innerText = 
+          "Welcome, " + name;
+      }
+    });                       
+    </script>
+  </body>
+</html>

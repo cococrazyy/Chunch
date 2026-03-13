@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Home</title>
+        
+        <link rel="stylesheet" href="style.css">
+
+        <!-- Google Identity Services -->
+        <script src="https://accounts.google.com/gsi/client" async defer></script>
+        <script src="https://apis.google.com/js/platform.js" async defer></script>
+        <meta name="google-signin-client_id" content="483439290581-t6qm63e9rcuvm62l6j3cghvj71eo5h1k.apps.googleusercontent.com">
+    </head>
+
+    <body>
+
+        <nav class="navbar">
+            <a href="index.html">HOME</a>
+            <a href="../src/components/pages/MeetTheTeamPage/index.html">MEET THE TEAM</a>
+            <a href="../src/components/pages/DonatePage/index.html">CONTRIBUTE</a>
+            <a href="../src/components/pages/DonatePage/index.html">VOLUNTEER</a>
+            <a href="../src/components/pages/QuotesPage/index.html">STUDENTS</a>
+        </nav>
+
+        <div class="container">
+            <h1>What is Chunch?</h1>
+
+            <p>From the first Monday of the fall semester at Southwestern University, murmurs of excitement spread across campus. Often, the source of this joy is two words: church lunch, or “chunch,” as it’s fondly called by students, is a staple of student life.</p>
+
+            <p>Cheryl and Bryan Scott, leaders of the College Ministry at Crestview Baptist Church, can answer that question: church lunch is a free meal for Southwestern students hosted in the gym at Crestview.</p>
+
+            <p>Now, from 11:00 a.m. to 2:00 p.m. on Mondays, the doors are open to serve lunch. Anyone is allowed to come, regardless of religious affiliation. As long as a student needs a good meal, they’re welcome.</p>
+
+            <button class="primary-btn" onclick="window.location.href='volunteer-intro-vids.html'">Apply to Volunteer</button>
+
+        </div>
+
+        <button class="admin-btn" onclick="openModal()">Admin / Captain Sign In</button>
+
+        <!-- LOGIN MODAL -->
+        <div class="modal" id="loginModal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeModal()">✕</span>
+                <h2>Admin / Captain Login</h2>
+
+                <div id="g_id_onload"
+                    data-client_id="483439290581-t6qm63e9rcuvm62l6j3cghvj71eo5h1k.apps.googleusercontent.com"
+                    data-callback="handleCredentialResponse"
+                    data-auto_prompt="false">
+                </div>
+
+                <div class="g_id_signin"
+                    data-type="standard"
+                    data-shape="pill"
+                    data-theme="outline"
+                    data-size="large">
+                </div>
+            </div>
+        </div>
+
+        <script>
+        const modal = document.getElementById("loginModal");
+
+        function openModal() {
+            modal.style.display = "flex";
+        }
+
+        function closeModal() {
+            modal.style.display = "none";
+        }
+
+        // Close when clicking outside modal
+        window.onclick = function(event) {
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+
+        // Close with ESC key
+        document.addEventListener("keydown", function(event) {
+            if (event.key === "Escape") {
+                closeModal();
+            }
+        });
+
+        async function handleCredentialResponse(response) {
+        const res = await fetch("/api/google-login", {
+            method: "POST", 
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                credential: response.credential
+            })
+        });
+
+            const data = await res.json();
+
+            if (data.success) {
+                window.location.href = "/admin";
+            } else {
+                alert("You are not authorized.");
+                closeModal();
+            }
+        }
+
+        function parseJwt(token) {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            return JSON.parse(atob(base64));
+        }
+
+        </script>
+
+    </body>
+</html>

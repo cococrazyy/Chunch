@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <!-- Google Identity Services -->
+        <script src="https://accounts.google.com/gsi/client" async defer></script>
+        <script src="https://apis.google.com/js/platform.js" async defer></script>
+        <meta name="google-signin-client_id" content="483439290581-t6qm63e9rcuvm62l6j3cghvj71eo5h1k.apps.googleusercontent.com">
+    </head>
+    <body>
+        <!-- LOGIN MODAL -->
+        <div class="modal" id="loginModal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeModal()">✕</span>
+                <h2>Admin / Captain Login</h2>
+
+                <div id="g_id_onload"
+                    data-client_id="483439290581-t6qm63e9rcuvm62l6j3cghvj71eo5h1k.apps.googleusercontent.com"
+                    data-callback="handleCredentialResponse"
+                    data-auto_prompt="false">
+                </div>
+
+                <div class="g_id_signin"
+                    data-type="standard"
+                    data-shape="pill"
+                    data-theme="outline"
+                    data-size="large">
+                </div>
+            </div>
+        </div>
+        <script>
+        const modal = document.getElementById("loginModal");
+
+        function openModal() {
+            modal.style.display = "flex";
+        }
+
+        function closeModal() {
+            modal.style.display = "none";
+        }
+
+        // Close when clicking outside modal
+        window.onclick = function(event) {
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+
+        // Close with ESC key
+        document.addEventListener("keydown", function(event) {
+            if (event.key === "Escape") {
+                closeModal();
+            }
+        });
+
+        async function handleCredentialResponse(response) {
+        const res = await fetch("/api/google-login", {
+            method: "POST", 
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                credential: response.credential
+            })
+        });
+
+            const data = await res.json();
+
+            if (data.success) {
+                window.location.href = "/admin";
+            } else {
+                alert("You are not authorized.");
+                closeModal();
+            }
+        }
+
+        function parseJwt(token) {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            return JSON.parse(atob(base64));
+        }
+
+        </script>
+    </body>
+</html>

@@ -1,0 +1,75 @@
+@font-face {
+    font-family: 'Hyperlegible';
+    src: local('Hyperlegible'), 
+        url('../../../assets/fonts/Atkinson-Hyperlegible-Regular.woff2') format('woff2'),
+        url('../../../assets/fonts/Atkinson-Hyperlegible-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Hyperlegible';
+    src: local('Hyperlegible'),
+        url('../../../assets/fonts/Atkinson-Hyperlegible-Bold.woff2') format('woff2'),
+        url('../../../assets/fonts/Atkinson-Hyperlegible-Bold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Hyperlegible';
+    src: local('Hyperlegible'),
+        url('../../../assets/fonts/Atkinson-Hyperlegible-Italic.woff2') format('woff2'),
+        url('../../../assets/fonts/Atkinson-Hyperlegible-Italic.woff') format('woff');
+    font-weight: normal; /* 2 numbers between 1 and 1000 and "normal" "lighter" "bold" "bolder" */
+    font-style: italic;
+}
+@font-face {
+    font-family: 'Hyperlegible';
+    src: local('Hyperlegible') 
+        url('../../../assets/fonts/Atkinson-Hyperlegible-BoldItalic.woff2') format('woff2'),
+        url('../../../assets/fonts/Atkinson-Hyperlegible-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+    font-family: 'Hyperlegible', regular;
+    text-align: left;
+}
+
+h1 {
+    color: black;
+}
+
+nav {
+    /* THE navigation bar */
+    ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background-color: gray;
+    }
+
+    /* alignment of buttons/tabs */
+    ul li {
+        float: left; /* makes listed element float next to each other */
+    }
+
+    /* format of menu option text */
+    ul li a {
+        display: block; /* specify padding, height, width, margins to <a> */
+        color: white;
+        text-align: center;
+        padding: 14px 16px; /* height px, width px of tab */
+        text-decoration: none; /* removes underline from link */
+    }
+    /* format when tab is hovered on */
+    ul li a:hover {
+        /* changes background color only */
+        background-color: black;
+    }
+}
+
+.container {
+    text-align: left;
+}
