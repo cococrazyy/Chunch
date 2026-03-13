@@ -417,7 +417,7 @@ def sync_volunteers():
 
     db.session.commit()  # commit the new availability rows
 
-    return redirect("/admin")
+    return redirect("/admin/master-list")
     
 #attempting to write a flask cli command to add admins
 import click
