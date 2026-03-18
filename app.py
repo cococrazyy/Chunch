@@ -129,6 +129,8 @@ class Assignment(db.Model, SoftDeleteMixin):
     
     created_by = Column(Integer, ForeignKey("user_account.user_id"))
 
+    original_station_id = Column(Integer, ForeignKey("station.station_id"))
+
     volunteer = relationship("Volunteer", backref = "assignments")
     station = relationship("Station", backref = "assignments")
     schedule = relationship("Schedule", backref = "assignments")
