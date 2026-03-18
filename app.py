@@ -197,6 +197,11 @@ def google_login():
 
     return jsonify({"success": True})
 
+@app.route("/debug/absent-id")
+def get_absent_id():
+    absent = Station.query.filter_by(station_name="Absent").first()
+    return {"absent_id": absent.station_id if absent else None}
+
 @app.route("/api/me")
 def me():
     if "user_id" not in session:
