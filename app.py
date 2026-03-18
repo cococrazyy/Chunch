@@ -229,11 +229,6 @@ def add_volunteer():
         return redirect("/")
     return render_template("admin.html")
 
-@app.route("/admin/master-list")
-def master_list():
-    volunteers = Volunteer.query.filter_by(deleted_at = None).order_by(Volunteer.last_name).all()
-    return render_template("master-list.html", volunteers=volunteers)
-    
 @app.route("/admin/master-list/add-volunteer", methods=["POST"])
 def add_volunteer():
     if "user_id" not in session:
