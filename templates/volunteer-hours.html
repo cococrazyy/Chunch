@@ -10,8 +10,7 @@
     <canvas id="hoursChart"></canvas>
 
 <script>
-    const data = {{ volunteer_data | tojson }};
-
+    const data = JSON.parse('{{ volunteer_data | tojson | safe }}');
     const labels = data.map(v => v.name);
     const hoursWorked = data.map(v => v.hours.length);
 
