@@ -285,71 +285,96 @@ def volunteer_hours():
 
     station_data = {}
 
-    for station in stations:
-        station_name = station.station_name
-        station_data[station_name] = []
+    def parse_hours(availability_rows):
+        cleaned_hours = []
 
-        assigned_volunteer_ids = {
-            a.volunteer_id for a in station.assignments
-            if a.deleted_at is None and a.volunteer_id is not None
-        }
-
-        for v in volunteers:
-            if v.id not in assigned_volunteer_ids:
+        for row in availability_rows:
+            if row.deleted_at is not None:
                 continue
 
-            hours = sorted(
-                int(a.hour) for a in v.availability
-                if a.deleted_at is None
-            )
+            try:
+                hour = int(str(row.hour).strip())
+            except (ValueError, TypeError):
+                continue
 
-            def format_hour(h):
-                if h == 0:
-                    return "12AM"
-                elif h < 12:
-                    return f"{h}AM"
-                elif h == 12:
-                    return "12PM"
-                else:
-                    return f"{h-12}PM"
+            if 5 <= hour <= 16:
+                cleaned_hours.append(hour)
 
-            if hours:
-                ranges = []
-                start = hours[0]
-                prev = hours[0]
+        return sorted(set(cleaned_hours))
 
-                for h in hours[1:]:
-                    if h == prev + 1:
-                        prev = h
-                    else:
-                        ranges.append([start, prev])
-                        start = h
-                        prev = h
+    def build_ranges(hours):
+        if not hours:
+            return []
 
-                ranges.append([start, prev])
+        ranges = []
+        start = hours[0]
+        prev = hours[0]
 
-                display_ranges = [
-                    f"{format_hour(start)}-{format_hour(end)}"
-                    for start, end in ranges
-                ]
-                hour_range = ", ".join(display_ranges)
+        for h in hours[1:]:
+            if h == prev + 1:
+                prev = h
             else:
-                ranges = []
-                hour_range = "N/A"
+                ranges.append([start, prev])
+                start = h
+                prev = h
 
-            station_data[station_name].append({
-                "name": f"{v.first_name} {v.last_name}",
-                "email": v.email,
-                "hours": hours,
-                "ranges": ranges,
-                "range_label": hour_range
-            })
+        ranges.append([start, prev])
+        return ranges
+
+    def format_hour(h):
+        if h == 0:
+            return "12AM"
+        elif h < 12:
+            return f"{h}AM"
+        elif h == 12:
+            return "12PM"
+        else:
+            return f"{h-12}PM"
+
+    volunteer_hours_map = {}
+    for v in volunteers:
+        hours = parse_hours(v.availability)
+        ranges = build_ranges(hours)
+
+        if ranges:
+            range_label = ", ".join(
+                f"{format_hour(start)}-{format_hour(end)}"
+                for start, end in ranges
+            )
+        else:
+            range_label = "N/A"
+
+        volunteer_hours_map[v.id] = {
+            "name": f"{v.first_name} {v.last_name}",
+            "email": v.email,
+            "hours": hours,
+            "ranges": ranges,
+            "range_label": range_label
+        }
+
+    for station in stations:
+        station_name = str(station.station_name)
+        station_data[station_name] = []
+
+        assigned_volunteer_ids = set()
+        for assignment in station.assignments:
+            if assignment.deleted_at is not None:
+                continue
+            if assignment.volunteer_id is None:
+                continue
+            assigned_volunteer_ids.add(assignment.volunteer_id)
+
+        for volunteer_id in assigned_volunteer_ids:
+            if volunteer_id in volunteer_hours_map:
+                station_data[station_name].append(volunteer_hours_map[volunteer_id])
+
+        station_data[station_name].sort(key=lambda x: x["name"])
 
     return render_template(
         "volunteer-hours.html",
         station_data=station_data
     )
-    
+
 def seed_admin():
     
     email = "anthonyb@southwestern.edu"   # must match Google email
