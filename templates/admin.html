@@ -250,7 +250,11 @@ function enableEdit() {
 }
 
 function requestCoverage() {
-    alert("Coverage request placeholder.");
+    const name = prompt("Enter the name of the volunteer who is absent:");
+
+    if (!name) return;
+
+    console.log("Absent volunteer:", name);
 }
 </script>
 
