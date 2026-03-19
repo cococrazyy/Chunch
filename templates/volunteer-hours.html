@@ -11,9 +11,10 @@
 
 <script>
     const data = {{ volunteer_data | tojson | safe }};
+
     const labels = data.map(v => v.name);
     const hoursWorked = data.map(v => {
-        if (v.hours.length === 0) return 5;
+        if (!v.hours || v.hours.length === 0) return 5;
         return Math.max(...v.hours);
     });
 
@@ -25,14 +26,19 @@
             labels: labels,
             datasets: [{
                 label: 'Hours Worked',
-                data: hoursWorked
+                data: hoursWorked,
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
             }]
         },
         options: {
+            indexAxis: 'y', // optional if you want horizontal bars
             scales: {
                 y: {
                     min: 5,
                     max: 16,
+                    reverse: true,   // <-- this reverses the axis
                     ticks: {
                         callback: function(value) {
                             if (value === 12) return "12PM";
@@ -42,7 +48,7 @@
                     }
                 }
             }
-        }  
+        }
     });
 </script>
 </body>
