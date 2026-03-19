@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>test Hours</title>
+    <title>Volunteer Hours</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -10,64 +10,40 @@
     <canvas id="hoursChart"></canvas>
 
 <script>
-    const stationData = {{ volunteer_data | tojson | safe }};
-    const stations = Object.keys(stationData);
-    let currentStationIndex = 0;
+    const data = {{ volunteer_data | tojson | safe }};
+    const labels = data.map(v => v.name);
+    const hoursWorked = data.map(v => {
+        if (v.hours.length === 0) return 5;
+        return Math.max(...v.hours);
+    });
 
-    function renderChart(stationIndex) {
-        const currentStation = stations[stationIndex];
-        const data = stationData[currentStation];
-        const labels = data.map(v => v.name);
-        const hoursWorked = data.map(v => {
-            if (!v.hours || v.hours.length === 0) return 5;
-            return Math.max(...v.hours);
-        });
+    const ctx = document.getElementById('hoursChart').getContext('2d');
 
-        const ctx = document.getElementById('hoursChart').getContext('2d');
-
-        if (window.myChart) {
-            window.myChart.destroy(); // destroy old chart before creating new
-        }
-
-        window.myChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: `Hours Worked (${currentStation})`,
-                    data: hoursWorked,
-                    backgroundColor: '#4e79a7',
-                    barThickness: 20
-                }]
-            },
-            options: {
-                indexAxis: 'x', // vertical bars
-                scales: {
-                    y: {
-                        min: 5,
-                        max: 16,
-                        ticks: {
-                            stepSize: 1,
-                            callback: function(value) {
-                                if (value === 0) return '12AM';
-                                if (value < 12) return value + 'AM';
-                                if (value === 12) return '12PM';
-                                return (value - 12) + 'PM';
-                            }
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Volunteers'
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Hours Worked',
+                data: hoursWorked
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    min: 5,
+                    max: 16,
+                    ticks: {
+                        callback: function(value) {
+                            if (value === 12) return "12PM";
+                            if (value < 12) return value + "AM";
+                            return (value - 12) + "PM";
                         }
                     }
                 }
             }
-        });
-    }
-
-    renderChart(currentStationIndex);
+        }  
+    });
 </script>
 </body>
 </html>
