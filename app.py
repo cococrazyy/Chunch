@@ -68,7 +68,7 @@ class Applicant(db.Model, SoftDeleteMixin):
     
 # creating user account class
 # only admins and captains should have be on this table
-class UserAccount(db.Model, SoftDeleteMixin):
+class UserAccount(db.Model):
     __tablename__ = "user_account"
 
     user_id = Column(Integer, primary_key=True)
@@ -279,7 +279,6 @@ def volunteer_hours():
             .all()
 
         stations = Station.query\
-            .filter(Station.deleted_at.is_(None))\
             .order_by(Station.station_name)\
             .all()
 
