@@ -216,7 +216,13 @@ def me():
 def admin_page():
     if "user_id" not in session:
         return redirect("/")
-    return render_template("admin.html")
+
+    volunteers = Volunteer.query\
+        .filter(Volunteer.deleted_at.is_(None))\
+        .order_by(Volunteer.last_name)\
+        .all()
+
+    return render_template("admin.html", volunteers=volunteers)
 
 @app.route("/admin/master-list")
 def master_list():
