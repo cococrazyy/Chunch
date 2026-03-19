@@ -276,34 +276,37 @@ def volunteer_hours():
     # Get all volunteers
     volunteers = Volunteer.query.order_by(Volunteer.last_name).all()
     
-    volunteer_data = []
+    station_data = {}
 
     for v in volunteers:
-        hours = sorted([int(a.hour) for a in v.availability])
-        def format_hour(h):
-            if h == 0:
-                return "12AM"
-            elif h < 12:
-                return f"{h}AM"
-            elif h == 12:
-                return "12PM"
+        for assignment in v.assignments:
+            station_name = assignment.station.station_name if assignment.station else "Unassigned"
+            if station_name not in station_data:
+                station_data[station_name] = []
+            hours = sorted([int(a.hour) for a in v.availability])
+            def format_hour(h):
+                if h == 0:
+                    return "12AM"
+                elif h < 12:
+                    return f"{h}AM"
+                elif h == 12:
+                    return "12PM"
+                else:
+                    return f"{h-12}PM"
+            if hours:
+                start = format_hour(hours[0])
+                end = format_hour(hours[-1])
+                hour_range = f"{start}-{end}"
             else:
-                return f"{h-12}PM"
-        if hours:
-            start = format_hour(hours[0])
-            end = format_hour(hours[-1])
-            hour_range = f"{start}-{end}"
-        else:
-            hour_range = "N/A"
+                hour_range = "N/A"
 
-        volunteer_data.append({
-            "name": f"{v.first_name} {v.last_name}",
-            "email": v.email,
-            "hours": hours,
-            "range": hour_range
-        })
-    
-    return render_template("volunteer-hours.html", volunteer_data=volunteer_data)   
+            station_data[station_name].append({
+                "name": f"{v.first_name} {v.last_name}",
+                "hours": hours,
+                "range": hour_range
+            })
+    return render_template("volunteer-hours.html", station_data=station_data) 
+
 @app.route("/seed-admin")
 def seed_admin():
     
