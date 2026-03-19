@@ -1,48 +1,173 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Volunteer Hours</title>
+    <title>Volunteer Hours by Station</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 24px;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+        }
+
+        #chartWrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        #hoursChart {
+            min-width: 1200px;
+            max-height: 700px;
+        }
+    </style>
 </head>
 <body>
-    <h1>TEST Hours</h1>
+    <h1>Volunteer Hours by Station</h1>
 
-    <canvas id="hoursChart"></canvas>
+    <div class="controls">
+        <label for="stationSelect">Select Station:</label>
+        <select id="stationSelect"></select>
+    </div>
+
+    <div id="chartWrapper">
+        <canvas id="hoursChart"></canvas>
+    </div>
 
 <script>
-    const data = {{ volunteer_data | tojson | safe }};
-    const labels = data.map(v => v.name);
-    const hoursWorked = data.map(v => {
-        if (v.hours.length === 0) return 5;
-        return Math.max(...v.hours);
-    });
-
+    const stationData = {{ station_data | tojson | safe }};
+    const stationNames = Object.keys(stationData);
+    const stationSelect = document.getElementById('stationSelect');
     const ctx = document.getElementById('hoursChart').getContext('2d');
 
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Hours Worked',
-                data: hoursWorked
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    min: 5,
-                    max: 16,
-                    ticks: {
-                        callback: function(value) {
-                            if (value === 12) return "12PM";
-                            if (value < 12) return value + "AM";
-                            return (value - 12) + "PM";
+    let hoursChart = null;
+
+    function formatHourLabel(value) {
+        if (value === 12) return "12PM";
+        if (value < 12) return value + "AM";
+        return (value - 12) + "PM";
+    }
+
+    function buildDatasets(volunteers) {
+        const datasets = [];
+
+        volunteers.forEach((volunteer, volunteerIndex) => {
+            if (!volunteer.ranges || volunteer.ranges.length === 0) {
+                return;
+            }
+
+            volunteer.ranges.forEach((range, rangeIndex) => {
+                const startHour = range[0];
+                const endHour = range[1];
+
+                datasets.push({
+                    label: rangeIndex === 0 ? volunteer.name : "",
+                    data: volunteers.map((v, i) => {
+                        if (i !== volunteerIndex) return null;
+                        return [startHour, endHour];
+                    }),
+                    borderWidth: 1,
+                    barPercentage: 0.9,
+                    categoryPercentage: 0.9
+                });
+            });
+        });
+
+        if (datasets.length === 0) {
+            datasets.push({
+                label: "No scheduled hours",
+                data: volunteers.map(() => null),
+                borderWidth: 1,
+                barPercentage: 0.9,
+                categoryPercentage: 0.9
+            });
+        }
+
+        return datasets;
+    }
+
+    function renderChart(stationName) {
+        const volunteers = stationData[stationName] || [];
+        const labels = volunteers.map(v => v.name);
+
+        if (hoursChart) {
+            hoursChart.destroy();
+        }
+
+        hoursChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: buildDatasets(volunteers)
+            },
+            options: {
+                indexAxis: 'x',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const volunteer = volunteers[context.dataIndex];
+                                if (!volunteer || !volunteer.range_label) {
+                                    return "";
+                                }
+                                return volunteer.name + ": " + volunteer.range_label;
+                            }
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: stationName
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 45,
+                            autoSkip: false
+                        }
+                    },
+                    y: {
+                        reverse: true,
+                        min: 5,
+                        max: 16,
+                        ticks: {
+                            stepSize: 1,
+                            callback: function(value) {
+                                return formatHourLabel(value);
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Hour'
                         }
                     }
                 }
             }
-        }  
+        });
+    }
+
+    stationNames.forEach(stationName => {
+        const option = document.createElement('option');
+        option.value = stationName;
+        option.textContent = stationName;
+        stationSelect.appendChild(option);
+    });
+
+    if (stationNames.length > 0) {
+        stationSelect.value = stationNames[0];
+        renderChart(stationNames[0]);
+    }
+
+    stationSelect.addEventListener('change', function() {
+        renderChart(this.value);
     });
 </script>
 </body>
