@@ -280,10 +280,18 @@ def volunteer_hours():
 
     for v in volunteers:
         hours = sorted([int(a.hour) for a in v.availability])
-
+        def format_hour(h):
+            if h == 0:
+                return "12AM"
+            elif h < 12:
+                return f"{h}AM"
+            elif h == 12:
+                return "12PM"
+            else:
+                return f"{h-12}PM"
         if hours:
-            start = hours[0]
-            end = hours[-1]
+            start = format_hour(hours[0])
+            end = format_hour(hours[-1])
             hour_range = f"{start}-{end}"
         else:
             hour_range = "N/A"
