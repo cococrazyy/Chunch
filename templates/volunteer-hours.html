@@ -7,6 +7,15 @@
 <body>
     <h1>TEST Hours</h1>
 
+    <label for="stationSelect">Select Station:</label>
+    <select id="stationSelect">
+    {% for station in station_data.keys() %}
+    <option value="{{ station }}">{{ station }}</option>
+    {% endfor %}
+    </select>
+    <button id="goBtn">Go</button>  
+
+
     <canvas id="hoursChart"></canvas>
 
 <script>
