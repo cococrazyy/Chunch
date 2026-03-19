@@ -177,6 +177,19 @@ body {
 </div>
 
 <div class="grid" id="scheduleGrid"></div>
+<div id="coverageBox" style="display:none; padding:20px;">
+    <h3>Select absent volunteer:</h3>
+
+    <select id="absentSelect">
+        {% for v in volunteers %}
+            <option value="{{ v.id }}">
+                {{ v.first_name }} {{ v.last_name }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <button onclick="submitAbsent()">Next</button>
+</div>
 
 <script>
 let hourlyView = false;
