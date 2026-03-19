@@ -280,11 +280,12 @@ def volunteer_hours():
     for v in volunteers:
         # If you don’t have an Availability table, just use v.availability
         # For now, fallback to empty string if None
-        availability_text = getattr(v, "availability", "") or ""
+       hours = [int(a.hour) for a in v.availability]
+
         volunteer_data.append({
             "name": f"{v.first_name} {v.last_name}",
             "email": v.email,
-            "availability": availability_text
+            "hours": hours
         })
     
     return render_template("volunteer-hours.html", volunteer_data=volunteer_data)
