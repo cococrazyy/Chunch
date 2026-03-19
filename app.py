@@ -277,19 +277,25 @@ def volunteer_hours():
     volunteers = Volunteer.query.order_by(Volunteer.last_name).all()
     
     volunteer_data = []
+
     for v in volunteers:
-        # If you don’t have an Availability table, just use v.availability
-        # For now, fallback to empty string if None
-       hours = [int(a.hour) for a in v.availability]
+        hours = sorted([int(a.hour) for a in v.availability])
+
+        if hours:
+            start = hours[0]
+            end = hours[-1]
+            hour_range = f"{start}-{end}"
+        else:
+            hour_range = "N/A"
 
         volunteer_data.append({
             "name": f"{v.first_name} {v.last_name}",
             "email": v.email,
-            "hours": hours
+            "hours": hours,
+            "range": hour_range
         })
     
-    return render_template("volunteer-hours.html", volunteer_data=volunteer_data)
-    
+    return render_template("volunteer-hours.html", volunteer_data=volunteer_data)   
 @app.route("/seed-admin")
 def seed_admin():
     
