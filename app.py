@@ -89,7 +89,6 @@ class UserAccount(db.Model, SoftDeleteMixin):
 class Station(db.Model, SoftDeleteMixin):
     __tablename__ = "station"
     station_id = Column(Integer, primary_key=True)
-    is_absent = Column(Boolean, default = False, nullable = False)
     station_name = Column(
         Enum(
             "Setup Team",
