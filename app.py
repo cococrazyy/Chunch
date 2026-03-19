@@ -220,8 +220,8 @@ def admin_page():
 
 @app.route("/admin/master-list")
 def master_list():
-    volunteers = Volunteer.query.filter_by(deleted_at = None).order_by(Volunteer.last_name).all()
-    return render_template("master-list.html", volunteers=volunteers)
+    volunteers = Volunteer.query.filter_by(deleted_at = None).order_by(Volunteer.last_name).all()
+    return render_template("master-list.html", volunteers=volunteers)
     
 
 @app.route("/admin/master-list/add-volunteer", methods=["POST"])
