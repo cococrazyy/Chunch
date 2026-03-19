@@ -280,10 +280,10 @@ def volunteer_hours():
 
     for v in volunteers:
         for assignment in v.assignments:
-            station_name = assignment.station.station_name if assignment.station else "Unassigned"
+             station_name = assignment.station.station_name if assignment.station else "Unassigned"
             if station_name not in station_data:
                 station_data[station_name] = []
-            hours = sorted([a.hour for a in v.availability if a.hour is not None])
+            hours = sorted([h for h in (a.hour for a in v.availability) if isinstance(h, int)])
             def format_hour(h):
                 if h == 0:
                     return "12AM"
@@ -305,7 +305,7 @@ def volunteer_hours():
                 "hours": hours,
                 "range": hour_range
             })
-    return render_template("volunteer-hours.html", volunteer_data=station_data)
+    return render_template("volunteer-hours.html", volunteer_data=station_data or {})
 
 @app.route("/seed-admin")
 def seed_admin():
