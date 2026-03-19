@@ -18,8 +18,6 @@ from flask_migrate import Migrate
 from flask import render_template
 
 app = Flask(__name__, static_folder='.', static_url_path='')
-app.config['DEBUG'] = True
-app.config['TESTING'] = True
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 app.config.update(
     SESSION_COOKIE_SECURE=True,
@@ -145,7 +143,7 @@ class Availability(db.Model, SoftDeleteMixin):
 
     volunteer_id = Column(Integer, ForeignKey("volunteers.id"))
 
-    hour = Column(Integer)       # Example: 8, 9, 10, 11
+    hour = Column(String(50))       # Example: 8, 9, 10, 11
 
     volunteer = relationship("Volunteer", backref=backref("availability", cascade = "all, delete-orphan"))
 
@@ -278,37 +276,34 @@ def volunteer_hours():
     # Get all volunteers
     volunteers = Volunteer.query.order_by(Volunteer.last_name).all()
     
-    station_data = {}
+    volunteer_data = []
 
     for v in volunteers:
-        for assignment in v.assignments:
-             station_name = assignment.station.station_name if assignment.station else "Unassigned"
-            if station_name not in station_data:
-                station_data[station_name] = []
-            hours = sorted([h for h in (a.hour for a in v.availability) if isinstance(h, int)])
-            def format_hour(h):
-                if h == 0:
-                    return "12AM"
-                elif h < 12:
-                    return f"{h}AM"
-                elif h == 12:
-                    return "12PM"
-                else:
-                    return f"{h-12}PM"
-            if hours:
-                start = format_hour(hours[0])
-                end = format_hour(hours[-1])
-                hour_range = f"{start}-{end}"
+        hours = sorted([int(a.hour) for a in v.availability])
+        def format_hour(h):
+            if h == 0:
+                return "12AM"
+            elif h < 12:
+                return f"{h}AM"
+            elif h == 12:
+                return "12PM"
             else:
-                hour_range = "N/A"
+                return f"{h-12}PM"
+        if hours:
+            start = format_hour(hours[0])
+            end = format_hour(hours[-1])
+            hour_range = f"{start}-{end}"
+        else:
+            hour_range = "N/A"
 
-            station_data[station_name].append({
-                "name": f"{v.first_name} {v.last_name}",
-                "hours": hours,
-                "range": hour_range
-            })
-    return render_template("volunteer-hours.html", volunteer_data=station_data or {})
-
+        volunteer_data.append({
+            "name": f"{v.first_name} {v.last_name}",
+            "email": v.email,
+            "hours": hours,
+            "range": hour_range
+        })
+    
+    return render_template("volunteer-hours.html", volunteer_data=volunteer_data)   
 @app.route("/seed-admin")
 def seed_admin():
     
@@ -495,4 +490,3 @@ def create_admin(email, first_name, last_name):
     db.session.commit()
 
     click.echo(f"admin privileges given to {email}")
-
