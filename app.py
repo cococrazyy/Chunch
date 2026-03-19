@@ -283,7 +283,7 @@ def volunteer_hours():
             station_name = assignment.station.station_name if assignment.station else "Unassigned"
             if station_name not in station_data:
                 station_data[station_name] = []
-            hours = sorted([int(a.hour) for a in v.availability])
+            hours = sorted([int(a.hour) for a in v.availability if a.hour and a.hour.isdigit()])
             def format_hour(h):
                 if h == 0:
                     return "12AM"
