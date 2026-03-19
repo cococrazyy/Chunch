@@ -118,7 +118,7 @@ class Schedule(db.Model, SoftDeleteMixin):
     time = Column(Time)
 
 # creating assignment table
-class Assignment(db.Model, SoftDeleteMixin):
+class Assignment(db.Model):
     __tablename__ = "assignments"
     assignment_id = Column(Integer, primary_key=True)
     
@@ -386,8 +386,6 @@ def volunteer_hours():
 
             assigned_volunteer_ids = set()
             for assignment in station.assignments:
-                if assignment.deleted_at is not None:
-                    continue
                 if assignment.volunteer_id is None:
                     continue
                 assigned_volunteer_ids.add(assignment.volunteer_id)
