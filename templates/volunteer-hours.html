@@ -12,7 +12,10 @@
 <script>
     const data = JSON.parse(`{{ volunteer_data | tojson | safe }}`);
     const labels = data.map(v => v.name);
-    const hoursWorked = data.map(v => v.hours.length);
+    const hoursWorked = data.map(v => {
+        if (v.hours.length === 0) return 5;
+        return Math.max(...v.hours);
+    });
 
     const ctx = document.getElementById('hoursChart').getContext('2d');
 
@@ -28,10 +31,18 @@
         options: {
             scales: {
                 y: {
-                    beginAtZero: true
+                    min: 5,
+                    max: 16,
+                    ticks: {
+                        callback: function(value) {
+                            if (value === 12) return "12PM";
+                            if (value < 12) return value + "AM";
+                            return (value - 12) + "PM";
+                        }
+                    }
                 }
             }
-        }
+        }  
     });
 </script>
 </body>
