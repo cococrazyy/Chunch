@@ -273,107 +273,110 @@ def delete_volunteer(volunteer_id):
 # Adding route to new volunteer hours page
 @app.route("/admin/volunteer-hours")
 def volunteer_hours():
-    volunteers = Volunteer.query\
-        .filter(Volunteer.deleted_at.is_(None))\
-        .order_by(Volunteer.last_name, Volunteer.first_name)\
-        .all()
+    try:
+        volunteers = Volunteer.query\
+            .filter(Volunteer.deleted_at.is_(None))\
+            .order_by(Volunteer.last_name, Volunteer.first_name)\
+            .all()
 
-    stations = Station.query\
-        .filter(Station.deleted_at.is_(None))\
-        .order_by(Station.station_name)\
-        .all()
+        stations = Station.query\
+            .filter(Station.deleted_at.is_(None))\
+            .order_by(Station.station_name)\
+            .all()
 
-    station_data = {}
+        station_data = {}
 
-    def parse_hours(availability_rows):
-        cleaned_hours = []
+        def parse_hours(availability_rows):
+            cleaned_hours = []
 
-        for row in availability_rows:
-            if row.deleted_at is not None:
-                continue
+            for row in availability_rows:
+                if row.deleted_at is not None:
+                    continue
 
-            try:
-                hour = int(str(row.hour).strip())
-            except (ValueError, TypeError):
-                continue
+                try:
+                    hour = int(str(row.hour).strip())
+                except (ValueError, TypeError):
+                    continue
 
-            if 5 <= hour <= 16:
-                cleaned_hours.append(hour)
+                if 5 <= hour <= 16:
+                    cleaned_hours.append(hour)
 
-        return sorted(set(cleaned_hours))
+            return sorted(set(cleaned_hours))
 
-    def build_ranges(hours):
-        if not hours:
-            return []
+        def build_ranges(hours):
+            if not hours:
+                return []
 
-        ranges = []
-        start = hours[0]
-        prev = hours[0]
+            ranges = []
+            start = hours[0]
+            prev = hours[0]
 
-        for h in hours[1:]:
-            if h == prev + 1:
-                prev = h
+            for h in hours[1:]:
+                if h == prev + 1:
+                    prev = h
+                else:
+                    ranges.append([start, prev])
+                    start = h
+                    prev = h
+
+            ranges.append([start, prev])
+            return ranges
+
+        def format_hour(h):
+            if h == 0:
+                return "12AM"
+            elif h < 12:
+                return f"{h}AM"
+            elif h == 12:
+                return "12PM"
             else:
-                ranges.append([start, prev])
-                start = h
-                prev = h
+                return f"{h-12}PM"
 
-        ranges.append([start, prev])
-        return ranges
+        volunteer_hours_map = {}
+        for v in volunteers:
+            hours = parse_hours(v.availability)
+            ranges = build_ranges(hours)
 
-    def format_hour(h):
-        if h == 0:
-            return "12AM"
-        elif h < 12:
-            return f"{h}AM"
-        elif h == 12:
-            return "12PM"
-        else:
-            return f"{h-12}PM"
+            if ranges:
+                range_label = ", ".join(
+                    f"{format_hour(start)}-{format_hour(end)}"
+                    for start, end in ranges
+                )
+            else:
+                range_label = "N/A"
 
-    volunteer_hours_map = {}
-    for v in volunteers:
-        hours = parse_hours(v.availability)
-        ranges = build_ranges(hours)
+            volunteer_hours_map[v.id] = {
+                "name": f"{v.first_name} {v.last_name}",
+                "email": v.email,
+                "hours": hours,
+                "ranges": ranges,
+                "range_label": range_label
+            }
 
-        if ranges:
-            range_label = ", ".join(
-                f"{format_hour(start)}-{format_hour(end)}"
-                for start, end in ranges
-            )
-        else:
-            range_label = "N/A"
+        for station in stations:
+            station_name = str(station.station_name)
+            station_data[station_name] = []
 
-        volunteer_hours_map[v.id] = {
-            "name": f"{v.first_name} {v.last_name}",
-            "email": v.email,
-            "hours": hours,
-            "ranges": ranges,
-            "range_label": range_label
-        }
+            assigned_volunteer_ids = set()
+            for assignment in station.assignments:
+                if assignment.deleted_at is not None:
+                    continue
+                if assignment.volunteer_id is None:
+                    continue
+                assigned_volunteer_ids.add(assignment.volunteer_id)
 
-    for station in stations:
-        station_name = str(station.station_name)
-        station_data[station_name] = []
+            for volunteer_id in assigned_volunteer_ids:
+                if volunteer_id in volunteer_hours_map:
+                    station_data[station_name].append(volunteer_hours_map[volunteer_id])
 
-        assigned_volunteer_ids = set()
-        for assignment in station.assignments:
-            if assignment.deleted_at is not None:
-                continue
-            if assignment.volunteer_id is None:
-                continue
-            assigned_volunteer_ids.add(assignment.volunteer_id)
+            station_data[station_name].sort(key=lambda x: x["name"])
 
-        for volunteer_id in assigned_volunteer_ids:
-            if volunteer_id in volunteer_hours_map:
-                station_data[station_name].append(volunteer_hours_map[volunteer_id])
-
-        station_data[station_name].sort(key=lambda x: x["name"])
-
-    return render_template(
-        "volunteer-hours.html",
-        station_data=station_data
-    )
+        return render_template(
+            "volunteer-hours.html",
+            station_data=station_data
+        )
+    except Exception as e:
+        return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
 def seed_admin():
     
