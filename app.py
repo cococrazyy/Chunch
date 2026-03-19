@@ -7,7 +7,7 @@ from sqlalchemy.orm import DeclarativeBase, relationship
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship, backref
 import os
-from flask import request, jsonify, session, redirect, url_for
+from flask import request, jsonify, session, redirect, url_for, flash
 from google.oauth2 import id_token
 from google.auth.transport import requests as grequests
 from werkzeug.middleware.proxy_fix import ProxyFix
