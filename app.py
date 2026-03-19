@@ -273,37 +273,51 @@ def delete_volunteer(volunteer_id):
 # Adding route to new volunteer hours page
 @app.route("/admin/volunteer-hours")
 def volunteer_hours():
-    # Get all volunteers
     volunteers = Volunteer.query.order_by(Volunteer.last_name).all()
     
-    volunteer_data = []
+    # Initialize all stations including empty
+    stations = [s.station_name for s in Station.query.all()]
+    station_data = {station: [] for station in stations}
+
+    def group_shifts(hours):
+        """Convert list of hours into consecutive shifts"""
+        if not hours:
+            return []
+        hours = sorted(hours)
+        shifts = []
+        start = prev = hours[0]
+        for h in hours[1:]:
+            if h == prev + 1:
+                prev = h
+            else:
+                shifts.append({"start": start, "end": prev})
+                start = prev = h
+        shifts.append({"start": start, "end": prev})
+        return shifts
 
     for v in volunteers:
         hours = sorted([int(a.hour) for a in v.availability])
-        def format_hour(h):
-            if h == 0:
-                return "12AM"
-            elif h < 12:
-                return f"{h}AM"
-            elif h == 12:
-                return "12PM"
-            else:
-                return f"{h-12}PM"
-        if hours:
-            start = format_hour(hours[0])
-            end = format_hour(hours[-1])
-            hour_range = f"{start}-{end}"
-        else:
-            hour_range = "N/A"
+        shifts = group_shifts(hours)
 
-        volunteer_data.append({
-            "name": f"{v.first_name} {v.last_name}",
-            "email": v.email,
-            "hours": hours,
-            "range": hour_range
-        })
+        if not v.assignments:
+            station_data.setdefault("Other", []).append({
+                "name": f"{v.first_name} {v.last_name}",
+                "email": v.email,
+                "shifts": shifts
+            })
+            continue
+
+        # Assign shifts to each station the volunteer is assigned to
+        for assignment in v.assignments:
+            station_name = assignment.station.station_name if assignment.station else "Other"
+            station_data.setdefault(station_name, []).append({
+                "name": f"{v.first_name} {v.last_name}",
+                "email": v.email,
+                "shifts": shifts
+            })
+
+    return render_template("volunteer-hours.html", station_data=station_data)
     
-    return render_template("volunteer-hours.html", volunteer_data=volunteer_data)   
 @app.route("/seed-admin")
 def seed_admin():
     
