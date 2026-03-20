@@ -1040,29 +1040,67 @@ def sync_volunteers():
         # Remove old availability so we don’t duplicate
         Availability.query.filter_by(volunteer_id=volunteer.id).delete()
 
-        availability_text = str(row.get("Typical Shift", ""))
+        availability_text = str(row.get("Typical Shift", "")).strip()
         entries = availability_text.split(",")
 
-        for entry in entries:
-            time_str = entry.strip().upper()
-            if not time_str:
-                continue
+        def parse_time_to_hour(time_str):
+            time_str = time_str.strip().upper().replace(" ", "")
 
-            # convert AM/PM text to numeric hour
-            if "AM" in time_str:
-                hour = int(time_str.replace("AM", ""))
-            elif "PM" in time_str:
-                hour = int(time_str.replace("PM", ""))
+            if ":" in time_str:
+                hour_part, rest = time_str.split(":", 1)
+                hour = int(hour_part)
+                suffix = "AM" if "AM" in rest else "PM" if "PM" in rest else None
+            else:
+                if time_str.endswith("AM"):
+                    hour = int(time_str.replace("AM", ""))
+                    suffix = "AM"
+                elif time_str.endswith("PM"):
+                    hour = int(time_str.replace("PM", ""))
+                    suffix = "PM"
+                else:
+                    return None
+
+            if suffix == "AM":
+                if hour == 12:
+                    return 0
+                return hour
+
+            if suffix == "PM":
                 if hour != 12:
                     hour += 12
-            else:
+                return hour
+
+            return None
+
+        for entry in entries:
+            part = entry.strip()
+            if not part:
                 continue
 
-            new_availability = Availability(
-                volunteer_id=volunteer.id,
-                hour=hour
-            )
-            db.session.add(new_availability)
+            if "-" in part:
+                start_str, end_str = part.split("-", 1)
+                start_hour = parse_time_to_hour(start_str)
+                end_hour = parse_time_to_hour(end_str)
+
+                if start_hour is None or end_hour is None:
+                    continue
+
+                if start_hour <= end_hour:
+                    hours_to_add = range(start_hour, end_hour + 1)
+                else:
+                    continue
+            else:
+                single_hour = parse_time_to_hour(part)
+                if single_hour is None:
+                    continue
+                hours_to_add = [single_hour]
+
+            for hour in hours_to_add:
+                new_availability = Availability(
+                    volunteer_id=volunteer.id,
+                    hour=hour
+                )
+                db.session.add(new_availability)
 
     db.session.commit()  # commit the new availability rows
 
