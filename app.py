@@ -805,36 +805,38 @@ def volunteer_hours():
                 "range_label": range_label
             }
 
-        assignments = Assignment.query\
-            .order_by(Assignment.assignment_id.asc())\
-            .all()
-
-        latest_station_by_volunteer = {}
-        for assignment in assignments:
-            if assignment.station_id is None or assignment.volunteer_id is None:
-                continue
-
-            latest_station_by_volunteer[assignment.volunteer_id] = assignment.station_id
+        sheet = get_sheet()
+        rows = sheet.get_all_records()
 
         station_to_volunteer_ids = {}
         for station in stations:
             station_to_volunteer_ids[station.station_id] = set()
 
-        for volunteer_id, station_id in latest_station_by_volunteer.items():
-            if station_id in station_to_volunteer_ids:
-                station_to_volunteer_ids[station_id].add(volunteer_id)
+        station_name_to_id = {
+            str(station.station_name).strip().lower(): station.station_id
+            for station in stations
+        }
 
-        assigned_volunteer_ids = set(latest_station_by_volunteer.keys())
+        volunteer_id_by_email = {
+            v.email.strip().lower(): v.id
+            for v in volunteers
+            if v.email
+        }
 
-        other_station = next(
-            (station for station in stations if str(station.station_name) == "Other"),
-            None
-        )
+        for row in rows:
+            email = str(row.get("Email", "")).strip().lower()
+            typical_station = str(row.get("Typical Station", "")).strip().lower()
 
-        if other_station is not None:
-            for volunteer_id in volunteer_rows_by_id.keys():
-                if volunteer_id not in assigned_volunteer_ids:
-                    station_to_volunteer_ids[other_station.station_id].add(volunteer_id)
+            if not email or not typical_station:
+                continue
+
+            volunteer_id = volunteer_id_by_email.get(email)
+            station_id = station_name_to_id.get(typical_station)
+
+            if volunteer_id is None or station_id is None:
+                continue
+
+            station_to_volunteer_ids[station_id].add(volunteer_id)
 
         for station in stations:
             station_name = str(station.station_name)
