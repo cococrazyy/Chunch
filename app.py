@@ -55,6 +55,9 @@ class Volunteer(db.Model, SoftDeleteMixin):
 
     email = Column(String(100), unique=True)
 
+    station_id = Column(Integer, ForeignKey("station.station_id"))
+    station = relationship("Station")
+
 #for people signing up to volunteer that will be placed in inbox
 class Applicant(db.Model, SoftDeleteMixin):
     __tablename__ = "applicants"
@@ -507,7 +510,9 @@ def debug_assignments():
             {
                 "volunteer_id": v.id,
                 "name": f"{v.first_name} {v.last_name}",
-                "station_id": v.assignments[0].station_id if v.assignments else None
+                
+                "station_id": v.assignments[0].station_id if v.assignments else None,
+                "station_name": str(v.assignments[0].station.station_name) if v.assignments else None
             }
             for v in volunteers[:50]
         ]
