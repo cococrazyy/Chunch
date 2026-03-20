@@ -225,7 +225,7 @@ def admin_page():
 
 @app.route("/debug/add-test-assignment")
 def add_test_assignment():
-    s = Station.query.order_by(Station.station_id).first()
+    s = Station.query.filter_by(station_name="Teardown Team").first()
 
     volunteers = Volunteer.query\
         .filter(Volunteer.deleted_at.is_(None))\
