@@ -237,6 +237,12 @@ def admin_page():
 
 @app.route("/debug/add-test-assignment")
 def add_test_assignment():
+
+    volunteers = Volunteer.query\
+        .filter(Volunteer.deleted_at.is_(None))\
+        .order_by(Volunteer.id)\
+        .all()
+
     #s = Station.query.filter_by(station_name="Teardown Team").first()
     
     # Check if the volunteer already has an assignment
@@ -250,10 +256,10 @@ def add_test_assignment():
         s = Station.query.filter_by(station_name="Teardown Team").first()
         station_id = s.station_id
 
-    volunteers = Volunteer.query\
-        .filter(Volunteer.deleted_at.is_(None))\
-        .order_by(Volunteer.id)\
-        .all()
+    #volunteers = Volunteer.query\
+        #.filter(Volunteer.deleted_at.is_(None))\
+        #.order_by(Volunteer.id)\
+        #.all()
 
     v = None
     for volunteer in volunteers:
