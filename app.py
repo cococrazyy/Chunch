@@ -652,19 +652,24 @@ def volunteer_hours():
                 "range_label": range_label
             }
 
-        assignments = Assignment.query.all()
+        assignments = Assignment.query\
+            .order_by(Assignment.assignment_id.asc())\
+            .all()
+
+        latest_station_by_volunteer = {}
+        for assignment in assignments:
+            if assignment.station_id is None or assignment.volunteer_id is None:
+                continue
+
+            latest_station_by_volunteer[assignment.volunteer_id] = assignment.station_id
 
         station_to_volunteer_ids = {}
         for station in stations:
             station_to_volunteer_ids[station.station_id] = set()
 
-        for assignment in assignments:
-            if assignment.station_id is None or assignment.volunteer_id is None:
-                continue
-
-            station_to_volunteer_ids.setdefault(
-                assignment.station_id, set()
-            ).add(assignment.volunteer_id)
+        for volunteer_id, station_id in latest_station_by_volunteer.items():
+            if station_id in station_to_volunteer_ids:
+                station_to_volunteer_ids[station_id].add(volunteer_id)
 
         for station in stations:
             station_name = str(station.station_name)
@@ -682,9 +687,6 @@ def volunteer_hours():
             "volunteer-hours.html",
             station_data=station_data
         )
-
-    except Exception as e:
-        return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
 def seed_admin():
     
