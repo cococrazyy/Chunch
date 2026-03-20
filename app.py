@@ -1011,66 +1011,68 @@ def grant_drive_access(email):
 def sync_volunteers():
     if "user_id" not in session:
         return redirect("/")
-    
+
     sheet = get_sheet()
     rows = sheet.get_all_records()
 
     for row in rows:
-        email = row["Email"].strip()
+        email = str(row.get("Email", "")).strip().lower()
+        if not email:
+            continue
 
         volunteer = Volunteer.query.filter_by(email=email).first()
 
         if not volunteer:
             volunteer = Volunteer(
-                first_name = row["First Name"],
-                last_name = row["Last Name"],
-                email = email
+                first_name=row["First Name"],
+                last_name=row["Last Name"],
+                email=email
             )
             db.session.add(volunteer)
+
     db.session.commit()
 
+    def parse_time_to_hour(time_str):
+        time_str = str(time_str).strip().upper()
+        time_str = time_str.replace(" ", "")
 
-    # Trying to get the hours added to the data table
+        if not time_str:
+            return None
+
+        if time_str.endswith("AM"):
+            raw = time_str[:-2]
+            if ":" in raw:
+                raw = raw.split(":")[0]
+            if not raw.isdigit():
+                return None
+            hour = int(raw)
+            return 0 if hour == 12 else hour
+
+        if time_str.endswith("PM"):
+            raw = time_str[:-2]
+            if ":" in raw:
+                raw = raw.split(":")[0]
+            if not raw.isdigit():
+                return None
+            hour = int(raw)
+            return hour if hour == 12 else hour + 12
+
+        return None
+
     for row in rows:
-        email = row["Email"].strip()
+        email = str(row.get("Email", "")).strip().lower()
         volunteer = Volunteer.query.filter_by(email=email).first()
         if not volunteer:
-            continue  # just in case
+            continue
 
-        # Remove old availability so we don’t duplicate
         Availability.query.filter_by(volunteer_id=volunteer.id).delete()
 
         availability_text = str(row.get("Typical Shift", "")).strip()
-        entries = availability_text.split(",")
+        if not availability_text:
+            continue
 
-        def parse_time_to_hour(time_str):
-            time_str = time_str.strip().upper().replace(" ", "")
-
-            if ":" in time_str:
-                hour_part, rest = time_str.split(":", 1)
-                hour = int(hour_part)
-                suffix = "AM" if "AM" in rest else "PM" if "PM" in rest else None
-            else:
-                if time_str.endswith("AM"):
-                    hour = int(time_str.replace("AM", ""))
-                    suffix = "AM"
-                elif time_str.endswith("PM"):
-                    hour = int(time_str.replace("PM", ""))
-                    suffix = "PM"
-                else:
-                    return None
-
-            if suffix == "AM":
-                if hour == 12:
-                    return 0
-                return hour
-
-            if suffix == "PM":
-                if hour != 12:
-                    hour += 12
-                return hour
-
-            return None
+        normalized_text = availability_text.replace("–", "-").replace("—", "-")
+        entries = normalized_text.split(",")
 
         for entry in entries:
             part = entry.strip()
@@ -1096,13 +1098,14 @@ def sync_volunteers():
                 hours_to_add = [single_hour]
 
             for hour in hours_to_add:
-                new_availability = Availability(
-                    volunteer_id=volunteer.id,
-                    hour=hour
+                db.session.add(
+                    Availability(
+                        volunteer_id=volunteer.id,
+                        hour=hour
+                    )
                 )
-                db.session.add(new_availability)
 
-    db.session.commit()  # commit the new availability rows
+    db.session.commit()
 
     return redirect("/admin/master-list")
     
