@@ -225,11 +225,45 @@ def admin_page():
 
 @app.route("/debug/add-test-assignment")
 def add_test_assignment():
-    v = Volunteer.query.first()
-    s = Station.query.first()
+    s = Station.query.order_by(Station.station_id).first()
+
+    volunteers = Volunteer.query\
+        .filter(Volunteer.deleted_at.is_(None))\
+        .order_by(Volunteer.id)\
+        .all()
+
+    v = None
+    for volunteer in volunteers:
+        valid_hours = []
+        for a in volunteer.availability:
+            if a.deleted_at is not None:
+                continue
+            try:
+                hour = int(str(a.hour).strip())
+            except (ValueError, TypeError):
+                continue
+            if 5 <= hour <= 16:
+                valid_hours.append(hour)
+
+        if valid_hours:
+            v = volunteer
+            break
 
     if not v or not s:
-        return "Missing volunteer or station"
+        return "Missing volunteer with hours or station"
+
+    existing = Assignment.query.filter_by(
+        volunteer_id=v.id,
+        station_id=s.station_id,
+        schedule_id=None
+    ).first()
+
+    if existing:
+        return {
+            "message": "Assignment already exists",
+            "volunteer": v.id,
+            "station": s.station_id
+        }
 
     assignment = Assignment(
         volunteer_id=v.id,
@@ -241,6 +275,7 @@ def add_test_assignment():
     db.session.commit()
 
     return {
+        "message": "Assignment added",
         "volunteer": v.id,
         "station": s.station_id
     }
