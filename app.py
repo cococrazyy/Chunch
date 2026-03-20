@@ -706,7 +706,7 @@ def sync_volunteers():
     rows = sheet.get_all_records()
 
     for row in rows:
-        email = row["Email (enter N/A) if you do not have one"].strip()
+        email = row["Email"].strip()
 
         volunteer = Volunteer.query.filter_by(email=email, deleted_at=None).first()
 
@@ -722,7 +722,7 @@ def sync_volunteers():
 
     # Trying to get the hours added to the data table
     for row in rows:
-        email = row["Email (enter N/A) if you do not have one"].strip()
+        email = row["Email"].strip()
         volunteer = Volunteer.query.filter_by(email=email).first()
         if not volunteer:
             continue  # just in case
@@ -730,7 +730,7 @@ def sync_volunteers():
         # Remove old availability so we don’t duplicate
         Availability.query.filter_by(volunteer_id=volunteer.id).delete()
 
-        availability_text = str(row.get("What is your typical shift? Select all hours that you work from when you come in until you leave. (Ex. if you work 11-2, you would select 11AM, 12PM, 1PM, 2PM)", ""))
+        availability_text = str(row.get("Typical Shift", ""))
         entries = availability_text.split(",")
 
         for entry in entries:
