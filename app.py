@@ -269,6 +269,39 @@ def delete_volunteer(volunteer_id):
 
     return redirect("/admin/master-list")
 
+@app.route("/admin/debug-assignments")
+def debug_assignments():
+    assignments = Assignment.query.all()
+    stations = Station.query.order_by(Station.station_id).all()
+    volunteers = Volunteer.query.order_by(Volunteer.id).all()
+
+    return {
+        "assignment_count": len(assignments),
+        "assignments": [
+            {
+                "assignment_id": a.assignment_id,
+                "volunteer_id": a.volunteer_id,
+                "station_id": a.station_id,
+                "schedule_id": a.schedule_id
+            }
+            for a in assignments[:50]
+        ],
+        "stations": [
+            {
+                "station_id": s.station_id,
+                "station_name": str(s.station_name)
+            }
+            for s in stations
+        ],
+        "volunteers": [
+            {
+                "volunteer_id": v.id,
+                "name": f"{v.first_name} {v.last_name}"
+            }
+            for v in volunteers[:50]
+        ]
+    }
+
 # Adding route to new volunteer hours page
 @app.route("/admin/volunteer-hours")
 def volunteer_hours():
