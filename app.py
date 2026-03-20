@@ -398,7 +398,7 @@ def debug_hourly_data():
 
 @app.route("/admin/inbox")
 def inbox():
-    applicants = Applicant.query.all()
+    applicants = Applicant.query.filter(Applicant.status = 'pending').all()
     return render_template("inbox.html", applicants=applicants)
 
 @app.route("/admin/master-list")
