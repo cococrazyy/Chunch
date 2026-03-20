@@ -293,7 +293,7 @@ def add_test_assignment():
     }
 
 # Delete assignments based on assignment number
-@app.route("/debug/delete-assignment/<int:assignment_id>", methods=["POST"])
+@app.route("/debug/delete-assignment/<int:assignment_id>/get")
 def delete_assignment(assignment_id):
     assignment = Assignment.query.get(assignment_id)
     if not assignment:
