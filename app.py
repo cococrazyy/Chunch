@@ -669,6 +669,18 @@ def volunteer_hours():
             if station_id in station_to_volunteer_ids:
                 station_to_volunteer_ids[station_id].add(volunteer_id)
 
+        assigned_volunteer_ids = set(latest_station_by_volunteer.keys())
+
+        other_station = next(
+            (station for station in stations if str(station.station_name) == "Other"),
+            None
+        )
+
+        if other_station is not None:
+            for volunteer_id in volunteer_rows_by_id.keys():
+                if volunteer_id not in assigned_volunteer_ids:
+                    station_to_volunteer_ids[other_station.station_id].add(volunteer_id)
+
         for station in stations:
             station_name = str(station.station_name)
             assigned_ids = station_to_volunteer_ids.get(station.station_id, set())
