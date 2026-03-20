@@ -292,6 +292,30 @@ def add_test_assignment():
         "station": s.station_id
     }
 
+# Delete assignments based on assignment number
+@app.route("/debug/delete-assignment/<int:assignment_id>", methods=["POST"])
+def delete_assignment(assignment_id):
+    assignment = Assignment.query.get(assignment_id)
+    if not assignment:
+        return {"error": f"Assignment {assignment_id} not found"}, 404
+
+    db.session.delete(assignment)
+    db.session.commit()
+    return {"message": f"Assignment {assignment_id} deleted"}
+
+# Delete assignments based on volunteer id
+@app.route("/debug/delete-assignments-for-volunteer/<int:volunteer_id>", methods=["POST"])
+def delete_assignments_for_volunteer(volunteer_id):
+    assignments = Assignment.query.filter_by(volunteer_id=volunteer_id).all()
+    if not assignments:
+        return {"message": "No assignments to delete"}, 404
+
+    for a in assignments:
+        db.session.delete(a)
+
+    db.session.commit()
+    return {"message": f"Deleted {len(assignments)} assignments for volunteer {volunteer_id}"}
+
 @app.route("/admin/debug-hourly-data")
 def debug_hourly_data():
     volunteers = Volunteer.query\
