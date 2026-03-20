@@ -317,6 +317,38 @@ def add_test_assignment():
 #    db.session.commit()
 #    return {"message": f"Deleted {len(assignments)} assignments for volunteer {volunteer_id}"}
 
+
+@app.route("/admin/debug-other-check")
+def debug_other_check():
+    volunteers = Volunteer.query\
+        .filter(Volunteer.deleted_at.is_(None))\
+        .order_by(Volunteer.id)\
+        .all()
+
+    assignments = Assignment.query\
+        .order_by(Assignment.assignment_id.asc())\
+        .all()
+
+    latest_station_by_volunteer = {}
+    for assignment in assignments:
+        if assignment.station_id is None or assignment.volunteer_id is None:
+            continue
+        latest_station_by_volunteer[assignment.volunteer_id] = assignment.station_id
+
+    assigned_volunteer_ids = set(latest_station_by_volunteer.keys())
+
+    return {
+        "assigned_volunteer_ids": list(assigned_volunteer_ids),
+        "volunteer_rows_by_id_keys": [v.id for v in volunteers],
+        "sample_pairs": [
+            {
+                "volunteer_id": v.id,
+                "is_assigned": v.id in assigned_volunteer_ids
+            }
+            for v in volunteers[:15]
+        ]
+    }
+
 @app.route("/admin/debug-hourly-data")
 def debug_hourly_data():
     volunteers = Volunteer.query\
