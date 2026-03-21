@@ -1015,7 +1015,22 @@ def get_applicant_sheet():
 
 @app.route("/admin/sync-applicants", methods=["GET", "POST"])
 def sync_applicants():
-    return {"message": "sync applicants route works"}
+    if "user_id" not in session:
+        return redirect("/")
+
+    try:
+        sheet = get_applicant_sheet()
+        rows = sheet.get_all_records()
+
+        return {
+            "row_count": len(rows),
+            "sample": rows[:3]
+        }
+
+    except Exception as e:
+        return {
+            "error": str(e)
+        }, 500
 
 # @app.route("/admin/sync-applicants", methods=["GET", "POST"])
 # def sync_applicants():
