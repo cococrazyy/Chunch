@@ -762,92 +762,89 @@ def volunteer_hours():
             .order_by(Station.station_name)\
             .all()
 
-        station_data = {}
+        # station_data = {}
 
-        def parse_hours(availability_rows):
-            cleaned_hours = []
+        # def parse_hours(availability_rows):
+        #     cleaned_hours = []
+        #     for row in availability_rows:
+        #         if row.deleted_at is not None:
+        #             continue
+        #         try:
+        #             hour = int(str(row.hour).strip())
+        #         except (ValueError, TypeError):
+        #             continue
+        #         if 5 <= hour <= 16:
+        #             cleaned_hours.append(hour)
+        #     return sorted(set(cleaned_hours))
 
-            for row in availability_rows:
-                if row.deleted_at is not None:
-                    continue
+        # def build_ranges(hours):
+        #     if not hours:
+        #         return []
+        #     ranges = []
+        #     start = hours[0]
+        #     prev = hours[0]
+        #     for h in hours[1:]:
+        #         if h == prev + 1:
+        #             prev = h
+        #         else:
+        #             ranges.append([start, prev])
+        #             start = h
+        #             prev = h
+        #     ranges.append([start, prev])
+        #     return ranges
 
-                try:
-                    hour = int(str(row.hour).strip())
-                except (ValueError, TypeError):
-                    continue
+        # def format_hour(h):
+        #     if h == 0:
+        #         return "12AM"
+        #     elif h < 12:
+        #         return f"{h}AM"
+        #     elif h == 12:
+        #         return "12PM"
+        #     else:
+        #         return f"{h-12}PM"
 
-                if 5 <= hour <= 16:
-                    cleaned_hours.append(hour)
-
-            return sorted(set(cleaned_hours))
-
-        def build_ranges(hours):
-            if not hours:
-                return []
-
-            ranges = []
-            start = hours[0]
-            prev = hours[0]
-
-            for h in hours[1:]:
-                if h == prev + 1:
-                    prev = h
-                else:
-                    ranges.append([start, prev])
-                    start = h
-                    prev = h
-
-            ranges.append([start, prev])
-            return ranges
-
-        def format_hour(h):
-            if h == 0:
-                return "12AM"
-            elif h < 12:
-                return f"{h}AM"
-            elif h == 12:
-                return "12PM"
-            else:
-                return f"{h-12}PM"
-
-        volunteer_rows_by_id = {}
-        for v in volunteers:
-            hours = parse_hours(v.availability)
-            ranges = build_ranges(hours)
-
-            if ranges:
-                range_label = ", ".join(
-                    f"{format_hour(start)}-{format_hour(end)}"
-                    for start, end in ranges
-                )
-            else:
-                range_label = "N/A"
-
-            volunteer_rows_by_id[v.id] = {
-                "name": f"{v.first_name} {v.last_name}",
-                "email": v.email,
-                "hours": hours,
-                "ranges": ranges,
-                "range_label": range_label
-            }
+        # volunteer_rows_by_id = {}
+        # for v in volunteers:
+        #     hours = parse_hours(v.availability)
+        #     ranges = build_ranges(hours)
+        #     if ranges:
+        #         range_label = ", ".join(
+        #             f"{format_hour(start)}-{format_hour(end)}"
+        #             for start, end in ranges
+        #         )
+        #     else:
+        #         range_label = "N/A"
+        #     volunteer_rows_by_id[v.id] = {
+        #         "name": f"{v.first_name} {v.last_name}",
+        #         "email": v.email,
+        #         "hours": hours,
+        #         "ranges": ranges,
+        #         "range_label": range_label
+        #     }
 
         sheet = get_sheet()
         rows = sheet.get_all_records()
 
+        station_name_to_id = {
+            str(station.station_name).strip().lower(): station.station_id
+            for station in stations
+        }
+
+        volunteer_id_by_email = {
+            v.email.strip().lower(): v.id
+            for v in volunteers
+            if v.email
+        }
+
+        return {
+            "sample_rows": rows[:10],
+            "station_name_to_id": station_name_to_id,
+            "volunteer_id_by_email_sample": list(volunteer_id_by_email.keys())[:20]
+        }
+
         # station_to_volunteer_ids = {}
         # for station in stations:
         #     station_to_volunteer_ids[station.station_id] = set()
-
-        # station_name_to_id = {
-        #     str(station.station_name).strip().lower(): station.station_id
-        #     for station in stations
-        # }
-
-        # volunteer_id_by_email = {
-        #     v.email.strip().lower(): v.id
-        #     for v in volunteers
-        #     if v.email
-        # }
 
         # for row in rows:
         #     email = str(row.get("Email", "")).strip().lower()
@@ -879,12 +876,10 @@ def volunteer_hours():
 
         #     station_data[station_name].sort(key=lambda x: x["name"])
 
-        # return station_data
-        return {
-            "sample_rows": rows[:10],
-            "station_name_to_id": station_name_to_id,
-            "volunteer_id_by_email_sample": list(volunteer_id_by_email.keys())[:20]
-        }
+        # return render_template(
+        #     "volunteer-hours.html",
+        #     station_data=station_data
+        # )
 
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
