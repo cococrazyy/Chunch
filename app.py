@@ -1013,6 +1013,16 @@ def get_applicant_sheet():
     sheet = spreadsheet.worksheet("Applicants")
     return sheet
 
+@app.route("/admin/sync-applicants", methods=["GET", "POST"])
+def sync_applicants():
+    if "user_id" not in session:
+        return redirect("/")
+
+    sheet = get_applicant_sheet()
+    rows = sheet.get_all_records()
+
+    return {"row_count": len(rows)}
+
 # @app.route("/admin/sync-applicants", methods=["GET", "POST"])
 # def sync_applicants():
 #     try:
