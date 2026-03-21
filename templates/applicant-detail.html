@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Applicant Detail</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
+      margin: 0;
+      padding: 24px;
+      color: #1f2937;
+    }
+
+    .card {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    h1 {
+      margin-top: 0;
+    }
+
+    .row {
+      margin-bottom: 16px;
+    }
+
+    .label {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 24px;
+    }
+
+    button, .back-link {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 14px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .accept {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .reject {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .back-link {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+
+    form {
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>{{ applicant.first_name }} {{ applicant.last_name }}</h1>
+
+    <div class="row">
+      <div class="label">Email</div>
+      <div>{{ applicant.email }}</div>
+    </div>
+
+    <div class="row">
+      <div class="label">Phone Number</div>
+      <div>{{ applicant.phone }}</div>
+    </div>
+
+    <div class="row">
+      <div class="label">Member</div>
+      <div>{{ applicant.availability }}</div>
+    </div>
+
+    <div class="row">
+      <div class="label">Unavailability</div>
+      <div>{{ applicant.unavailability }}</div>
+    </div>
+
+    <div class="row">
+      <div class="label">Status</div>
+      <div>{{ applicant.status }}</div>
+    </div>
+
+    <div class="actions">
+      <form method="POST" action="/admin/inbox/accept/{{ applicant.id }}">
+        <button class="accept" type="submit" onclick="return confirm('Accept this applicant?')">Accept</button>
+      </form>
+
+      <form method="POST" action="/admin/inbox/reject/{{ applicant.id }}">
+        <button class="reject" type="submit" onclick="return confirm('Reject this applicant?')">Reject</button>
+      </form>
+
+      <a class="back-link" href="/admin/inbox">Back to Inbox</a>
+    </div>
+  </div>
+</body>
+</html>
