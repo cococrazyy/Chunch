@@ -1020,11 +1020,11 @@ def sync_applicants():
 
     try:
         sheet = get_applicant_sheet()
-        rows = sheet.get_all_records()
+        values = sheet.get_all_values()
 
         return {
-            "row_count": len(rows),
-            "sample": rows[:3]
+            "row_count_all_values": len(values),
+            "first_5_rows": values[:5]
         }
 
     except Exception as e:
