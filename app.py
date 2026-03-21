@@ -76,7 +76,7 @@ class Applicant(db.Model, SoftDeleteMixin):
         ), nullable=False, default="pending"
     )
     availability = Column(String(500))
-    unvavailability = Column(String(500))
+    unavailability = Column(String(500))
     
 # creating user account class
 # only admins and captains should have be on this table
