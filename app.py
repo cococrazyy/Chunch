@@ -669,6 +669,17 @@ def view_deleted():
 
     deleted = Volunteer.query.filter(Volunteer.deleted_at.is_not(None))
     return render_template("deleted-volunteers.html", deleted=deleted)
+
+@app.route("/admin/master-list/deleted-volunteers/permadelete/<int:volunteer_id>", methods=["POST"])
+def perma_delete(volunteer_id):
+    if "user_id" not in session:
+        return redirect("/")
+    volunteer = Volunteer.query.get_or_404(volunteer_id)
+    if volunteer:
+        db.session.delete(volunteer)
+        db.session.commit()
+    return redirect("/admin/master-list/deleted-volunteers")
+
 @app.route("/admin/debug-assignments2")
 def debug_assignments():
     assignments = Assignment.query.all()
