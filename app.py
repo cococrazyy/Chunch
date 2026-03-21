@@ -54,7 +54,7 @@ class Volunteer(db.Model, SoftDeleteMixin):
     last_name = Column(String(50))
 
     email = Column(String(100), unique=True)
-
+    phone = Column(String(100), unique=True)
     #station_id = Column(Integer, ForeignKey("station.station_id"))
     #station = relationship("Station")
 
@@ -1018,9 +1018,10 @@ def sync_volunteers():
 
         for row in rows:
             email = str(row.get("Email", "")).strip().lower()
+            phone = str(row.get("Phone Number", "")).strip()
             if not email:
                 continue
-
+            
             volunteer = Volunteer.query.filter_by(email=email).first()
 
             if not volunteer:
@@ -1028,9 +1029,12 @@ def sync_volunteers():
                     first_name=row["First Name"],
                     last_name=row["Last Name"],
                     email=email
+                    phone=phone
                 )
                 db.session.add(volunteer)
-
+            if not volunteer.phone and phone:
+                volunteer.phone = phone
+            
         db.session.commit()
 
         def parse_time_to_hour(time_str):
