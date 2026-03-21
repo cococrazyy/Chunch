@@ -2,7 +2,7 @@ from flask import Flask, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy import Column, Integer, String
-from sqlalchemy import Column, Integer, String, Enum, Date, Time, Boolean, Text
+from sqlalchemy import Column, Integer, String, Enum, Date, Time, Boolean
 from sqlalchemy.orm import DeclarativeBase, relationship
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship, backref
@@ -57,11 +57,6 @@ class Volunteer(db.Model, SoftDeleteMixin):
     phone = Column(String(100), unique=True)
     #station_id = Column(Integer, ForeignKey("station.station_id"))
     #station = relationship("Station")
-    is_absent = Column(Boolean, default=False, nullable=False)
-    absence_start = Column(Date, nullable=True)
-    absence_end = Column(Date, nullable=True)
-    covered_by_volunteer_id = Column(Integer, ForeignKey("volunteers.id"), nullable=True)
-    absence_note = Column(Text, nullable=True)
 
 #for people signing up to volunteer that will be placed in inbox
 class Applicant(db.Model, SoftDeleteMixin):
@@ -146,11 +141,6 @@ class Assignment(db.Model):
     created_by = Column(Integer, ForeignKey("user_account.user_id"))
 
    # original_station_id = Column(Integer, ForeignKey("station.station_id"))
-    is_temporary_coverage = Column(Boolean, default=False, nullable=False)
-    original_station_id = Column(Integer, ForeignKey("station.station_id"), nullable=True)
-    covers_for_volunteer_id = Column(Integer, ForeignKey("volunteers.id"), nullable=True)
-    coverage_start = Column(Date, nullable=True)
-    coverage_end = Column(Date, nullable=True)
 
     volunteer = relationship("Volunteer", backref = "assignments")
     station = relationship("Station", backref = "assignments")
@@ -326,11 +316,6 @@ def add_test_assignment():
 #
 #    db.session.commit()
 #    return {"message": f"Deleted {len(assignments)} assignments for volunteer {volunteer_id}"}
-
-@app.route("/test_absence")
-def test_absence():
-    v = Volunteer.query.first()
-    return str(v.is_absent)
 
 @app.route("/admin/debug-hourly-final")
 def debug_hourly_final():
