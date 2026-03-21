@@ -215,9 +215,12 @@
                     {% for a in applicants %}
                     <tr>
                         <td>
-                            <a class="name-link" href="/admin/inbox/{{ a.id }}">
-                                {{ a.first_name }} {{ a.last_name }}
-                            </a>
+                          <a class="name-link view-link" href="/admin/inbox/{{ a.id }}">
+                          <span class="applicant-name">{{ a.first_name }} {{ a.last_name }}</span>
+                          <span class="view-indicator">
+                            👁 View
+                          </span>
+                          </a>
                         </td>
                         <td class="muted">{{ a.email }}</td>
                         <td class="muted">{{ a.phone }}</td>
