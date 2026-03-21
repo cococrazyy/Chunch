@@ -1013,55 +1013,55 @@ def get_applicant_sheet():
     sheet = spreadsheet.worksheet("Applicants")
     return sheet
 
-@app.route("/admin/sync-applicants", methods=["GET", "POST"])
-def sync_applicants():
-    try:
-        if "user_id" not in session:
-            return redirect("/")
+# @app.route("/admin/sync-applicants", methods=["GET", "POST"])
+# def sync_applicants():
+#     try:
+#         if "user_id" not in session:
+#             return redirect("/")
 
-        sheet = get_applicant_sheet()
-        rows = sheet.get_all_records()
+#         sheet = get_applicant_sheet()
+#         rows = sheet.get_all_records()
 
-        for row in rows:
-            first_name = str(row.get("First Name", "")).strip()
-            last_name = str(row.get("Last Name", "")).strip()
-            email = str(row.get("Email", "")).strip().lower()
-            phone = str(row.get("Phone Number", "")).strip()
+#         for row in rows:
+#             first_name = str(row.get("First Name", "")).strip()
+#             last_name = str(row.get("Last Name", "")).strip()
+#             email = str(row.get("Email", "")).strip().lower()
+#             phone = str(row.get("Phone Number", "")).strip()
 
-            member = str(row.get("Member", "")).strip()
-            unavailability = str(row.get("Unavailability", "")).strip()
-            other_info = str(row.get("Other Info", "")).strip()
+#             member = str(row.get("Member", "")).strip()
+#             unavailability = str(row.get("Unavailability", "")).strip()
+#             other_info = str(row.get("Other Info", "")).strip()
 
-            if not email:
-                continue
+#             if not email:
+#                 continue
 
-            existing = Applicant.query.filter_by(email=email).first()
+#             existing = Applicant.query.filter_by(email=email).first()
 
-            if not existing:
-                applicant = Applicant(
-                    first_name=first_name,
-                    last_name=last_name,
-                    email=email,
-                    phone=phone,
-                    availability=member,
-                    unavailability=unavailability,
-                    status="pending"
-                )
-                db.session.add(applicant)
-            else:
-                existing.first_name = first_name
-                existing.last_name = last_name
-                existing.phone = phone
-                existing.availability = member
-                existing.unavailability = unavailability
+#             if not existing:
+#                 applicant = Applicant(
+#                     first_name=first_name,
+#                     last_name=last_name,
+#                     email=email,
+#                     phone=phone,
+#                     availability=member,
+#                     unavailability=unavailability,
+#                     status="pending"
+#                 )
+#                 db.session.add(applicant)
+#             else:
+#                 existing.first_name = first_name
+#                 existing.last_name = last_name
+#                 existing.phone = phone
+#                 existing.availability = member
+#                 existing.unavailability = unavailability
 
-        db.session.commit()
+#         db.session.commit()
 
-        return redirect("/admin/inbox")
+#         return redirect("/admin/inbox")
 
-    except Exception as e:
-        db.session.rollback()
-        return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
+#     except Exception as e:
+#         db.session.rollback()
+#         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
 
 def get_drive_service():
