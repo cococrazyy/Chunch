@@ -989,12 +989,18 @@ from google.oauth2.service_account import Credentials
 def get_sheet():
     creds_dict = json.loads(os.environ["GOOGLE_SERVICE_JSON"])
 
-    scopes = ["https://www.googleapis.com/auth/spreadsheets.readonly", 
-             "https://www.googleapis.com/auth/drive"]
-    credentials = Credentials.from_service_account_info(creds_dict, scopes=scopes)
+    scopes = [
+        "https://www.googleapis.com/auth/spreadsheets.readonly",
+        "https://www.googleapis.com/auth/drive"
+    ]
 
+    credentials = Credentials.from_service_account_info(creds_dict, scopes=scopes)
     client = gspread.authorize(credentials)
-    sheet = client.open("Chunch Volunteer Info").sheet1
+
+    spreadsheet = client.open("Chunch Volunteer Info")
+
+    sheet = spreadsheet.worksheet("Volunteer Information")
+
     return sheet
 
 def get_applicant_sheet():
