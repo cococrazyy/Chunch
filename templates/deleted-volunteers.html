@@ -1,4 +1,27 @@
 <!DOCTYPE html>
 <html>
-  
+  <table border="1" cellpadding="6">
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone Number</th>
+        </tr>
+
+        {% for d in deleted %}
+        <tr>
+            <td>{{ d.first_name }} {{ d.last_name }}</td>
+            <td>{{ d.email }}</td>
+            <td>{{ d.phone }}</td>
+           <!-- <td>
+              <form method = "POST" action = "/admin/master-list/delete-volunteer/{{ v.id }}">
+                <button type ="submit"
+                  onclick="return confirm('Delete this volunteer?')">
+                  Delete
+                </button>
+              </form> 
+            </td>
+          -->
+        </tr>
+        {% endfor %}
+    </table>
 </html>
