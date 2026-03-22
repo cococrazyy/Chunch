@@ -538,6 +538,11 @@ async function loadStationBoard() {
     try {
         const response = await fetch("/admin/debug-hourly-final");
         const stationData = await response.json();
+
+        if (!response.ok || stationData.error) {
+            throw new Error(stationData.error || "Failed to load station board.");
+        }
+
         renderStationBoard(stationData);
     } catch (error) {
         document.getElementById("scheduleGrid").innerHTML = `
