@@ -1300,6 +1300,11 @@ def sync_volunteers():
         db.session.rollback()
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
     
+@app.route("/admin/need-coverage")
+def need_coverage_page():
+    volunteers = Volunteer.query.filter(Volunteer.deleted_at.is_(None)).all()
+    return render_template("need-coverage.html", volunteers=volunteers)
+
 #attempting to write a flask cli command to add admins
 import click
 from flask.cli import with_appcontext

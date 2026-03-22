@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Request Coverage</title>
+</head>
+<body>
+
+<h2>Request Coverage</h2>
+<p>Select the volunteer who will be absent.</p>
+
+<select id="absentSelect">
+    {% for v in volunteers %}
+        <option value="{{ v.id }}">
+            {{ v.first_name }} {{ v.last_name }}
+        </option>
+    {% endfor %}
+</select>
+
+<button onclick="submitAbsent()">Next</button>
+
+<script>
+function submitAbsent() {
+    const selected = document.getElementById("absentSelect").value;
+
+    // redirect with query param
+    window.location.href = `/admin/coverage/details?volunteer_id=${selected}`;
+}
+</script>
+
+</body>
+</html>
