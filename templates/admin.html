@@ -43,11 +43,6 @@ body {
     margin-bottom: 6px;
 }
 
-.header-copy p {
-    color: #cbd5e1;
-    font-size: 15px;
-}
-
 .header-tools {
     display: flex;
     align-items: center;
@@ -114,9 +109,9 @@ body {
 }
 
 .summary-bar {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 16px;
-    flex-wrap: wrap;
     margin-bottom: 24px;
 }
 
@@ -124,7 +119,6 @@ body {
     background: white;
     border-radius: 16px;
     padding: 18px 20px;
-    min-width: 180px;
     box-shadow: 0 10px 28px rgba(15, 23, 42, 0.07);
     border: 1px solid #e2e8f0;
 }
@@ -378,16 +372,20 @@ body {
 <div class="page">
     <div class="summary-bar">
         <div class="summary-card">
-            <div class="summary-label">Stations</div>
-            <div class="summary-value" id="stationCount">0</div>
+            <div class="summary-label">Total Volunteers</div>
+            <div class="summary-value" id="totalVolunteersCount">0</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-label">Assigned Volunteers</div>
+            <div class="summary-value" id="assignedVolunteersCount">0</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-label">Total Captains</div>
+            <div class="summary-value" id="captainsCount">0</div>
         </div>
         <div class="summary-card">
             <div class="summary-label">Available Reserves</div>
             <div class="summary-value" id="reserveCount">0</div>
-        </div>
-        <div class="summary-card">
-            <div class="summary-label">Unfilled Stations</div>
-            <div class="summary-value" id="emptyCount">0</div>
         </div>
     </div>
 
@@ -441,13 +439,32 @@ function formatCountLabel(count) {
     return count === 1 ? "1 volunteer" : `${count} volunteers`;
 }
 
+function getVolunteerDisplayName(volunteer) {
+    if (typeof volunteer === "string") return volunteer;
+    return volunteer.name || `${volunteer.firstName || ""} ${volunteer.lastName || ""}`.trim();
+}
+
+function isCaptain(volunteer) {
+    if (!volunteer || typeof volunteer === "string") return false;
+
+    const captainStatus = (volunteer.captain_status || volunteer.captainStatus || "").toString().toLowerCase();
+    const role = (volunteer.role || "").toString().toLowerCase();
+
+    return captainStatus === "captain" || role === "captain";
+}
+
 function renderStationBoard(stationData) {
     const grid = document.getElementById("scheduleGrid");
     grid.innerHTML = "";
 
     const stationNames = Object.keys(stationData);
+    let totalVolunteers = 0;
+    let assignedVolunteers = 0;
+    let captainsCount = 0;
     let reserveCount = 0;
-    let emptyStations = 0;
+
+    const seenVolunteerKeys = new Set();
+    const seenCaptainKeys = new Set();
 
     stationNames.forEach(stationName => {
         if (stationName === "Other") return;
@@ -455,12 +472,12 @@ function renderStationBoard(stationData) {
         const station = stationData[stationName];
         const volunteers = station.volunteers || [];
 
+        totalVolunteers += volunteers.length;
+
         if (stationName === "Reserve") {
             reserveCount = volunteers.length;
-        }
-
-        if (volunteers.length === 0) {
-            emptyStations += 1;
+        } else {
+            assignedVolunteers += volunteers.length;
         }
 
         const card = document.createElement("div");
@@ -474,9 +491,26 @@ function renderStationBoard(stationData) {
         if (volunteers.length > 0) {
             volunteerHTML = `
                 <div class="volunteer-list">
-                    ${volunteers.map(name => `
-                        <div class="volunteer-pill">${name}</div>
-                    `).join("")}
+                    ${volunteers.map(volunteer => {
+                        const displayName = getVolunteerDisplayName(volunteer);
+                        const uniqueKey =
+                            typeof volunteer === "string"
+                                ? displayName
+                                : (volunteer.id ?? displayName);
+
+                        if (!seenVolunteerKeys.has(uniqueKey)) {
+                            seenVolunteerKeys.add(uniqueKey);
+                        }
+
+                        if (isCaptain(volunteer) && !seenCaptainKeys.has(uniqueKey)) {
+                            seenCaptainKeys.add(uniqueKey);
+                            captainsCount += 1;
+                        }
+
+                        return `
+                            <div class="volunteer-pill">${displayName}</div>
+                        `;
+                    }).join("")}
                 </div>
             `;
         } else {
@@ -494,9 +528,10 @@ function renderStationBoard(stationData) {
         grid.appendChild(card);
     });
 
-    document.getElementById("stationCount").textContent = stationNames.filter(name => name !== "Other").length;
+    document.getElementById("totalVolunteersCount").textContent = totalVolunteers;
+    document.getElementById("assignedVolunteersCount").textContent = assignedVolunteers;
+    document.getElementById("captainsCount").textContent = captainsCount;
     document.getElementById("reserveCount").textContent = reserveCount;
-    document.getElementById("emptyCount").textContent = emptyStations;
 }
 
 async function loadStationBoard() {
@@ -528,7 +563,7 @@ async function loadSchedule() {
         const converted = {};
         data.forEach(station => {
             converted[station.stationName] = {
-                volunteers: (station.volunteers || []).map(v => `${v.firstName} ${v.lastName}`)
+                volunteers: station.volunteers || []
             };
         });
 
