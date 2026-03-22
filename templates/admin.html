@@ -58,6 +58,106 @@ body {
     background: white;
     color: #0f172a;
 }
+.detail-panel {
+    position: fixed;
+    top: 0;
+    right: -460px;
+    width: 420px;
+    max-width: 92vw;
+    height: 100vh;
+    background: white;
+    box-shadow: -10px 0 30px rgba(15, 23, 42, 0.2);
+    z-index: 1000;
+    transition: right 0.25s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-panel.open {
+    right: 0;
+}
+
+.detail-panel-header {
+    padding: 22px 22px 16px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+}
+
+.detail-panel-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.detail-panel-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.detail-btn {
+    border: none;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.detail-btn.back {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+.detail-btn.edit {
+    background: #2563eb;
+    color: white;
+}
+
+.detail-panel-body {
+    padding: 22px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.detail-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 16px;
+    background: #f8fafc;
+}
+
+.detail-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-bottom: 6px;
+}
+
+.detail-value {
+    font-size: 15px;
+    font-weight: 600;
+    color: #0f172a;
+    word-break: break-word;
+}
+
+.detail-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.28);
+    z-index: 999;
+    display: none;
+}
+
+.detail-overlay.open {
+    display: block;
+}
 
 .load-btn,
 .header button {
@@ -524,7 +624,7 @@ function renderStationBoard(stationData) {
                         }
 
                         return `
-                            <button class="volunteer-pill" type="button">
+                            <button class="volunteer-pill" type="button" onclick='openVolunteerPanel(${JSON.stringify(JSON.stringify(volunteer))})'>
                                 ${displayName}
                             </button>
                         `;
@@ -609,8 +709,56 @@ function submitAbsent() {
     alert(`Coverage flow placeholder for volunteer ID ${selected}`);
 }
 
+function openVolunteerPanel(volunteerJson) {
+    const volunteer = JSON.parse(volunteerJson);
+
+    document.getElementById("detailName").textContent = volunteer.name || "Volunteer";
+    document.getElementById("detailEmail").textContent = volunteer.email || "None listed";
+    document.getElementById("detailPhone").textContent = volunteer.phone || "None listed";
+    document.getElementById("detailCaptain").textContent = volunteer.captain_status || "Volunteer";
+
+    document.getElementById("detailPanel").classList.add("open");
+    document.getElementById("detailOverlay").classList.add("open");
+}
+
+function closeVolunteerPanel() {
+    document.getElementById("detailPanel").classList.remove("open");
+    document.getElementById("detailOverlay").classList.remove("open");
+}
+
+function editVolunteer() {
+    alert("Edit feature not wired yet.");
+}
+
 window.addEventListener("DOMContentLoaded", loadStationBoard);
 </script>
+<div id="detailOverlay" class="detail-overlay" onclick="closeVolunteerPanel()"></div>
 
+<div id="detailPanel" class="detail-panel">
+    <div class="detail-panel-header">
+        <div class="detail-panel-title" id="detailName">Volunteer</div>
+        <div class="detail-panel-actions">
+            <button class="detail-btn back" type="button" onclick="closeVolunteerPanel()">Back</button>
+            <button class="detail-btn edit" type="button" onclick="editVolunteer()">Edit</button>
+        </div>
+    </div>
+
+    <div class="detail-panel-body">
+        <div class="detail-card">
+            <div class="detail-label">Email</div>
+            <div class="detail-value" id="detailEmail">—</div>
+        </div>
+
+        <div class="detail-card">
+            <div class="detail-label">Phone</div>
+            <div class="detail-value" id="detailPhone">—</div>
+        </div>
+
+        <div class="detail-card">
+            <div class="detail-label">Captain Status</div>
+            <div class="detail-value" id="detailCaptain">—</div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
