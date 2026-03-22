@@ -627,7 +627,7 @@ def master_list():
             "last_name": v.last_name,
             "email": v.email,
             "phone": v.phone,
-            "captain_status": user.role if role.is_not(None) else "Volunteer"
+            "captain_status": user.role if user.role.is_not(None) else "Volunteer"
         })
 
     return render_template("master-list.html", volunteers=volunteer_rows)
