@@ -606,10 +606,31 @@ def undo_rejection(applicants_id):
 @app.route("/admin/master-list")
 def master_list():
     volunteers = Volunteer.query\
-    .filter(Volunteer.deleted_at.is_(None))\
-    .order_by(Volunteer.last_name)\
-    .all()
-    return render_template("master-list.html", volunteers=volunteers)
+        .filter(Volunteer.deleted_at.is_(None))\
+        .order_by(Volunteer.last_name)\
+        .all()
+
+    accounts = UserAccount.query.all()
+    role_by_volunteer_id = {
+        account.volunteer_id: account.role
+        for account in accounts
+        if account.volunteer_id is not None
+    }
+
+    volunteer_rows = []
+    for v in volunteers:
+        role = role_by_volunteer_id.get(v.id, "volunteer")
+
+        volunteer_rows.append({
+            "id": v.id,
+            "first_name": v.first_name,
+            "last_name": v.last_name,
+            "email": v.email,
+            "phone": v.phone,
+            "captain_status": "Captain" if role == "captain" else "Volunteer"
+        })
+
+    return render_template("master-list.html", volunteers=volunteer_rows)
     
 
 @app.route("/admin/master-list/add-volunteer", methods=["POST"])
