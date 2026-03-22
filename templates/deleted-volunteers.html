@@ -1,35 +1,141 @@
 <!DOCTYPE html>
-<html>
-  <table border="1" cellpadding="6">
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Deleted Volunteers</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    margin: 0;
+    padding: 24px;
+    color: #1e293b;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+h1 {
+    margin-bottom: 16px;
+}
+
+.top-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+button {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.secondary {
+    background: #64748b;
+    color: white;
+}
+
+.danger {
+    background: #dc2626;
+    color: white;
+}
+
+.success {
+    background: #16a34a;
+    color: white;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+th {
+    text-align: left;
+    background: #e2e8f0;
+    padding: 10px;
+}
+
+td {
+    padding: 10px;
+    border-top: 1px solid #e2e8f0;
+}
+
+tr:hover {
+    background: #f8fafc;
+}
+
+.actions-cell {
+    display: flex;
+    gap: 8px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Deleted Volunteers</h1>
+
+<div class="top-actions">
+    <button class="secondary" onclick="window.location.href='/admin/master-list'">
+        Back to Master List
+    </button>
+</div>
+
+<table>
+    <thead>
         <tr>
             <th>Name</th>
             <th>Email</th>
             <th>Phone Number</th>
+            <th></th>
         </tr>
+    </thead>
 
+    <tbody>
         {% for d in deleted %}
         <tr>
             <td>{{ d.first_name }} {{ d.last_name }}</td>
             <td>{{ d.email }}</td>
             <td>{{ d.phone }}</td>
-            <td>
-              <form method = "POST" action = "/admin/master-list/deleted-volunteers/permadelete/{{ d.id }}">
-                <button type ="submit"
-                  onclick="return confirm('Permanently delete this volunteer?')">
-                  Permanently Delete
-                </button>
-              </form>
-            </td>
-            <td>
-              <form method = "POST" action = "/admin/master-list/deleted-volunteers/undo/{{ d.id }}">
-                <button type ="submit"
-                  onclick="return confirm('Undo deletion of this volunteer?')">
-                  Undo Delete
-                </button>
-              </form>
+            <td class="actions-cell">
+
+                <form method="POST" action="/admin/master-list/deleted-volunteers/permadelete/{{ d.id }}">
+                    <button class="danger" type="submit"
+                        onclick="return confirm('Permanently delete this volunteer?')">
+                        Permanently Delete
+                    </button>
+                </form>
+
+                <form method="POST" action="/admin/master-list/deleted-volunteers/undo/{{ d.id }}">
+                    <button class="success" type="submit"
+                        onclick="return confirm('Undo deletion of this volunteer?')">
+                        Restore
+                    </button>
+                </form>
+
             </td>
         </tr>
-        
         {% endfor %}
-    </table>
+    </tbody>
+</table>
+
+</div>
+
+</body>
 </html>
