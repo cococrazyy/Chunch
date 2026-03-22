@@ -139,6 +139,7 @@ tr:hover {
             <th>Name</th>
             <th>Email</th>
             <th>Phone Number</th>
+            <th>Captain Status</th>
             <th></th>
         </tr>
     </thead>
@@ -149,6 +150,7 @@ tr:hover {
             <td>{{ v.first_name }} {{ v.last_name }}</td>
             <td>{{ v.email }}</td>
             <td>{{ v.phone }}</td>
+            <td>{{ v.captain_status }}</td>
             <td class="actions-cell">
                 <form method="POST" action="/admin/master-list/delete-volunteer/{{ v.id }}">
                     <button class="danger" type="submit"
