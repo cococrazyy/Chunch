@@ -573,14 +573,30 @@ def inbox():
     rejected = Applicant.query.filter(Applicant.status == 'rejected').all()
     return render_template("inbox.html", applicants=applicants, rejected=rejected)
 
-@app.route("/admin/inbox/accept/<int:applicants_id>", methods=["POST"])
+@app.route("/admin/inbox/accept/<int:applicants_id", methods=["POST"])
 def accept_applicant(applicants_id):
     if "user_id" not in session:
         return redirect("/")
     applicant = Applicant.query.get_or_404(applicants_id)
-    if applicant:
-        applicant.status = 'accepted'
-        db.session.commit()
+    volunteer = Volunteer(
+        first_name=applicant.first_name,
+        last_name=applicant.last_name,
+        email=applicant.email,
+        phone=applicant.phone
+    )
+    db.session.add(volunteer)
+    db.session.flush()  
+    
+    assignment = Assignment(
+        volunteer_id=volunteer.id,
+        station_id=station_id,
+        schedule_id=schedule_id
+    )
+    db.session.add(assignment)
+
+    applicant.status = "accepted"
+    db.session.commit()
+
     return redirect("/admin/inbox")
 
 @app.route("/admin/inbox/reject/<int:applicants_id>", methods=["POST"])
