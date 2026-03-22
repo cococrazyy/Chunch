@@ -571,9 +571,13 @@ def debug_hourly_data():
 def inbox():
     applicants = Applicant.query.filter(Applicant.status == 'pending').all()
     rejected = Applicant.query.filter(Applicant.status == 'rejected').all()
-    return render_template("inbox.html", applicants=applicants, rejected=rejected)
 
-@app.route("/admin/inbox/accept/<int:applicants_id", methods=["POST"])
+    stations = Station.query.all()
+    schedules = Schedule.query.all()
+    return render_template("inbox.html", applicants=applicants, rejected=rejected, 
+                           stations=stations, schedules=schedules)
+
+@app.route("/admin/inbox/accept-with-assignment/<int:applicants_id>", methods=["POST"])
 def accept_applicant(applicants_id):
     if "user_id" not in session:
         return redirect("/")
