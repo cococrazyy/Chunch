@@ -330,23 +330,11 @@ def debug_hourly_final():
             .order_by(Station.station_name)\
             .all()
 
-        # Build volunteer data (NOW RETURNS FULL OBJECTS)
-        volunteer_rows_by_id = {}
+        volunteer_rows_by_id = {
+            v.id: f"{v.first_name} {v.last_name}"
+            for v in volunteers
+        }
 
-        for v in volunteers:
-            role = "Volunteer"
-            if v.account and v.account.role == "captain":
-                role = "Captain"
-
-            volunteer_rows_by_id[v.id] = {
-                "id": v.id,
-                "name": f"{v.first_name} {v.last_name}",
-                "email": v.email or "",
-                "phone": v.phone or "",
-                "captain_status": role
-            }
-
-        # Prepare mappings
         station_to_volunteer_ids = {
             station.station_id: set()
             for station in stations
@@ -363,7 +351,6 @@ def debug_hourly_final():
             if v.email
         }
 
-        # Read sheet
         sheet = get_sheet()
         rows = sheet.get_all_records()
 
@@ -385,23 +372,18 @@ def debug_hourly_final():
 
             station_to_volunteer_ids[station_id].add(volunteer_id)
 
-        # Build final output
         station_data = {}
 
         for station in stations:
             station_name = str(station.station_name)
             assigned_ids = station_to_volunteer_ids.get(station.station_id, set())
 
-            volunteers_for_station = [
-                volunteer_rows_by_id[vid]
-                for vid in assigned_ids
-                if vid in volunteer_rows_by_id
-            ]
-
-            volunteers_for_station.sort(key=lambda x: x["name"])
-
             station_data[station_name] = {
-                "volunteers": volunteers_for_station
+                "volunteers": [
+                    volunteer_rows_by_id[vid]
+                    for vid in assigned_ids
+                    if vid in volunteer_rows_by_id
+                ]
             }
 
         return station_data
@@ -409,7 +391,37 @@ def debug_hourly_final():
     except Exception as e:
         return {"error": str(e)}, 500
 
-        
+@app.route("/admin/debug-other-check")
+def debug_other_check():
+    volunteers = Volunteer.query\
+        .filter(Volunteer.deleted_at.is_(None))\
+        .order_by(Volunteer.id)\
+        .all()
+
+    assignments = Assignment.query\
+        .order_by(Assignment.assignment_id.asc())\
+        .all()
+
+    latest_station_by_volunteer = {}
+    for assignment in assignments:
+        if assignment.station_id is None or assignment.volunteer_id is None:
+            continue
+        latest_station_by_volunteer[assignment.volunteer_id] = assignment.station_id
+
+    assigned_volunteer_ids = set(latest_station_by_volunteer.keys())
+
+    return {
+        "assigned_volunteer_ids": list(assigned_volunteer_ids),
+        "volunteer_rows_by_id_keys": [v.id for v in volunteers],
+        "sample_pairs": [
+            {
+                "volunteer_id": v.id,
+                "is_assigned": v.id in assigned_volunteer_ids
+            }
+            for v in volunteers[:15]
+        ]
+    }
+
 @app.route("/admin/debug-hourly-data")
 def debug_hourly_data():
     volunteers = Volunteer.query\
