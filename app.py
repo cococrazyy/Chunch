@@ -330,10 +330,27 @@ def debug_hourly_final():
             .order_by(Station.station_name)\
             .all()
 
-        volunteer_rows_by_id = {
-            v.id: f"{v.first_name} {v.last_name}"
-            for v in volunteers
+        accounts = UserAccount.query.all()
+        role_by_volunteer_id = {
+            account.volunteer_id: account.role
+            for account in accounts
+            if account.volunteer_id is not None
         }
+
+        volunteer_rows_by_id = {}
+
+        for v in volunteers:
+            captain_status = "Volunteer"
+            if role_by_volunteer_id.get(v.id) == "captain":
+                captain_status = "Captain"
+
+            volunteer_rows_by_id[v.id] = {
+                "id": v.id,
+                "name": f"{v.first_name} {v.last_name}",
+                "email": v.email or "",
+                "phone": v.phone or "",
+                "captain_status": captain_status
+            }
 
         station_to_volunteer_ids = {
             station.station_id: set()
@@ -378,12 +395,16 @@ def debug_hourly_final():
             station_name = str(station.station_name)
             assigned_ids = station_to_volunteer_ids.get(station.station_id, set())
 
+            volunteers_for_station = [
+                volunteer_rows_by_id[vid]
+                for vid in assigned_ids
+                if vid in volunteer_rows_by_id
+            ]
+
+            volunteers_for_station.sort(key=lambda x: x["name"])
+
             station_data[station_name] = {
-                "volunteers": [
-                    volunteer_rows_by_id[vid]
-                    for vid in assigned_ids
-                    if vid in volunteer_rows_by_id
-                ]
+                "volunteers": volunteers_for_station
             }
 
         return station_data
