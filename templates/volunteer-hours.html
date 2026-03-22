@@ -6,35 +6,91 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 24px;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 24px;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            margin: 0;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: none;
+            background: #64748b;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.9;
         }
 
         .controls {
             margin-bottom: 20px;
         }
 
+        select {
+            padding: 6px 8px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+        }
+
         #chartWrapper {
             width: 100%;
-            overflow-x: auto;
         }
 
         #hoursChart {
-            min-width: 1200px;
-            max-height: 700px;
+            width: 100% !important;
+            height: 500px !important;
         }
     </style>
 </head>
 <body>
-    <h1>checkingVolunteer Hours by Station</h1>
+<div class="container">
+
+    <div class="top-bar">
+        <h1>Volunteer Hours by Station</h1>
+        <button onclick="window.location.href='/admin'">Back to Dashboard</button>
+    </div>
 
     <div class="controls">
         <label for="stationSelect">Select Station:</label>
         <select id="stationSelect"></select>
     </div>
 
-    <div id="chartWrapper">
-        <canvas id="hoursChart"></canvas>
+    <div class="chart-card">
+        <div id="chartWrapper">
+            <canvas id="hoursChart"></canvas>
+        </div>
     </div>
+
+</div>
 
 <script>
     const stationData = {{ station_data | tojson | safe }};
@@ -69,8 +125,8 @@
                         return [startHour, endHour];
                     }),
                     borderWidth: 1,
-                    barPercentage: 0.9,
-                    categoryPercentage: 0.9
+                    barPercentage: 0.6,
+                    categoryPercentage: 0.7
                 });
             });
         });
@@ -80,8 +136,8 @@
                 label: "No scheduled hours",
                 data: volunteers.map(() => null),
                 borderWidth: 1,
-                barPercentage: 1.0,
-                categoryPercentage: 1.0 
+                barPercentage: 0.6,
+                categoryPercentage: 0.7
             });
         }
 
