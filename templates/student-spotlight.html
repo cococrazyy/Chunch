@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Spotlight</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background: #f4f6f9;
+    color: #1f2937;
+}
+
+.navbar {
+    background: #0f172a;
+    padding: 18px 40px;
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    flex-wrap: wrap;
+}
+
+.navbar a {
+    text-decoration: none;
+    color: white;
+    font-weight: 600;
+    padding: 10px 18px;
+    border-radius: 8px;
+    transition: 0.3s ease;
+}
+
+.navbar a:hover {
+    background: #2563eb;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 80px auto;
+    padding: 0 20px;
+    text-align: center;
+}
+
+h1 {
+    font-size: 48px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #111827;
+}
+
+.subtitle {
+    font-size: 18px;
+    color: #6b7280;
+    margin-bottom: 40px;
+}
+
+.spotlight-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-top: 20px;
+}
+
+.spotlight-card {
+    background: white;
+    border-radius: 18px;
+    padding: 24px;
+    text-align: left;
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+    border: 1px solid #e5e7eb;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.spotlight-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 32px rgba(15, 23, 42, 0.12);
+}
+
+.student-name {
+    font-size: 22px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 6px;
+}
+
+.student-year {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2563eb;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.student-quote {
+    font-size: 16px;
+    line-height: 1.7;
+    color: #374151;
+}
+
+.student-quote::before {
+    content: "“";
+    font-size: 28px;
+    font-weight: 700;
+    color: #2563eb;
+    margin-right: 4px;
+}
+
+.student-quote::after {
+    content: "”";
+    font-size: 28px;
+    font-weight: 700;
+    color: #2563eb;
+    margin-left: 4px;
+}
+
+.empty-state {
+    margin-top: 40px;
+    color: #6b7280;
+    font-size: 17px;
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        gap: 12px;
+        padding: 15px 20px;
+    }
+
+    .container {
+        margin: 60px auto;
+    }
+
+    h1 {
+        font-size: 34px;
+    }
+
+    .subtitle {
+        font-size: 16px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<nav class="navbar">
+    <a href="index.html">HOME</a>
+    <a href="#">MEET THE TEAM</a>
+    <a href="contribute.html">CONTRIBUTE</a>
+    <a href="volunteer-intro-vids.html">VOLUNTEER</a>
+    <a href="/student-spotlight">STUDENTS</a>
+</nav>
+
+<div class="container">
+    <h1>Student Spotlight</h1>
+    <p class="subtitle">Hear directly from students about what Chunch means to them.</p>
+
+    {% if spotlight_entries %}
+        <div class="spotlight-grid">
+            {% for entry in spotlight_entries %}
+                <div class="spotlight-card">
+                    <div class="student-name">{{ entry.name }}</div>
+                    <div class="student-year">{{ entry.year }}</div>
+                    <div class="student-quote">{{ entry.quote }}</div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="empty-state">No spotlight entries available yet.</p>
+    {% endif %}
+</div>
+
+</body>
+</html>
