@@ -122,6 +122,25 @@ class Station(db.Model):
         )
     )
 
+class Absence(db.Model):
+    __tablename__ = "absences"
+
+    absence_id = Column(Integer, primary_key=True)
+
+    volunteer_id = Column(Integer, ForeignKey("volunteers.id"), nullable=False)
+
+    start_date = Column(Date, nullable=False)
+    end_date = Column(Date, nullable=False)
+
+    is_partial = Column(Boolean, nullable=False, default=False)
+
+    partial_start_hour = Column(Integer, nullable=True)
+    partial_end_hour = Column(Integer, nullable=True)
+
+    notes = Column(String(255), nullable=True)
+
+    volunteer = relationship("Volunteer", backref="absences")
+
 # creating schedule table
 class Schedule(db.Model, SoftDeleteMixin):
     __tablename__ = "schedule"
