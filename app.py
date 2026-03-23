@@ -292,30 +292,81 @@ def coverage_details():
 
         return None
 
+    def parse_hour_list(text):
+        text = str(text).strip()
+        if not text:
+            return []
+
+        normalized = text.replace("–", "-").replace("—", "-")
+        parts = [part.strip() for part in normalized.split(",") if part.strip()]
+
+        hours = set()
+
+        for part in parts:
+            if "-" in part:
+                start_str, end_str = part.split("-", 1)
+                start_hour = parse_time_to_hour(start_str)
+                end_hour = parse_time_to_hour(end_str)
+
+                if start_hour is None or end_hour is None:
+                    continue
+
+                if start_hour > end_hour:
+                    continue
+
+                for hour in range(start_hour, end_hour + 1):
+                    hours.add(hour)
+            else:
+                single_hour = parse_time_to_hour(part)
+                if single_hour is not None:
+                    hours.add(single_hour)
+
+        return sorted(hours)
+
     def parse_shift_hours(shift_text):
-        shift_text = str(shift_text).strip()
-        if not shift_text:
-            return []
-
-        normalized = shift_text.replace("–", "-").replace("—", "-")
-        parts = normalized.split("-", 1)
-
-        if len(parts) != 2:
-            return []
-
-        start_hour = parse_time_to_hour(parts[0])
-        end_hour = parse_time_to_hour(parts[1])
-
-        if start_hour is None or end_hour is None:
-            return []
-
-        if start_hour > end_hour:
-            return []
-
-        return list(range(start_hour, end_hour + 1))
+        return parse_hour_list(shift_text)
 
     typical_shift = str(absent_row.get("Typical Shift", "")).strip()
     shift_hours = parse_shift_hours(typical_shift)
+    shift_hour_set = set(shift_hours)
+
+    fully_available_reserves = []
+    partial_overlap_reserves = []
+
+    for row in rows:
+        email = str(row.get("Email", "")).strip().lower()
+        typical_station = str(row.get("Typical Station", "")).strip().lower()
+
+        if not email or typical_station != "reserve":
+            continue
+
+        volunteer = Volunteer.query\
+            .filter(Volunteer.deleted_at.is_(None), Volunteer.email == email)\
+            .first()
+
+        if not volunteer:
+            continue
+
+        unavailability_text = str(row.get("Unavailability", "")).strip()
+        unavailable_hours = parse_hour_list(unavailability_text)
+        unavailable_hour_set = set(unavailable_hours)
+
+        overlapping_hours = sorted(shift_hour_set.intersection(unavailable_hour_set))
+
+        reserve_info = {
+            "id": volunteer.id,
+            "name": f"{volunteer.first_name} {volunteer.last_name}",
+            "email": volunteer.email,
+            "phone": volunteer.phone,
+            "typical_shift": str(row.get("Typical Shift", "")).strip(),
+            "unavailability": unavailability_text,
+            "overlapping_hours": overlapping_hours
+        }
+
+        if len(overlapping_hours) == 0:
+            fully_available_reserves.append(reserve_info)
+        else:
+            partial_overlap_reserves.append(reserve_info)
 
     return {
         "absent_volunteer": {
@@ -325,9 +376,11 @@ def coverage_details():
             "typical_shift": typical_shift,
             "shift_hours": shift_hours,
             "unavailability": str(absent_row.get("Unavailability", "")).strip()
-        }
+        },
+        "fully_available_reserves": fully_available_reserves,
+        "partial_overlap_reserves": partial_overlap_reserves
     }
-    
+
 @app.route("/debug/add-test-assignment")
 def add_test_assignment():
     return {"message": "disabled"}
