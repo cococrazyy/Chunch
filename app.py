@@ -239,145 +239,37 @@ def admin_page():
 
 @app.route("/admin/coverage/details")
 def coverage_details():
-    volunteer_id = request.args.get("volunteer_id", type=int)
+    try:
+        volunteer_id = request.args.get("volunteer_id", type=int)
 
-    if not volunteer_id:
-        return {"error": "Missing volunteer_id"}, 400
+        if not volunteer_id:
+            return {"error": "Missing volunteer_id"}, 400
 
-    absent_volunteer = Volunteer.query\
-        .filter(Volunteer.deleted_at.is_(None), Volunteer.id == volunteer_id)\
-        .first()
-
-    if not absent_volunteer:
-        return {"error": "Volunteer not found"}, 404
-
-    sheet = get_sheet()
-    rows = sheet.get_all_records()
-
-    row_by_email = {}
-    for row in rows:
-        email = str(row.get("Email", "")).strip().lower()
-        if email:
-            row_by_email[email] = row
-
-    absent_email = (absent_volunteer.email or "").strip().lower()
-    absent_row = row_by_email.get(absent_email)
-
-    if not absent_row:
-        return {"error": "Absent volunteer not found in sheet"}, 404
-
-    def parse_time_to_hour(time_str):
-        time_str = str(time_str).strip().upper().replace(" ", "")
-
-        if not time_str:
-            return None
-
-        if time_str.endswith("AM"):
-            raw = time_str[:-2]
-            if ":" in raw:
-                raw = raw.split(":")[0]
-            if not raw.isdigit():
-                return None
-            hour = int(raw)
-            return 0 if hour == 12 else hour
-
-        if time_str.endswith("PM"):
-            raw = time_str[:-2]
-            if ":" in raw:
-                raw = raw.split(":")[0]
-            if not raw.isdigit():
-                return None
-            hour = int(raw)
-            return hour if hour == 12 else hour + 12
-
-        return None
-
-    def parse_hour_list(text):
-        text = str(text).strip()
-        if not text:
-            return []
-
-        normalized = text.replace("–", "-").replace("—", "-")
-        parts = [part.strip() for part in normalized.split(",") if part.strip()]
-
-        hours = set()
-
-        for part in parts:
-            if "-" in part:
-                start_str, end_str = part.split("-", 1)
-                start_hour = parse_time_to_hour(start_str)
-                end_hour = parse_time_to_hour(end_str)
-
-                if start_hour is None or end_hour is None:
-                    continue
-
-                if start_hour > end_hour:
-                    continue
-
-                for hour in range(start_hour, end_hour + 1):
-                    hours.add(hour)
-            else:
-                single_hour = parse_time_to_hour(part)
-                if single_hour is not None:
-                    hours.add(single_hour)
-
-        return sorted(hours)
-
-    typical_shift = str(absent_row.get("Typical Shift", "")).strip()
-    shift_hours = parse_hour_list(typical_shift)
-    shift_hour_set = set(shift_hours)
-
-    fully_available_reserves = []
-    partial_overlap_reserves = []
-
-    for row in rows:
-        email = str(row.get("Email", "")).strip().lower()
-        typical_station = str(row.get("Typical Station", "")).strip().lower()
-
-        if not email or typical_station != "reserve":
-            continue
-
-        volunteer = Volunteer.query\
-            .filter(Volunteer.deleted_at.is_(None), Volunteer.email == email)\
+        absent_volunteer = Volunteer.query\
+            .filter(Volunteer.deleted_at.is_(None), Volunteer.id == volunteer_id)\
             .first()
 
-        if not volunteer:
-            continue
+        if not absent_volunteer:
+            return {"error": "Volunteer not found"}, 404
 
-        unavailability_text = str(row.get("Unavailability", "")).strip()
-        unavailable_hours = parse_hour_list(unavailability_text)
-        unavailable_hour_set = set(unavailable_hours)
+        sheet = get_sheet()
+        rows = sheet.get_all_records()
 
-        overlapping_hours = sorted(shift_hour_set.intersection(unavailable_hour_set))
+        return render_template(
+            "coverage-details.html",
+            absent_volunteer={
+                "id": absent_volunteer.id,
+                "name": f"{absent_volunteer.first_name} {absent_volunteer.last_name}",
+                "email": absent_volunteer.email,
+                "typical_shift": "TEST",
+                "unavailability": ""
+            },
+            fully_available_reserves=[],
+            partial_overlap_reserves=[]
+        )
 
-        reserve_info = {
-            "id": volunteer.id,
-            "name": f"{volunteer.first_name} {volunteer.last_name}",
-            "email": volunteer.email,
-            "phone": volunteer.phone,
-            "typical_shift": str(row.get("Typical Shift", "")).strip(),
-            "unavailability": unavailability_text,
-            "overlapping_hours": overlapping_hours,
-            "special_notes": str(row.get("Special Notes", "")).strip()
-        }
-
-        if len(overlapping_hours) == 0:
-            fully_available_reserves.append(reserve_info)
-        else:
-            partial_overlap_reserves.append(reserve_info)
-
-    return render_template(
-        "coverage-details.html",
-        absent_volunteer={
-            "id": absent_volunteer.id,
-            "name": f"{absent_volunteer.first_name} {absent_volunteer.last_name}",
-            "email": absent_volunteer.email,
-            "typical_shift": typical_shift,
-            "unavailability": str(absent_row.get("Unavailability", "")).strip()
-        },
-        fully_available_reserves=fully_available_reserves,
-        partial_overlap_reserves=partial_overlap_reserves
-    )
+    except Exception as e:
+        return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
 @app.route("/debug/add-test-assignment")
 def add_test_assignment():
