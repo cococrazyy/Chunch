@@ -1079,6 +1079,21 @@ def get_applicant_sheet():
     sheet = spreadsheet.worksheet("Applicants")
     return sheet
 
+def get_spotlight_sheet():
+    creds_dict = json.loads(os.environ["GOOGLE_SERVICE_JSON"])
+
+    scopes = [
+        "https://www.googleapis.com/auth/spreadsheets.readonly",
+        "https://www.googleapis.com/auth/drive"
+    ]
+
+    credentials = Credentials.from_service_account_info(creds_dict, scopes=scopes)
+    client = gspread.authorize(credentials)
+
+    spreadsheet = client.open("Chunch Volunteer Info")
+    sheet = spreadsheet.worksheet("Spotlight")
+    return sheet
+
 @app.route("/admin/inbox/<int:applicant_id>")
 def applicant_detail(applicant_id):
     applicant = Applicant.query.get_or_404(applicant_id)
