@@ -46,7 +46,7 @@
     {% for r in partial_overlap_reserves %}
         <div style="border:1px solid gray; padding:10px; margin-bottom:10px;">
             <strong>{{ r.name }}</strong><br>
-            Overlapping Hours: {{ r.overlapping_hours }}<br>
+            Overlapping Time: {{ r.overlapping_label }}
 
             {% if r.special_notes %}
                 <div style="color:red;">
