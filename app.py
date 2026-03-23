@@ -360,7 +360,8 @@ def coverage_details():
             "phone": volunteer.phone,
             "typical_shift": str(row.get("Typical Shift", "")).strip(),
             "unavailability": unavailability_text,
-            "overlapping_hours": overlapping_hours
+            "overlapping_hours": overlapping_hours,
+            "special_notes": str(row.get("Special Notes", "")).strip()
         }
 
         if len(overlapping_hours) == 0:
