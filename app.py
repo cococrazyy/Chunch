@@ -754,6 +754,36 @@ def undo_delete(volunteer_id):
         volunteer.deleted_at = None
         db.session.commit()
     return redirect("/admin/master-list/deleted-volunteers")
+
+@app.route("/student-spotlight")
+def student_spotlight():
+    try:
+        sheet = get_spotlight_sheet()
+        rows = sheet.get_all_records()
+
+        spotlight_entries = []
+
+        for row in rows:
+            name = str(row.get("Name", "")).strip()
+            year = str(row.get("Year", "")).strip()
+            quote = str(row.get("Quote", "")).strip()
+
+            if not name and not year and not quote:
+                continue
+
+            spotlight_entries.append({
+                "name": name,
+                "year": year,
+                "quote": quote
+            })
+
+        return render_template(
+            "student-spotlight.html",
+            spotlight_entries=spotlight_entries
+        )
+
+    except Exception as e:
+        return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
     
 @app.route("/admin/debug-assignments2")
 def debug_assignments():
