@@ -1493,18 +1493,32 @@ def sync_volunteers():
     
 @app.route("/admin/need-coverage")
 def need_coverage():
-    try:
-        if "user_id" not in session:
-            return redirect("/")
+    if "user_id" not in session:
+        return redirect("/")
 
-        volunteers = Volunteer.query\
-            .filter(Volunteer.deleted_at.is_(None))\
-            .order_by(Volunteer.last_name, Volunteer.first_name)\
-            .all()
+    sheet = get_sheet()
+    rows = sheet.get_all_records()
 
-        return render_template("need-coverage.html", volunteers=volunteers)
-    except Exception as e:
-        return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
+    non_reserve_emails = set()
+
+    for row in rows:
+        email = str(row.get("Email", "")).strip().lower()
+        typical_station = str(row.get("Typical Station", "")).strip().lower()
+
+        if email and typical_station != "reserve":
+            non_reserve_emails.add(email)
+
+    volunteers = Volunteer.query\
+        .filter(Volunteer.deleted_at.is_(None))\
+        .order_by(Volunteer.last_name, Volunteer.first_name)\
+        .all()
+
+    filtered_volunteers = [
+        v for v in volunteers
+        if (v.email or "").strip().lower() in non_reserve_emails
+    ]
+
+    return render_template("need-coverage.html", volunteers=filtered_volunteers)
 
 #attempting to write a flask cli command to add admins
 import click
