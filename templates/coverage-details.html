@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Coverage Recommendations</title>
+</head>
+<body>
+
+<h1>Coverage Recommendations</h1>
+
+<button onclick="window.location.href='/admin/need-coverage'">
+    Back
+</button>
+
+<h2>Calling Out</h2>
+<p><strong>Name:</strong> {{ absent_volunteer.name }}</p>
+<p><strong>Email:</strong> {{ absent_volunteer.email }}</p>
+<p><strong>Shift:</strong> {{ absent_volunteer.typical_shift }}</p>
+
+<hr>
+
+<h2>Fully Available Reserves</h2>
+
+{% if fully_available_reserves %}
+    {% for r in fully_available_reserves %}
+        <div style="border:1px solid black; padding:10px; margin-bottom:10px;">
+            <strong>{{ r.name }}</strong><br>
+            Email: {{ r.email }}<br>
+            Phone: {{ r.phone }}<br>
+
+            {% if r.special_notes %}
+                <div style="color:red;">
+                    ⚠ {{ r.special_notes }}
+                </div>
+            {% endif %}
+        </div>
+    {% endfor %}
+{% else %}
+    <p>No fully available reserves.</p>
+{% endif %}
+
+<hr>
+
+<h2>Plan B (Partial Overlap)</h2>
+
+{% if partial_overlap_reserves %}
+    {% for r in partial_overlap_reserves %}
+        <div style="border:1px solid gray; padding:10px; margin-bottom:10px;">
+            <strong>{{ r.name }}</strong><br>
+            Overlapping Hours: {{ r.overlapping_hours }}<br>
+
+            {% if r.special_notes %}
+                <div style="color:red;">
+                    ⚠ {{ r.special_notes }}
+                </div>
+            {% endif %}
+        </div>
+    {% endfor %}
+{% else %}
+    <p>No partial options.</p>
+{% endif %}
+
+</body>
+</html>
