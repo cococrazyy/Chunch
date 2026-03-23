@@ -1,31 +1,187 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Request Coverage</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coverage Recommendations</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 24px;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+
+        h1 {
+            margin: 0;
+        }
+
+        button {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .secondary {
+            background: #64748b;
+            color: white;
+        }
+
+        .primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            margin-top: 0;
+            margin-bottom: 12px;
+        }
+
+        .muted {
+            color: #64748b;
+        }
+
+        .section-title {
+            margin: 0 0 12px 0;
+        }
+
+        .reserve-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .reserve-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 14px;
+            background: #f8fafc;
+        }
+
+        .reserve-name {
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .warning {
+            margin-top: 8px;
+            color: #92400e;
+            background: #fef3c7;
+            border: 1px solid #fcd34d;
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-size: 14px;
+        }
+
+        .empty-state {
+            color: #64748b;
+            font-style: italic;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 800px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
+<div class="container">
 
-<h2>Request Coverage</h2>
-<p>Select the volunteer who will be absent.</p>
+    <div class="top-bar">
+        <h1>Coverage Recommendations</h1>
+        <button class="secondary" onclick="window.location.href='/admin/coverage'">Back</button>
+    </div>
 
-<select id="absentSelect">
-    {% for v in volunteers %}
-        <option value="{{ v.id }}">
-            {{ v.first_name }} {{ v.last_name }}
-        </option>
-    {% endfor %}
-</select>
+    <div class="card">
+        <h2>Calling Out Volunteer</h2>
+        <p><strong>Name:</strong> {{ absent_volunteer.name }}</p>
+        <p><strong>Email:</strong> {{ absent_volunteer.email }}</p>
+        <p><strong>Typical Shift:</strong> {{ absent_volunteer.typical_shift or "None listed" }}</p>
+        <p><strong>Unavailability:</strong> {{ absent_volunteer.unavailability or "None listed" }}</p>
+    </div>
 
-<button onclick="submitAbsent()">Next</button>
+    <div class="two-column">
+        <div class="card">
+            <h2 class="section-title">Fully Available Reserves</h2>
 
-<script>
-function submitAbsent() {
-    const selected = document.getElementById("absentSelect").value;
+            {% if fully_available_reserves %}
+                <div class="reserve-list">
+                    {% for r in fully_available_reserves %}
+                        <div class="reserve-card">
+                            <div class="reserve-name">{{ r.name }}</div>
+                            <div><strong>Email:</strong> {{ r.email or "None listed" }}</div>
+                            <div><strong>Phone:</strong> {{ r.phone or "None listed" }}</div>
+                            <div><strong>Typical Shift:</strong> {{ r.typical_shift or "None listed" }}</div>
+                            <div><strong>Unavailability:</strong> {{ r.unavailability or "None listed" }}</div>
 
-    // redirect with query param
-    window.location.href = `/admin/coverage/details?volunteer_id=${selected}`;
-}
-</script>
+                            {% if r.special_notes %}
+                                <div class="warning">{{ r.special_notes }}</div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="empty-state">No fully available reserves found.</p>
+            {% endif %}
+        </div>
 
+        <div class="card">
+            <h2 class="section-title">Plan B: Partial Overlap</h2>
+
+            {% if partial_overlap_reserves %}
+                <div class="reserve-list">
+                    {% for r in partial_overlap_reserves %}
+                        <div class="reserve-card">
+                            <div class="reserve-name">{{ r.name }}</div>
+                            <div><strong>Email:</strong> {{ r.email or "None listed" }}</div>
+                            <div><strong>Phone:</strong> {{ r.phone or "None listed" }}</div>
+                            <div><strong>Typical Shift:</strong> {{ r.typical_shift or "None listed" }}</div>
+                            <div><strong>Unavailability:</strong> {{ r.unavailability or "None listed" }}</div>
+                            <div><strong>Overlapping Hours:</strong> {{ r.overlapping_hours }}</div>
+
+                            {% if r.special_notes %}
+                                <div class="warning">{{ r.special_notes }}</div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="empty-state">No partial-overlap reserves found.</p>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
 </body>
 </html>
