@@ -15,6 +15,7 @@ from flask import render_template
 from googleapiclient.discovery import build
 from flask_softdelete import SoftDeleteMixin
 from flask_migrate import Migrate
+from datetime import date
 from flask import render_template
 
 app = Flask(__name__, static_folder='.', static_url_path='')
