@@ -2,62 +2,172 @@
 <html>
 <head>
     <title>Coverage Recommendations</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 24px;
+            background: #f4f6f8;
+            color: #1f2937;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            background: #64748b;
+            color: white;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            margin-top: 0;
+            margin-bottom: 12px;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .reserve-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 12px;
+            background: #f8fafc;
+        }
+
+        .reserve-name {
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .warning {
+            margin-top: 8px;
+            color: #92400e;
+            background: #fef3c7;
+            border: 1px solid #fcd34d;
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-size: 14px;
+        }
+
+        .empty-state {
+            color: #6b7280;
+            font-style: italic;
+        }
+
+        @media (max-width: 800px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
 
-<h1>Coverage Recommendations</h1>
+<div class="container">
 
-<button class="secondary" onclick="window.location.href='/admin/need-coverage'">Back</button>
-    Back
-</button>
+    <div class="top-bar">
+        <h1>Coverage Recommendations</h1>
+        <button onclick="window.location.href='/admin/need-coverage'">Back</button>
+    </div>
 
-<h2>Calling Out</h2>
-<p><strong>Name:</strong> {{ absent_volunteer.name }}</p>
-<p><strong>Email:</strong> {{ absent_volunteer.email }}</p>
-<p><strong>Shift:</strong> {{ absent_volunteer.typical_shift }}</p>
+    <div class="card">
+        <h2>Calling Out Volunteer</h2>
+        <p><strong>Name:</strong> {{ absent_volunteer.name }}</p>
+        <p><strong>Email:</strong> {{ absent_volunteer.email }}</p>
+        <p><strong>Shift Being Covered:</strong> {{ absent_volunteer.typical_shift or "None listed" }}</p>
+        <p><strong>Coverage Start Date:</strong> {{ absent_volunteer.start_date }}</p>
+        <p><strong>Coverage End Date:</strong> {{ absent_volunteer.end_date }}</p>
+        <p><strong>Absence Type:</strong>
+            {% if absent_volunteer.is_partial %}
+                Partial Shift
+            {% else %}
+                Full Shift
+            {% endif %}
+        </p>
+        <p><strong>Notes:</strong> {{ absent_volunteer.notes or "None listed" }}</p>
+    </div>
 
-<hr>
+    <div class="two-column">
+        <div class="card">
+            <h2>Fully Available Reserves</h2>
 
-<h2>Fully Available Reserves</h2>
+            {% if fully_available_reserves %}
+                {% for r in fully_available_reserves %}
+                    <div class="reserve-card">
+                        <div class="reserve-name">{{ r.name }}</div>
+                        <div><strong>Email:</strong> {{ r.email or "None listed" }}</div>
+                        <div><strong>Phone:</strong> {{ r.phone or "None listed" }}</div>
+                        <div><strong>Typical Shift:</strong> {{ r.typical_shift or "None listed" }}</div>
+                        <div><strong>Unavailability:</strong> {{ r.unavailability or "None listed" }}</div>
 
-{% if fully_available_reserves %}
-    {% for r in fully_available_reserves %}
-        <div style="border:1px solid black; padding:10px; margin-bottom:10px;">
-            <strong>{{ r.name }}</strong><br>
-            Email: {{ r.email }}<br>
-            Phone: {{ r.phone }}<br>
-
-            {% if r.special_notes %}
-                <div style="color:red;">
-                    ⚠ {{ r.special_notes }}
-                </div>
+                        {% if r.special_notes %}
+                            <div class="warning">⚠ {{ r.special_notes }}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="empty-state">No fully available reserves.</p>
             {% endif %}
         </div>
-    {% endfor %}
-{% else %}
-    <p>No fully available reserves.</p>
-{% endif %}
 
-<hr>
+        <div class="card">
+            <h2>Plan B (Partial Overlap)</h2>
 
-<h2>Plan B (Partial Overlap)</h2>
+            {% if partial_overlap_reserves %}
+                {% for r in partial_overlap_reserves %}
+                    <div class="reserve-card">
+                        <div class="reserve-name">{{ r.name }}</div>
+                        <div><strong>Email:</strong> {{ r.email or "None listed" }}</div>
+                        <div><strong>Phone:</strong> {{ r.phone or "None listed" }}</div>
+                        <div><strong>Overlapping Time:</strong> {{ r.overlapping_label or "None listed" }}</div>
 
-{% if partial_overlap_reserves %}
-    {% for r in partial_overlap_reserves %}
-        <div style="border:1px solid gray; padding:10px; margin-bottom:10px;">
-            <strong>{{ r.name }}</strong><br>
-            Overlapping Time: {{ r.overlapping_label }}
-
-            {% if r.special_notes %}
-                <div style="color:red;">
-                    ⚠ {{ r.special_notes }}
-                </div>
+                        {% if r.special_notes %}
+                            <div class="warning">⚠ {{ r.special_notes }}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="empty-state">No partial options.</p>
             {% endif %}
         </div>
-    {% endfor %}
-{% else %}
-    <p>No partial options.</p>
-{% endif %}
+    </div>
+
+</div>
 
 </body>
 </html>
