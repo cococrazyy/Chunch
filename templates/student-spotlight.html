@@ -67,6 +67,30 @@ h1 {
     gap: 24px;
     margin-top: 20px;
 }
+.cta {
+    margin: 30px 0 40px;
+}
+
+.cta p {
+    font-size: 16px;
+    color: #374151;
+    margin-bottom: 10px;
+}
+
+.cta a {
+    display: inline-block;
+    background: #2563eb;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.2s ease;
+}
+
+.cta a:hover {
+    background: #1d4ed8;
+}
 
 .spotlight-card {
     background: white;
@@ -161,6 +185,12 @@ h1 {
 <div class="container">
     <h1>Student Spotlight</h1>
     <p class="subtitle">Hear directly from students about what Chunch means to them.</p>
+    <div class="cta">
+    <p>Have something to say?</p>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSfz55ZJ2GFwnNhRyz69MfZYN2_6Hn_bMDhvHZwtIEb8jn9VBw/viewform?usp=header" target="_blank">
+        Share Your Story
+    </a>
+</div>
 
     {% if spotlight_entries %}
         <div class="spotlight-grid">
