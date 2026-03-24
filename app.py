@@ -180,9 +180,9 @@ class Availability(db.Model, SoftDeleteMixin):
 
     volunteer = relationship("Volunteer", backref=backref("availability", cascade = "all, delete-orphan"))
 
-if os.environ.get("RUN_DB_INIT") == "1":
-    with app.app_context():
-        db.create_all()
+
+with app.app_context():
+    db.create_all()
         
 # Serve your existing HTML pages
 @app.route("/")
