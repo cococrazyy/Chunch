@@ -402,6 +402,7 @@ def coverage_details():
         shift_label = typical_shift
 
     shift_hour_set = set(shift_hours)
+    shift_length = len(shift_hours)
 
     fully_available_reserves = []
     partial_overlap_reserves = []
@@ -430,6 +431,7 @@ def coverage_details():
         unavailable_hour_set = set(unavailable_hours)
 
         overlapping_hours = sorted(shift_hour_set.intersection(unavailable_hour_set))
+        overlap_count = len(overlapping_hours)
 
         reserve_info = {
             "id": volunteer.id,
@@ -442,9 +444,9 @@ def coverage_details():
             "special_notes": str(row.get("Special Notes", "")).strip()
         }
 
-        if len(overlapping_hours) == 0:
+        if overlap_count == 0:
             fully_available_reserves.append(reserve_info)
-        else:
+        elif shift_length > 0 and (overlap_count / shift_length) < 0.5:
             partial_overlap_reserves.append(reserve_info)
 
     return render_template(
