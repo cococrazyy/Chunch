@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Coverage Recommendations</title>
+    <title>Coverage Options</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -106,7 +106,7 @@
     </div>
 
     <div class="card">
-        <h2>Calling Out Volunteer</h2>
+        <h2>Absent Volunteer</h2>
         <p><strong>Name:</strong> {{ absent_volunteer.name }}</p>
         <p><strong>Email:</strong> {{ absent_volunteer.email }}</p>
         <p><strong>Shift Being Covered:</strong> {{ absent_volunteer.typical_shift or "None listed" }}</p>
@@ -146,7 +146,7 @@
         </div>
 
         <div class="card">
-            <h2>Plan B (Partial Overlap)</h2>
+            <h2>Partially Available Reserves</h2>
 
             {% if partial_overlap_reserves %}
                 {% for r in partial_overlap_reserves %}
