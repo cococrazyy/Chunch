@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Request Coverage</title>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -94,7 +95,7 @@
     <form method="POST" action="/admin/need-coverage/save">
         <div class="field">
             <label for="volunteer_id">Volunteer</label>
-            <select id="volunteer_id" name="volunteer_id" required>
+            <select id="volunteer_id" name="volunteer_id" class="searchable" required>
                 {% for v in volunteers %}
                     <option value="{{ v.id }}">
                         {{ v.first_name }} {{ v.last_name }}
@@ -149,11 +150,23 @@
     </form>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 <script>
 function togglePartialFields() {
     const isPartial = document.getElementById("is_partial").value === "true";
     document.getElementById("partialFields").style.display = isPartial ? "block" : "none";
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+    $('#volunteer_id').select2({
+        placeholder: "Search for a volunteer",
+        allowClear: true,
+        width: '100%'
+    });
+});
+
 </script>
 
 </body>
