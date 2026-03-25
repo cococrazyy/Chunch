@@ -96,7 +96,7 @@
         <div class="field">
             <label for="volunteer_id">Volunteer</label>
             <select id="volunteer_id" name="volunteer_id" required>
-                <option value="" ></option>
+                <option></option> <!-- placeholder -->
                 {% for v in volunteers %}
                     <option value="{{ v.id }}">
                         {{ v.first_name }} {{ v.last_name }}
@@ -160,18 +160,12 @@ function togglePartialFields() {
     document.getElementById("partialFields").style.display = isPartial ? "block" : "none";
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-    const $select = $('#volunteer_id');
-
-    $select.select2({
-        placeholder: "Select a volunteer",
-        allowClear: true,
-        width: '100%'
+$(document).ready(function() {
+    $('#volunteer_id').select2({
+        placeholder: "Type to search a volunteer",
+        allowClear: true,        // adds an X to clear selection
+        width: '100%',
     });
-
-    setTimeout(() => {
-        $select.val(null).trigger('change');
-    }, 0);
 });
 
 </script>
