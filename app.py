@@ -829,7 +829,7 @@ def debug_hourly_final():
             if v.email
         }
 
-         for row in rows:
+        for row in rows:
             email = str(row.get("Email", "")).strip().lower()
             typical_station = str(row.get("Typical Station", "")).strip().lower()
 
