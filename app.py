@@ -462,6 +462,7 @@ def coverage_details():
         "coverage-details.html",
         absent_volunteer={
             "id": absent_volunteer.id,
+            "absence_id": latest_absence.absence_id,
             "name": f"{absent_volunteer.first_name} {absent_volunteer.last_name}",
             "email": absent_volunteer.email,
             "typical_shift": shift_label,
