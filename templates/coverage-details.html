@@ -132,17 +132,23 @@
                         <div class="reserve-name">{{ r.name }}</div>
                         <div><strong>Email:</strong> {{ r.email or "None listed" }}</div>
                         <div><strong>Phone:</strong> {{ r.phone or "None listed" }}</div>
-                        <div><strong>Typical Shift:</strong> {{ r.typical_shift or "None listed" }}</div>
                         <div><strong>Unavailability:</strong> {{ r.unavailability or "None listed" }}</div>
 
                         {% if r.special_notes %}
                             <div class="warning">⚠ {{ r.special_notes }}</div>
                         {% endif %}
+
+                        <form method="POST" action="/admin/coverage/assign">
+                            <input type="hidden" name="absence_id" value="{{ absent_volunteer.absence_id }}">
+                            <input type="hidden" name="absent_volunteer_id" value="{{ absent_volunteer.id }}">
+                            <input type="hidden" name="reserve_volunteer_id" value="{{ r.id }}">
+                            <button type="submit">Assign This Reserve</button>
+                        </form>
                     </div>
                 {% endfor %}
             {% else %}
                 <p class="empty-state">No fully available reserves.</p>
-            {% endif %}
+            {% endif %} 
         </div>
 
         <div class="card">
@@ -159,8 +165,15 @@
                         {% if r.special_notes %}
                             <div class="warning">⚠ {{ r.special_notes }}</div>
                         {% endif %}
+
+                        <form method="POST" action="/admin/coverage/assign">
+                            <input type="hidden" name="absence_id" value="{{ absent_volunteer.absence_id }}">
+                            <input type="hidden" name="absent_volunteer_id" value="{{ absent_volunteer.id }}">
+                            <input type="hidden" name="reserve_volunteer_id" value="{{ r.id }}">
+                            <button type="submit">Assign This Reserve</button>
+                        </form>
                     </div>
-                {% endfor %}
+                 {% endfor %}
             {% else %}
                 <p class="empty-state">No partial options.</p>
             {% endif %}
