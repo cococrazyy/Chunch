@@ -97,15 +97,23 @@
             <label for="volunteer_id">Volunteer</label>
             <!-- for only one name
             <select id="volunteer_id" name="volunteer_id" required> -->
-            <select id="volunteer_id" name="volunteer_id[]" multiple required>
+            <!--<select id="volunteer_id" name="volunteer_id[]" multiple required>
                 <option></option> <!-- placeholder -->
-                {% for v in volunteers %}
+                <!--{% for v in volunteers %}
                     <option value="{{ v.id }}">
                         {{ v.first_name }} {{ v.last_name }}
                     </option>
                 {% endfor %}
             </select>
-        </div>
+        </div> -->
+        <select id="volunteer_id" name="volunteer_id" required>
+    <option></option> <!-- placeholder -->
+    {% for v in volunteers %}
+        <option value="{{ v.id }}">
+            {{ v.first_name }} {{ v.last_name }}
+        </option>
+    {% endfor %}
+</select>
 
         <div class="inline-row">
             <div class="field">
