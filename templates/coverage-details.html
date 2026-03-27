@@ -138,11 +138,17 @@
                 <div class="warning">⚠ {{ r.special_notes }}</div>
             {% endif %}
 
-            <form method="POST" action="/admin/coverage/assign" style="margin-top: 10px;">
+            <form method="POST" action="/admin/coverage/assign" style="margin-top: 10px;" class="assign-form">
                 <input type="hidden" name="absence_id" value="{{ absent_volunteer.absence_id }}">
                 <input type="hidden" name="absent_volunteer_id" value="{{ absent_volunteer.id }}">
                 <input type="hidden" name="reserve_volunteer_id" value="{{ r.id }}">
-                <button type="submit">Assign This Reserve</button>
+                <input type="hidden" name="send_email" value="no">
+
+                <button
+                    type="button"
+                    onclick="openAssignPopup(this.form, '{{ r.name|escape }}')">
+                    Assign This Reserve
+                </button>
             </form>
         </div>
     {% endfor %}
@@ -166,11 +172,17 @@
                 <div class="warning">⚠ {{ r.special_notes }}</div>
             {% endif %}
 
-            <form method="POST" action="/admin/coverage/assign" style="margin-top: 10px;">
+            <form method="POST" action="/admin/coverage/assign" style="margin-top: 10px;" class="assign-form">
                 <input type="hidden" name="absence_id" value="{{ absent_volunteer.absence_id }}">
                 <input type="hidden" name="absent_volunteer_id" value="{{ absent_volunteer.id }}">
                 <input type="hidden" name="reserve_volunteer_id" value="{{ r.id }}">
-                <button type="submit">Assign This Reserve</button>
+                <input type="hidden" name="send_email" value="no">
+
+                <button
+                    type="button"
+                    onclick="openAssignPopup(this.form, '{{ r.name|escape }}')">
+                    Assign This Reserve
+                </button>
             </form>
         </div>
     {% endfor %}
