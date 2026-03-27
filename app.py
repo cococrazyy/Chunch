@@ -559,16 +559,21 @@ def assign_reserve_coverage():
             db.session.add(absent_assignment)
             db.session.flush()
         reserve_assignment = Assignment.query.filter_by(
-            volunteer_id=reserve_volunteer_id,
+            volunteer_id=reserve_volunteer_id
         ).first()
-
-        if not reserve_assignment:
-            return "<pre>Reserve assignment not found.</pre>", 404
 
         reserve_station = Station.query.filter_by(station_name="Reserve").first()
         if not reserve_station:
             return "<pre>Reserve station not found.</pre>", 404
 
+        if not reserve_assignment:
+            reserve_assignment = Assignment(
+                volunteer_id=reserve_volunteer_id,
+                station_id=reserve_station.station_id,
+                schedule_id=None
+            )
+            db.session.add(reserve_assignment)
+            db.session.flush()
         if reserve_assignment.station_id != reserve_station.station_id:
             return "<pre>Selected volunteer is not currently in the reserve pool.</pre>", 400
 
