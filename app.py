@@ -20,6 +20,7 @@ from flask import render_template
 
 app = Flask(__name__, static_folder='.', static_url_path='')
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+is_production = os.environ.get("RENDER") == "true"
 app.config.update(
     SESSION_COOKIE_SECURE=True,
     SESSION_COOKIE_HTTPONLY=True,
