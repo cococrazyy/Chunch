@@ -193,6 +193,58 @@
     </div>
 
 </div>
+<div id="assignPopup" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:1000;">
+    <div style="background:white; width:90%; max-width:650px; margin:60px auto; padding:24px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.2);">
+        <h3 style="margin-top:0;">Email Preview</h3>
 
+        <div style="margin-bottom:14px;">
+            <strong>Subject:</strong>
+            <div id="assignEmailSubject" style="margin-top:6px; padding:10px; border:1px solid #ccc; border-radius:8px; background:#f8f8f8;"></div>
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <strong>Message:</strong>
+            <div id="assignEmailBody" style="margin-top:6px; padding:12px; border:1px solid #ccc; border-radius:8px; background:#f8f8f8; white-space:pre-wrap;"></div>
+        </div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button type="button" onclick="submitAssignWithEmail('yes')">Assign and Send Email</button>
+            <button type="button" onclick="submitAssignWithEmail('no')">Assign Without Email</button>
+            <button type="button" onclick="closeAssignPopup()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let activeAssignForm = null;
+
+function openAssignPopup(form, reserveName, stationName) {
+    activeAssignForm = form;
+
+    const subject = "Coverage Assignment for " + stationName;
+    const body =
+        "Hi " + reserveName + ",\n\n" +
+        "You have been assigned to cover the " + stationName + " station.\n\n" +
+        "Please review the training materials and station-specific videos before your shift.\n\n" +
+        "Thank you.";
+
+    document.getElementById("assignEmailSubject").textContent = subject;
+    document.getElementById("assignEmailBody").textContent = body;
+    document.getElementById("assignPopup").style.display = "block";
+}
+
+function closeAssignPopup() {
+    activeAssignForm = null;
+    document.getElementById("assignPopup").style.display = "none";
+}
+
+function submitAssignWithEmail(choice) {
+    if (!activeAssignForm) return;
+
+    activeAssignForm.querySelector('input[name="send_email"]').value = choice;
+    document.getElementById("assignPopup").style.display = "none";
+    activeAssignForm.submit();
+}
+</script>
 </body>
 </html>
