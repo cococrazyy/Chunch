@@ -811,10 +811,35 @@ def debug_hourly_final():
 
             station_to_volunteer_ids[station_id].add(volunteer_id)
 
-        absent_station = Station.query.filter_by(station_name="Absent").first()
-        absent_station_id = absent_station.station_id if absent_station else None
+            absent_station = Station.query.filter_by(station_name="Absent").first()
+            absent_station_id = absent_station.station_id if absent_station else None
 
-        assignments = Assignment.query.all()
+            today = date.today()
+
+            assignments = Assignment.query.all()
+
+            for assignment in assignments:
+                if assignment.is_covering and assignment.absence_id:
+                    absence = Absence.query.get(assignment.absence_id)
+                    if absence and absence.end_date < today:
+                        # move reserve back
+                        if assignment.original_station_id is not None:
+                            assignment.station_id = assignment.original_station_id
+
+                            assignment.is_covering = False
+                            assignment.covering_for_volunteer_id = None
+                            assignment.original_station_id = None
+                            assignment.absence_id = None
+
+                            # restore absent volunteer
+                            covered = Assignment.query.filter_by(
+                                volunteer_id=absence.volunteer_id
+                            ).first()
+
+                            if covered:
+                                covered.is_absent = False
+
+            db.session.commit()     
 
         for assignment in assignments:
             if assignment.volunteer_id is None:
