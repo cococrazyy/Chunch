@@ -520,7 +520,6 @@ def assign_reserve_coverage():
 
         absent_assignment = Assignment.query.filter_by(
             volunteer_id=absent_volunteer_id,
-            schedule_id=None
         ).first()
 
         if not absent_assignment:
@@ -528,7 +527,6 @@ def assign_reserve_coverage():
 
         reserve_assignment = Assignment.query.filter_by(
             volunteer_id=reserve_volunteer_id,
-            schedule_id=None
         ).first()
 
         if not reserve_assignment:
