@@ -252,17 +252,21 @@ def me():
 
 @app.route("/admin")
 def admin_page():
-    debug_admin = request.args.get("debug_admin") == "1"
+    try:
+        debug_admin = request.args.get("debug_admin") == "1"
 
-    if "user_id" not in session and not debug_admin:
-        return redirect("/")
+        if "user_id" not in session and not debug_admin:
+            return redirect("/")
 
-    volunteers = Volunteer.query\
-        .filter(Volunteer.deleted_at.is_(None))\
-        .order_by(Volunteer.last_name)\
-        .all()
+        volunteers = Volunteer.query\
+            .filter(Volunteer.deleted_at.is_(None))\
+            .order_by(Volunteer.last_name)\
+            .all()
 
-    return render_template("admin.html", volunteers=volunteers)
+        return render_template("admin.html", volunteers=volunteers)
+
+    except Exception as e:
+        return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
 @app.route("/admin/coverage/details")
 def coverage_details():
