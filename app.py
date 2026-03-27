@@ -480,6 +480,14 @@ def coverage_details():
         elif shift_length > 0 and (overlap_count / shift_length) < 0.5:
             partial_overlap_reserves.append(reserve_info)
 
+    absent_assignment = Assignment.query.filter_by(
+        volunteer_id=absent_volunteer.id
+    ).first()
+
+    station_name = ""
+    if absent_assignment and absent_assignment.station:
+        station_name = str(absent_assignment.station.station_name)
+
     return render_template(
         "coverage-details.html",
         absent_volunteer={
@@ -487,6 +495,7 @@ def coverage_details():
             "absence_id": latest_absence.absence_id,
             "name": f"{absent_volunteer.first_name} {absent_volunteer.last_name}",
             "email": absent_volunteer.email,
+            "station_name": station_name,
             "typical_shift": shift_label,
             "unavailability": str(absent_row.get("Unavailability", "")).strip(),
             "start_date": latest_absence.start_date,
