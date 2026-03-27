@@ -785,6 +785,32 @@ def debug_hourly_final():
             for station in stations
         }
 
+        station_name_to_id = {
+            str(station.station_name).strip().lower(): station.station_id
+            for station in stations
+        }
+
+        volunteer_id_by_email = {
+            v.email.strip().lower(): v.id
+            for v in volunteers
+            if v.email
+        }
+
+        for row in rows:
+            email = str(row.get("Email", "")).strip().lower()
+            typical_station = str(row.get("Typical Station", "")).strip().lower()
+
+            if not email or not typical_station or typical_station == "other":
+                continue
+
+            volunteer_id = volunteer_id_by_email.get(email)
+            station_id = station_name_to_id.get(typical_station)
+
+            if volunteer_id is None or station_id is None:
+                continue
+
+            station_to_volunteer_ids[station_id].add(volunteer_id)
+
         absent_station = Station.query.filter_by(station_name="Absent").first()
         absent_station_id = absent_station.station_id if absent_station else None
 
@@ -793,6 +819,9 @@ def debug_hourly_final():
         for assignment in assignments:
             if assignment.volunteer_id is None:
                 continue
+
+            for volunteer_ids in station_to_volunteer_ids.values():
+                volunteer_ids.discard(assignment.volunteer_id)
 
             if assignment.is_absent and absent_station_id is not None:
                 station_to_volunteer_ids[absent_station_id].add(assignment.volunteer_id)
