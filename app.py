@@ -475,6 +475,66 @@ def coverage_details():
         fully_available_reserves=fully_available_reserves,
         partial_overlap_reserves=partial_overlap_reserves
     )
+
+@app.route("/admin/coverage/assign", methods=["POST"])
+def assign_reserve_coverage():
+    try:
+        if "user_id" not in session:
+            return redirect("/")
+
+        absence_id = request.form.get("absence_id", type=int)
+        absent_volunteer_id = request.form.get("absent_volunteer_id", type=int)
+        reserve_volunteer_id = request.form.get("reserve_volunteer_id", type=int)
+
+        if not absence_id or not absent_volunteer_id or not reserve_volunteer_id:
+            return "<pre>Missing required coverage fields.</pre>", 400
+
+        if absent_volunteer_id == reserve_volunteer_id:
+            return "<pre>A volunteer cannot cover their own absence.</pre>", 400
+
+        absence = Absence.query.get(absence_id)
+        if not absence:
+            return "<pre>Absence record not found.</pre>", 404
+
+        absent_assignment = Assignment.query.filter_by(
+            volunteer_id=absent_volunteer_id,
+            schedule_id=None
+        ).first()
+
+        if not absent_assignment:
+            return "<pre>Absent volunteer assignment not found.</pre>", 404
+
+        reserve_assignment = Assignment.query.filter_by(
+            volunteer_id=reserve_volunteer_id,
+            schedule_id=None
+        ).first()
+
+        if not reserve_assignment:
+            return "<pre>Reserve assignment not found.</pre>", 404
+
+        reserve_station = Station.query.filter_by(station_name="Reserve").first()
+        if not reserve_station:
+            return "<pre>Reserve station not found.</pre>", 404
+
+        if reserve_assignment.station_id != reserve_station.station_id:
+            return "<pre>Selected volunteer is not currently in the reserve pool.</pre>", 400
+
+        absent_assignment.is_absent = True
+
+        reserve_assignment.original_station_id = reserve_assignment.station_id
+        reserve_assignment.station_id = absent_assignment.station_id
+        reserve_assignment.is_covering = True
+        reserve_assignment.covering_for_volunteer_id = absent_volunteer_id
+        reserve_assignment.absence_id = absence_id
+
+        db.session.commit()
+
+        return redirect("/admin")
+
+    except Exception as e:
+        db.session.rollback()
+        return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
+
 @app.route("/admin/need-coverage/save", methods=["POST"])
 def save_need_coverage():
     try:
