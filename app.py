@@ -890,6 +890,7 @@ def debug_hourly_final():
             if v.email
         }
 
+        # base assignments from sheet
         for row in rows:
             email = str(row.get("Email", "")).strip().lower()
             typical_station = str(row.get("Typical Station", "")).strip().lower()
@@ -912,6 +913,7 @@ def debug_hourly_final():
 
         assignments = Assignment.query.all()
 
+        # revert expired coverage
         for assignment in assignments:
             if assignment.is_covering and assignment.absence_id:
                 absence = Absence.query.get(assignment.absence_id)
@@ -931,42 +933,41 @@ def debug_hourly_final():
                     if covered:
                         covered.is_absent = False
 
-        db.session.commit()   
+        db.session.commit()
 
+        # =========================
+        # FINAL PLACEMENT LOGIC
+        # =========================
         for assignment in assignments:
-    if assignment.volunteer_id is None:
-        continue
+            if assignment.volunteer_id is None:
+                continue
 
+            # remove from all stations first
+            for volunteer_ids in station_to_volunteer_ids.values():
+                volunteer_ids.discard(assignment.volunteer_id)
 
-    for volunteer_ids in station_to_volunteer_ids.values():
-        volunteer_ids.discard(assignment.volunteer_id)
+            # 🔥 COVERING RESERVE (HIGHEST PRIORITY)
+            if assignment.is_covering and assignment.station_id is not None:
+                station_to_volunteer_ids.setdefault(
+                    assignment.station_id, set()
+                ).add(assignment.volunteer_id)
+                continue
 
-    absence = None
-    if assignment.absence_id:
-        absence = Absence.query.get(assignment.absence_id)
+            # 🔥 ABSENT (FULL OR PARTIAL)
+            if assignment.is_absent and absent_station_id is not None:
+                station_to_volunteer_ids.setdefault(
+                    absent_station_id, set()
+                ).add(assignment.volunteer_id)
 
+            # 🔥 NORMAL STATION (ALSO for partial)
+            if assignment.station_id is not None:
+                station_to_volunteer_ids.setdefault(
+                    assignment.station_id, set()
+                ).add(assignment.volunteer_id)
 
-    if absence and absence.is_partial and absent_station_id is not None:
-
-        station_to_volunteer_ids.setdefault(
-            absent_station_id, set()
-        ).add(assignment.volunteer_id)
-
-        # ALSO keep them in their station (they still work part of shift)
-        if assignment.station_id is not None:
-            station_to_volunteer_ids.setdefault(
-                assignment.station_id, set()
-            ).add(assignment.volunteer_id)
-
-    elif assignment.is_absent and absent_station_id is not None:
-        station_to_volunteer_ids.setdefault(
-            absent_station_id, set()
-        ).add(assignment.volunteer_id)
-
-    elif assignment.station_id is not None:
-        station_to_volunteer_ids.setdefault(
-            assignment.station_id, set()
-        ).add(assignment.volunteer_id)
+        # =========================
+        # BUILD RESPONSE
+        # =========================
         station_data = {}
 
         for station in stations:
