@@ -727,16 +727,19 @@ function startShortenFlow() {
 
     const originalEndDate = currentAbsentEditVolunteer?.absence_end_date || "";
 
+    const prettyNew = formatDatePretty(newEndDate);
+    const prettyOriginal = formatDatePretty(originalEndDate);
+
     document.getElementById("reserveDecisionTitle").textContent = "Shorten Absence";
 
     document.getElementById("reserveDecisionSummary").textContent =
-        `New return date: ${formatDatePretty(newEndDate)}. Original reserve return: ${formatDatePretty(originalEndDate)}.`;
+        `New return date: ${prettyNew}. Original reserve return: ${prettyOriginal}.`;
 
     document.getElementById("reserveDecisionImmediateLabel").textContent =
-        `Move reserve back on ${formatDatePretty(newEndDate)}`;
+        `Move reserve back on ${prettyNew}`;
 
     document.getElementById("reserveDecisionDoubleLabel").textContent =
-        `Allow double coverage from ${formatDatePretty(newEndDate)} to ${formatDatePretty(originalEndDate)}`;
+        `Keep reserve until ${prettyOriginal} (double coverage from ${prettyNew} to ${prettyOriginal})`;
 
     closeAbsenceActionModal();
     document.getElementById("reserveDecisionOverlay").classList.add("open");
