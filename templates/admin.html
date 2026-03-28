@@ -612,6 +612,13 @@ function closeAbsentEditPicker() {
     document.getElementById("absentEditModal").classList.remove("open");
 }
 
+function closeAbsenceActionModal() {
+    document.getElementById("absenceActionOverlay").classList.remove("open");
+    document.getElementById("absenceActionModal").classList.remove("open");
+}
+
+let currentAbsentEditVolunteer = null;
+
 function startAbsentEdit() {
     const select = document.getElementById("absentVolunteerSelect");
     if (!select) return;
@@ -625,8 +632,14 @@ function startAbsentEdit() {
     const volunteer = absentVolunteers.find(v => Number(v.id) === selectedId);
     if (!volunteer) return;
 
+    currentAbsentEditVolunteer = volunteer;
+
+    document.getElementById("absenceActionVolunteerName").textContent =
+        volunteer.name || "Volunteer";
+
     closeAbsentEditPicker();
-    openVolunteerPanel(JSON.stringify(volunteer));
+    document.getElementById("absenceActionOverlay").classList.add("open");
+    document.getElementById("absenceActionModal").classList.add("open");
 }
 
 function getVolunteerDisplayName(volunteer) {
@@ -958,6 +971,211 @@ window.addEventListener("DOMContentLoaded", loadStationBoard);
         </div>
     </div>
 </div>
-</body>
-</body>
+<div id="absenceActionOverlay" class="detail-overlay" onclick="closeAbsenceActionModal()"></div>
+
+<div id="absenceActionModal" class="detail-panel">
+    <div class="detail-panel-header">
+        <div class="detail-panel-title">
+            Edit Absence: <span id="absenceActionVolunteerName">Volunteer</span>
+        </div>
+        <div class="detail-panel-actions">
+            <button class="detail-btn back" type="button" onclick="closeAbsenceActionModal()">Back</button>
+        </div>
+    </div>
+
+    <div class="detail-panel-body">
+        <div class="detail-card">
+            <div class="detail-label">Choose Action</div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <button class="detail-btn edit" type="button" onclick="alert('Extend flow next')">Extend</button>
+                <button class="detail-btn edit" type="button" onclick="alert('Shorten flow next')">Shorten</button>
+                <button class="detail-btn edit" type="button" onclick="alert('Cancel flow next')">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="absenceActionOverlay" class="detail-overlay" onclick="closeAbsenceActionModal()"></div>
+
+<div id="absenceActionModal" class="detail-panel">
+    <div class="detail-panel-header">
+        <div class="detail-panel-title">
+            Edit Absence: <span id="absenceActionVolunteerName">Volunteer</span>
+        </div>
+        <div class="detail-panel-actions">
+            <button class="detail-btn back" type="button" onclick="closeAbsenceActionModal()">Back</button>
+        </div>
+    </div>
+
+    <div class="detail-panel-body">
+        <div class="detail-card">
+            <div class="detail-label">Choose Action</div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <button class="detail-btn edit" type="button" onclick="alert('Extend flow next')">Extend</button>
+                <button class="detail-btn edit" type="button" onclick="alert('Shorten flow next')">Shorten</button>
+                <button class="detail-btn edit" type="button" onclick="alert('Cancel flow next')">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="absenceActionOverlay" class="detail-overlay" onclick="closeAbsenceActionModal()"></div>
+
+<div id="absenceActionModal" class="detail-panel">
+    <div class="detail-panel-header">
+        <div class="detail-panel-title">
+            Edit Absence: <span id="absenceActionVolunteerName">Volunteer</span>
+        </div>
+        <div class="detail-panel-actions">
+            <button class="detail-btn back" type="button" onclick="closeAbsenceActionModal()">Back</button>
+        </div>
+    </div>
+
+    <div class="detail-panel-body">
+        <div class="detail-card">
+            <div class="detail-label">Choose Action</div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <button class="detail-btn edit" type="button" onclick="alert('Extend flow next')">Extend</button>
+                <button class="detail-btn edit" type="button" onclick="alert('Shorten flow next')">Shorten</button>
+                <button class="detail-btn edit" type="button" onclick="alert('Cancel flow next')">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="absenceActionOverlay" class="detail-overlay" onclick="closeAbsenceActionModal()"></div>
+
+<div id="absenceActionModal" class="detail-panel">
+    <div class="detail-panel-header">
+        <div class="detail-panel-title">
+            Edit Absence: <span id="absenceActionVolunteerName">Volunteer</span>
+        </div>
+        <div class="detail-panel-actions">
+            <button class="detail-btn back" type="button" onclick="closeAbsenceActionModal()">Back</button>
+        </div>
+    </div>
+
+    <div class="detail-panel-body">
+        <div class="detail-card">
+            <div class="detail-label">Choose Action</div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <button class="detail-btn edit" type="button" onclick="alert('Extend flow next')">Extend</button>
+                <button class="detail-btn edit" type="button" onclick="alert('Shorten flow next')">Shorten</button>
+                <button class="detail-btn edit" type="button" onclick="alert('Cancel flow next')">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="absenceActionOverlay" class="detail-overlay" onclick="closeAbsenceActionModal()"></div>
+
+<div id="absenceActionModal" class="detail-panel">
+    <div class="detail-panel-header">
+        <div class="detail-panel-title">
+            Edit Absence: <span id="absenceActionVolunteerName">Volunteer</span>
+        </div>
+        <div class="detail-panel-actions">
+            <button class="detail-btn back" type="button" onclick="closeAbsenceActionModal()">Back</button>
+        </div>
+    </div>
+
+    <div class="detail-panel-body">
+        <div class="detail-card">
+            <div class="detail-label">Choose Action</div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <button class="detail-btn edit" type="button" onclick="alert('Extend flow next')">Extend</button>
+                <button class="detail-btn edit" type="button" onclick="alert('Shorten flow next')">Shorten</button>
+                <button class="detail-btn edit" type="button" onclick="alert('Cancel flow next')">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="absenceActionOverlay" class="detail-overlay" onclick="closeAbsenceActionModal()"></div>
+
+<div id="absenceActionModal" class="detail-panel">
+    <div class="detail-panel-header">
+        <div class="detail-panel-title">
+            Edit Absence: <span id="absenceActionVolunteerName">Volunteer</span>
+        </div>
+        <div class="detail-panel-actions">
+            <button class="detail-btn back" type="button" onclick="closeAbsenceActionModal()">Back</button>
+        </div>
+    </div>
+
+    <div class="detail-panel-body">
+        <div class="detail-card">
+            <div class="detail-label">Choose Action</div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <button class="detail-btn edit" type="button" onclick="alert('Extend flow next')">Extend</button>
+                <button class="detail-btn edit" type="button" onclick="alert('Shorten flow next')">Shorten</button>
+                <button class="detail-btn edit" type="button" onclick="alert('Cancel flow next')">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="absenceActionOverlay" class="detail-overlay" onclick="closeAbsenceActionModal()"></div>
+
+<div id="absenceActionModal" class="detail-panel">
+    <div class="detail-panel-header">
+        <div class="detail-panel-title">
+            Edit Absence: <span id="absenceActionVolunteerName">Volunteer</span>
+        </div>
+        <div class="detail-panel-actions">
+            <button class="detail-btn back" type="button" onclick="closeAbsenceActionModal()">Back</button>
+        </div>
+    </div>
+
+    <div class="detail-panel-body">
+        <div class="detail-card">
+            <div class="detail-label">Choose Action</div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <button class="detail-btn edit" type="button" onclick="alert('Extend flow next')">Extend</button>
+                <button class="detail-btn edit" type="button" onclick="alert('Shorten flow next')">Shorten</button>
+                <button class="detail-btn edit" type="button" onclick="alert('Cancel flow next')">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="absenceActionOverlay" class="detail-overlay" onclick="closeAbsenceActionModal()"></div>
+
+<div id="absenceActionModal" class="detail-panel">
+    <div class="detail-panel-header">
+        <div class="detail-panel-title">
+            Edit Absence: <span id="absenceActionVolunteerName">Volunteer</span>
+        </div>
+        <div class="detail-panel-actions">
+            <button class="detail-btn back" type="button" onclick="closeAbsenceActionModal()">Back</button>
+        </div>
+    </div>
+
+    <div class="detail-panel-body">
+        <div class="detail-card">
+            <div class="detail-label">Choose Action</div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <button class="detail-btn edit" type="button" onclick="alert('Extend flow next')">Extend</button>
+                <button class="detail-btn edit" type="button" onclick="alert('Shorten flow next')">Shorten</button>
+                <button class="detail-btn edit" type="button" onclick="alert('Cancel flow next')">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="absenceActionOverlay" class="detail-overlay" onclick="closeAbsenceActionModal()"></div>
+
+<div id="absenceActionModal" class="detail-panel">
+    <div class="detail-panel-header">
+        <div class="detail-panel-title">
+            Edit Absence: <span id="absenceActionVolunteerName">Volunteer</span>
+        </div>
+        <div class="detail-panel-actions">
+            <button class="detail-btn back" type="button" onclick="closeAbsenceActionModal()">Back</button>
+        </div>
+    </div>
+
+    <div class="detail-panel-body">
+        <div class="detail-card">
+            <div class="detail-label">Choose Action</div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <button class="detail-btn edit" type="button" onclick="alert('Extend flow next')">Extend</button>
+                <button class="detail-btn edit" type="button" onclick="alert('Shorten flow next')">Shorten</button>
+                <button class="detail-btn edit" type="button" onclick="alert('Cancel flow next')">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
 </html>
