@@ -784,29 +784,41 @@ function formatHourPretty(h) {
     return `${h - 12} PM`;
 }
 
-if (volunteer.absence_id) {
-    let text = "";
+    const absenceMessageCard = document.getElementById("detailAbsenceMessageCard");
+    const absenceMessage = document.getElementById("detailAbsenceMessage");
 
-    if (volunteer.absence_is_partial) {
-        const start = formatHourPretty(volunteer.absence_partial_start_hour);
-        const end = formatHourPretty(volunteer.absence_partial_end_hour);
-        text = `Partial: ${start} – ${end}`;
-    } else {
-        const start = formatDatePretty(volunteer.absence_start_date);
-        const end = formatDatePretty(volunteer.absence_end_date);
+    if (volunteer.absence_id) {
+        let text = "";
 
-        if (start === end) {
-            text = start;
+        if (volunteer.absence_is_partial) {
+            const start = formatHourPretty(volunteer.absence_partial_start_hour);
+            const end = formatHourPretty(volunteer.absence_partial_end_hour);
+            text = `Partial: ${start} – ${end}`;
         } else {
-            text = `${start} – ${end}`;
-        }
-    }
+            const start = formatDatePretty(volunteer.absence_start_date);
+            const end = formatDatePretty(volunteer.absence_end_date);
 
-    absenceText.textContent = text;
-    absenceCard.style.display = "block";
-} else {
-    absenceCard.style.display = "none";
-}
+            if (start === end) {
+                text = start;
+            } else {
+                text = `${start} – ${end}`;
+            }
+        }
+
+        absenceText.textContent = text;
+        absenceCard.style.display = "block";
+
+        const notes = (volunteer.absence_notes || "").trim();
+        if (notes) {
+            absenceMessage.textContent = notes;
+            absenceMessageCard.style.display = "block";
+        } else {
+            absenceMessageCard.style.display = "none";
+        }
+    } else {
+        absenceCard.style.display = "none";
+        absenceMessageCard.style.display = "none";
+    }
 
     document.getElementById("detailPanel").classList.add("open");
     document.getElementById("detailOverlay").classList.add("open");
