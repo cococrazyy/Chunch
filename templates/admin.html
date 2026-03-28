@@ -750,6 +750,22 @@ function startEndAbsenceFlow() {
     document.getElementById("reserveDecisionModal").classList.add("open");
 }
 
+function handleReserveDecision(choice) {
+    if (!currentAbsentEditVolunteer) {
+        alert("No absence is selected.");
+        return;
+    }
+
+    if (choice === "move_now") {
+        alert("Move reserve back now selected. Save logic comes next.");
+        return;
+    }
+
+    if (choice === "double_coverage") {
+        alert("Double coverage selected. Save logic comes next.");
+        return;
+    }
+}
 
 function renderStationBoard(stationData) {
     currentStationData = stationData || {};
@@ -1132,11 +1148,11 @@ window.addEventListener("DOMContentLoaded", loadStationBoard);
 
         <div class="detail-card">
             <div style="display:flex; flex-direction:column; gap:10px;">
-                <button class="detail-btn edit" type="button" id="reserveDecisionImmediateLabel">
+                <button class="detail-btn edit" type="button" id="reserveDecisionImmediateLabel" onclick="handleReserveDecision('move_now')">
                     Move reserve back now
                 </button>
 
-                <button class="detail-btn edit" type="button" id="reserveDecisionDoubleLabel">
+                <button class="detail-btn edit" type="button" id="reserveDecisionDoubleLabel" onclick="handleReserveDecision('double_coverage')">
                     Allow double coverage
                 </button>
             </div>
