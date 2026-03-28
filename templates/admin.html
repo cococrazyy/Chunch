@@ -798,6 +798,18 @@ function editVolunteer() {
     document.getElementById("editAbsenceModal").classList.add("open");
 }
 
+function closeEditAbsenceModal() {
+    document.getElementById("editAbsenceOverlay").classList.remove("open");
+    document.getElementById("editAbsenceModal").classList.remove("open");
+}
+
+function togglePartialEditFields() {
+    const isPartial = document.getElementById("editIsPartial").value === "true";
+    document.getElementById("editPartialFields").style.display = isPartial ? "block" : "none";
+}
+
+window.addEventListener("DOMContentLoaded", loadStationBoard);
+
 window.addEventListener("DOMContentLoaded", loadStationBoard);
 </script>
 <div id="detailOverlay" class="detail-overlay" onclick="closeVolunteerPanel()"></div>
@@ -850,5 +862,58 @@ window.addEventListener("DOMContentLoaded", loadStationBoard);
         </div>
     </div>
 </div>
+<div id="editAbsenceOverlay" class="detail-overlay" onclick="closeEditAbsenceModal()"></div>
+
+<div id="editAbsenceModal" class="detail-panel">
+    <div class="detail-panel-header">
+        <div class="detail-panel-title">
+            Edit Absence: <span id="editAbsenceVolunteerName">Volunteer</span>
+        </div>
+        <div class="detail-panel-actions">
+            <button class="detail-btn back" type="button" onclick="closeEditAbsenceModal()">Back</button>
+        </div>
+    </div>
+
+    <div class="detail-panel-body">
+        <input type="hidden" id="editAbsenceId">
+
+        <div class="detail-card">
+            <div class="detail-label">Start Date</div>
+            <input type="date" id="editStartDate" class="date-picker">
+        </div>
+
+        <div class="detail-card">
+            <div class="detail-label">End Date</div>
+            <input type="date" id="editEndDate" class="date-picker">
+        </div>
+
+        <div class="detail-card">
+            <div class="detail-label">Absence Type</div>
+            <select id="editIsPartial" class="date-picker" onchange="togglePartialEditFields()">
+                <option value="false">Full</option>
+                <option value="true">Partial</option>
+            </select>
+        </div>
+
+        <div class="detail-card" id="editPartialFields" style="display:none;">
+            <div class="detail-label">Partial Hour Range</div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <input type="number" id="editPartialStartHour" class="date-picker" min="0" max="23" placeholder="Start hour">
+                <input type="number" id="editPartialEndHour" class="date-picker" min="0" max="23" placeholder="End hour">
+            </div>
+        </div>
+
+        <div class="detail-card">
+            <div class="detail-label">Notes</div>
+            <textarea id="editNotes" class="date-picker" style="width:100%; min-height:100px; resize:vertical;"></textarea>
+        </div>
+
+        <div class="detail-card">
+            <div class="detail-label">Next</div>
+            <div class="detail-value">Save logic comes in the next step.</div>
+        </div>
+    </div>
+</div>
+</body>
 </body>
 </html>
