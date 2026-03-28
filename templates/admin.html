@@ -1035,7 +1035,9 @@ function editVolunteer() {
     alert("Edit feature not wired yet.");
 }
 
-window.addEventListener("DOMContentLoaded", loadStationBoard);
+window.addEventListener("DOMContentLoaded", () => {
+    console.log("admin page loaded");
+});
 </script>
 
 <div id="detailOverlay" class="detail-overlay" onclick="closeVolunteerPanel()"></div>
