@@ -519,6 +519,49 @@ def coverage_details():
         partial_overlap_reserves=partial_overlap_reserves
     )
 
+@app.route("/admin/absence/update", methods=["POST"])
+def update_absence():
+    data = request.get_json()
+
+    volunteer_id = data.get("volunteer_id")
+    action = data.get("action")
+
+    absence = Absence.query.filter_by(volunteer_id=volunteer_id).first()
+    if not absence:
+        return jsonify({"error": "Absence not found"}), 404
+
+    assignment = Assignment.query.filter_by(volunteer_id=volunteer_id).first()
+
+    if action == "move_now":
+        # find reserve covering
+        reserve_assignment = Assignment.query.filter_by(
+            covering_for_volunteer_id=volunteer_id
+        ).first()
+
+        if reserve_assignment:
+            # move reserve back
+            reserve_assignment.station_id = reserve_assignment.original_station_id
+            reserve_assignment.is_covering = False
+            reserve_assignment.covering_for_volunteer_id = None
+            reserve_assignment.original_station_id = None
+            reserve_assignment.absence_id = None
+
+        if assignment:
+            assignment.is_absent = False
+
+        db.session.delete(absence)
+
+    elif action == "double_coverage":
+        # just end absence early
+        absence.end_date = date.today()
+
+        if assignment:
+            assignment.is_absent = False
+
+    db.session.commit()
+
+    return jsonify({"success": True})
+
 @app.route("/admin/coverage/assign", methods=["POST"])
 def assign_reserve_coverage():
     try:
