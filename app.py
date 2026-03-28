@@ -519,18 +519,15 @@ def coverage_details():
         partial_overlap_reserves=partial_overlap_reserves
     )
 
+
 @app.route("/admin/absence/update", methods=["POST"])
 def update_absence():
-    from datetime import date
-
     data = request.get_json()
 
     volunteer_id = data.get("volunteer_id")
     action = data.get("action")
-
-    print("=== ABSENCE UPDATE DEBUG ===")
-    print("volunteer_id:", volunteer_id)
-    print("action:", action)
+    mode = data.get("mode")
+    new_end_date = data.get("new_end_date")
 
     absence = Absence.query.filter_by(volunteer_id=volunteer_id).first()
     if not absence:
@@ -541,28 +538,43 @@ def update_absence():
         schedule_id=None
     ).first()
 
-    if action == "move_now":
-        reserve_assignment = Assignment.query.filter_by(
-            covering_for_volunteer_id=volunteer_id
-        ).first()
+    reserve_assignment = Assignment.query.filter_by(
+        covering_for_volunteer_id=volunteer_id
+    ).first()
 
-        if reserve_assignment:
-            reserve_assignment.station_id = reserve_assignment.original_station_id
-            reserve_assignment.is_covering = False
-            reserve_assignment.covering_for_volunteer_id = None
-            reserve_assignment.original_station_id = None
-            reserve_assignment.absence_id = None
+    if mode == "end":
 
-        if assignment is not None:
+        if action == "move_now":
+            if reserve_assignment:
+                reserve_assignment.station_id = reserve_assignment.original_station_id
+                reserve_assignment.is_covering = False
+                reserve_assignment.covering_for_volunteer_id = None
+                reserve_assignment.original_station_id = None
+                reserve_assignment.absence_id = None
+
+        if assignment:
             assignment.is_absent = False
 
         db.session.delete(absence)
 
-    elif action == "double_coverage":
-        absence.end_date = date.today()
+    elif mode == "shorten":
 
-        if assignment is not None:
-            assignment.is_absent = False
+        if not new_end_date:
+            return jsonify({"error": "Missing new end date"}), 400
+
+        absence.end_date = new_end_date
+
+        if action == "move_now":
+            # reserve leaves EARLY (on new date)
+            if reserve_assignment:
+                reserve_assignment.station_id = reserve_assignment.original_station_id
+                reserve_assignment.is_covering = False
+                reserve_assignment.covering_for_volunteer_id = None
+                reserve_assignment.original_station_id = None
+                reserve_assignment.absence_id = None
+
+        elif action == "double_coverage":
+            pass
 
     db.session.commit()
 
