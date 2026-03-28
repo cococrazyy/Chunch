@@ -837,6 +837,78 @@ def debug_hourly_final():
             if email:
                 sheet_row_by_email[email] = row
 
+        def parse_time_to_hour(time_str):
+            time_str = str(time_str).strip().upper().replace(" ", "")
+            if not time_str:
+                return None
+
+            if time_str.endswith("AM"):
+                raw = time_str[:-2]
+                if ":" in raw:
+                    raw = raw.split(":")[0]
+                if not raw.isdigit():
+                    return None
+                hour = int(raw)
+                return 0 if hour == 12 else hour
+
+            if time_str.endswith("PM"):
+                raw = time_str[:-2]
+                if ":" in raw:
+                    raw = raw.split(":")[0]
+                if not raw.isdigit():
+                    return None
+                hour = int(raw)
+                return hour if hour == 12 else hour + 12
+
+            return None
+
+        def parse_hour_list(text):
+            text = str(text).strip()
+            if not text:
+                return []
+
+            normalized = text.replace("–", "-").replace("—", "-")
+            parts = [part.strip() for part in normalized.split(",") if part.strip()]
+
+            hours = set()
+
+            for part in parts:
+                if "-" in part:
+                    start_str, end_str = part.split("-", 1)
+                    start_hour = parse_time_to_hour(start_str)
+                    end_hour = parse_time_to_hour(end_str)
+
+                    if start_hour is None or end_hour is None:
+                        continue
+
+                    if start_hour > end_hour:
+                        continue
+
+                    for hour in range(start_hour, end_hour + 1):
+                        hours.add(hour)
+                else:
+                    single_hour = parse_time_to_hour(part)
+                    if single_hour is not None:
+                        hours.add(single_hour)
+
+            return sorted(hours)
+
+        def format_hour(h):
+            if h is None:
+                return ""
+            if h == 0:
+                return "12AM"
+            if h < 12:
+                return f"{h}AM"
+            if h == 12:
+                return "12PM"
+            return f"{h-12}PM"
+
+        def format_hour_range(start_hour, end_hour):
+            if start_hour is None or end_hour is None:
+                return ""
+            return f"{format_hour(start_hour)}–{format_hour(end_hour)}"
+
         volunteer_rows_by_id = {}
 
         for v in volunteers:
@@ -874,13 +946,13 @@ def debug_hourly_final():
                 "absence_notes": latest_absence.notes or "" if latest_absence else ""
             }
 
-        station_to_volunteer_ids = {
-            station.station_id: set()
+        station_name_to_id = {
+            str(station.station_name).strip().lower(): station.station_id
             for station in stations
         }
 
-        station_name_to_id = {
-            str(station.station_name).strip().lower(): station.station_id
+        station_entries = {
+            station.station_id: []
             for station in stations
         }
 
@@ -890,7 +962,8 @@ def debug_hourly_final():
             if v.email
         }
 
-        # base assignments from sheet
+        volunteer_typical_shift_hours = {}
+
         for row in rows:
             email = str(row.get("Email", "")).strip().lower()
             typical_station = str(row.get("Typical Station", "")).strip().lower()
@@ -904,16 +977,20 @@ def debug_hourly_final():
             if volunteer_id is None or station_id is None:
                 continue
 
-            station_to_volunteer_ids[station_id].add(volunteer_id)
+            shift_text = str(row.get("Typical Shift", "")).strip()
+            shift_hours = parse_hour_list(shift_text)
+            volunteer_typical_shift_hours[volunteer_id] = shift_hours
+
+            base_row = dict(volunteer_rows_by_id[volunteer_id])
+            base_row["display_time"] = ""
+            station_entries.setdefault(station_id, []).append(base_row)
 
         absent_station = Station.query.filter_by(station_name="Absent").first()
         absent_station_id = absent_station.station_id if absent_station else None
 
         today = date.today()
-
         assignments = Assignment.query.all()
 
-        # revert expired coverage
         for assignment in assignments:
             if assignment.is_covering and assignment.absence_id:
                 absence = Absence.query.get(assignment.absence_id)
@@ -935,52 +1012,73 @@ def debug_hourly_final():
 
         db.session.commit()
 
-        # =========================
-        # FINAL PLACEMENT LOGIC
-        # =========================
+        def remove_existing_entries(volunteer_id):
+            for entry_list in station_entries.values():
+                entry_list[:] = [entry for entry in entry_list if entry.get("id") != volunteer_id]
+
         for assignment in assignments:
             if assignment.volunteer_id is None:
                 continue
 
-            # remove from all stations first
-            for volunteer_ids in station_to_volunteer_ids.values():
-                volunteer_ids.discard(assignment.volunteer_id)
-
-            # 🔥 COVERING RESERVE (HIGHEST PRIORITY)
-            if assignment.is_covering and assignment.station_id is not None:
-                station_to_volunteer_ids.setdefault(
-                    assignment.station_id, set()
-                ).add(assignment.volunteer_id)
+            volunteer_id = assignment.volunteer_id
+            volunteer_row = volunteer_rows_by_id.get(volunteer_id)
+            if not volunteer_row:
                 continue
 
-            # 🔥 ABSENT (FULL OR PARTIAL)
+            remove_existing_entries(volunteer_id)
+
+            linked_absence = None
+            if assignment.absence_id:
+                linked_absence = Absence.query.get(assignment.absence_id)
+
+            # covering reserve stays only in the covered station
+            if assignment.is_covering and assignment.station_id is not None:
+                cover_row = dict(volunteer_row)
+                cover_row["display_time"] = ""
+                station_entries.setdefault(assignment.station_id, []).append(cover_row)
+                continue
+
+            # partial absence: show in absent for absent window AND in station for remaining window
+            if linked_absence and linked_absence.is_partial and assignment.station_id is not None and absent_station_id is not None:
+                full_shift_hours = volunteer_typical_shift_hours.get(volunteer_id, [])
+                absent_start = linked_absence.partial_start_hour
+                absent_end = linked_absence.partial_end_hour
+
+                working_hours = [
+                    h for h in full_shift_hours
+                    if absent_start is not None and absent_end is not None and not (absent_start <= h <= absent_end)
+                ]
+
+                absent_row = dict(volunteer_row)
+                absent_row["display_time"] = format_hour_range(absent_start, absent_end)
+                station_entries.setdefault(absent_station_id, []).append(absent_row)
+
+                if working_hours:
+                    station_row = dict(volunteer_row)
+                    station_row["display_time"] = format_hour_range(min(working_hours), max(working_hours))
+                    station_entries.setdefault(assignment.station_id, []).append(station_row)
+                continue
+
             if assignment.is_absent and absent_station_id is not None:
-                station_to_volunteer_ids.setdefault(
-                    absent_station_id, set()
-                ).add(assignment.volunteer_id)
+                absent_row = dict(volunteer_row)
+                absent_row["display_time"] = ""
+                station_entries.setdefault(absent_station_id, []).append(absent_row)
+                continue
 
-            # 🔥 NORMAL STATION (ALSO for partial)
             if assignment.station_id is not None:
-                station_to_volunteer_ids.setdefault(
-                    assignment.station_id, set()
-                ).add(assignment.volunteer_id)
+                station_row = dict(volunteer_row)
+                station_row["display_time"] = ""
+                station_entries.setdefault(assignment.station_id, []).append(station_row)
 
-        # =========================
-        # BUILD RESPONSE
-        # =========================
         station_data = {}
 
         for station in stations:
             station_name = str(station.station_name)
-            assigned_ids = station_to_volunteer_ids.get(station.station_id, set())
+            volunteers_for_station = station_entries.get(station.station_id, [])
 
-            volunteers_for_station = [
-                volunteer_rows_by_id[vid]
-                for vid in assigned_ids
-                if vid in volunteer_rows_by_id
-            ]
-
-            volunteers_for_station.sort(key=lambda x: x["name"])
+            volunteers_for_station.sort(
+                key=lambda x: (x.get("name", ""), x.get("display_time", ""))
+            )
 
             station_data[station_name] = {
                 "volunteers": volunteers_for_station
