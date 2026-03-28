@@ -1122,6 +1122,7 @@ window.addEventListener("DOMContentLoaded", loadStationBoard);
     </div>
 
     <div class="detail-panel-body">
+
         <div class="detail-card">
             <div class="detail-label">Choose Action</div>
             <div style="display:flex; flex-direction:column; gap:10px;">
@@ -1133,46 +1134,22 @@ window.addEventListener("DOMContentLoaded", loadStationBoard);
 
         <div class="detail-card" id="extendAbsenceSection" style="display:none;">
             <div class="detail-label">Extend Absence</div>
-            <div style="display:flex; flex-direction:column; gap:12px;">
-                <label>
-                    <div class="detail-label" style="margin-bottom:4px;">New End Date</div>
-                    <input type="date" id="extendAbsenceNewEndDate" class="date-picker" style="width:100%;">
-                </label>
-
-                <div class="detail-value" id="extendAbsenceSummary">
-                    Choose a new end date for this absence.
-                </div>
-
-                <button class="detail-btn edit" type="button" onclick="startExtendFlow()">Next</button>
-            </div>
+            <input type="date" id="extendAbsenceNewEndDate" class="date-picker" style="width:100%;">
+            <button class="detail-btn edit" type="button" onclick="startExtendFlow()">Next</button>
         </div>
 
         <div class="detail-card" id="shortenAbsenceSection" style="display:none;">
             <div class="detail-label">Shorten Absence</div>
-            <div style="display:flex; flex-direction:column; gap:12px;">
-                <label>
-                    <div class="detail-label" style="margin-bottom:4px;">New End Date</div>
-                    <input type="date" id="shortenAbsenceNewEndDate" class="date-picker" style="width:100%;">
-                </label>
-
-                <div class="detail-value">
-                    Choose whether to move the reserve back immediately or allow double coverage until the original return date
-                </div>
-
-                <button class="detail-btn edit" type="button" onclick="startShortenFlow()">Next</button>
-            </div>
+            <input type="date" id="shortenAbsenceNewEndDate" class="date-picker" style="width:100%;">
+            <button class="detail-btn edit" type="button" onclick="startShortenFlow()">Next</button>
         </div>
 
         <div class="detail-card" id="endAbsenceSection" style="display:none;">
             <div class="detail-label">End Absence</div>
-            <div style="display:flex; flex-direction:column; gap:12px;">
-                <div class="detail-value">
-                    End this absence now. Decide whether to end the reserve's coverage or allow double coverage until the original return date.
-                </div>
-
-                <button class="detail-btn edit" type="button" onclick="startEndAbsenceFlow()">Next</button>
-            </div>
+            <div class="detail-value">End this absence now.</div>
+            <button class="detail-btn edit" type="button" onclick="startEndAbsenceFlow()">Next</button>
         </div>
+
     </div>
 </div>
 
