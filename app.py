@@ -1266,6 +1266,8 @@ def debug_hourly_final():
 
             station_entries.setdefault(assignment.station_id, []).append(cover_row)
 
+        station_data = {}
+
         for station in stations:
             station_name = str(station.station_name)
             volunteers_for_station = station_entries.get(station.station_id, [])
@@ -1277,8 +1279,6 @@ def debug_hourly_final():
             station_data[station_name] = {
                 "volunteers": volunteers_for_station
             }
-        
-        station_data = {}
 
         return station_data
 
