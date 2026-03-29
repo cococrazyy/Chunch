@@ -855,33 +855,77 @@ def save_need_coverage():
 def debug_hourly_final():
     try:
         volunteers = Volunteer.query.all()
-        assignments = Assignment.query.all()
         stations = Station.query.all()
 
-        station_data = {}
+        sheet = get_sheet()
+        rows = sheet.get_all_records()
 
-        for s in stations:
-            station_data[str(s.station_name)] = {"volunteers": []}
-
-        volunteer_by_id = {
-            v.id: f"{v.first_name} {v.last_name}"
-            for v in volunteers
+        # Map email -> sheet row
+        sheet_row_by_email = {
+            str(row.get("Email", "")).strip().lower(): row
+            for row in rows
+            if row.get("Email")
         }
+
+        # Build station structure
+        station_data = {
+            str(s.station_name): {"volunteers": []}
+            for s in stations
+        }
+
+        # Map station name -> id
+        station_name_map = {
+            str(s.station_name).strip().lower(): str(s.station_name)
+            for s in stations
+        }
+
+        # STEP 1: Put ALL volunteers in their typical station
+        for v in volunteers:
+            email = (v.email or "").strip().lower()
+            row = sheet_row_by_email.get(email)
+
+            if not row:
+                continue
+
+            station_name = str(row.get("Typical Station", "")).strip().lower()
+
+            if station_name not in station_name_map:
+                continue
+
+            display_station = station_name_map[station_name]
+
+            station_data[display_station]["volunteers"].append({
+                "id": v.id,
+                "name": f"{v.first_name} {v.last_name}",
+                "display_time": ""
+            })
+
+        # STEP 2: Override with assignments
+        assignments = Assignment.query.all()
 
         for a in assignments:
             if not a.station_id or not a.volunteer_id:
                 continue
 
-            station = Station.query.get(a.station_id)
-            if not station:
+            volunteer = next((v for v in volunteers if v.id == a.volunteer_id), None)
+            station = next((s for s in stations if s.station_id == a.station_id), None)
+
+            if not volunteer or not station:
                 continue
 
+            name = f"{volunteer.first_name} {volunteer.last_name}"
             station_name = str(station.station_name)
 
-            station_data.setdefault(station_name, {"volunteers": []})
+            # remove from all stations first
+            for s in station_data.values():
+                s["volunteers"] = [
+                    v for v in s["volunteers"] if v["id"] != volunteer.id
+                ]
+
+            # add to assigned station
             station_data[station_name]["volunteers"].append({
-                "id": a.volunteer_id,
-                "name": volunteer_by_id.get(a.volunteer_id, "Unknown"),
+                "id": volunteer.id,
+                "name": name,
                 "display_time": ""
             })
 
