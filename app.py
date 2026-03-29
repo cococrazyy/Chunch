@@ -949,6 +949,29 @@ def debug_hourly_final():
             return f"{format_hour(start_hour)}–{format_hour(end_hour)}"
 
         volunteer_by_id = {v.id: v for v in volunteers}
+        def build_volunteer_entry(v, row=None, display_time=""):
+            return {
+                "id": v.id,
+                "name": f"{v.first_name} {v.last_name}",
+                "email": v.email or "",
+                "phone": v.phone or "",
+                "captain_status": "Volunteer",
+                "typical_shift": str((row or {}).get("Typical Shift", "")).strip(),
+                "unavailability": str((row or {}).get("Unavailability", "")).strip(),
+                "capability_restrictions": str(
+                    (row or {}).get("Capability Restrictions", "") or
+                    (row or {}).get("Restrictions", "") or
+                    (row or {}).get("Other Info", "")
+                ).strip(),
+                "absence_id": None,
+                "absence_start_date": "",
+                "absence_end_date": "",
+                "absence_is_partial": False,
+                "absence_partial_start_hour": None,
+                "absence_partial_end_hour": None,
+                "absence_notes": "",
+                "display_time": display_time
+            }
         today = date.today()
 
         # STEP 1: Put all volunteers in their typical station
@@ -966,11 +989,9 @@ def debug_hourly_final():
 
             display_station = station_name_map[station_name]
 
-            station_data[display_station]["volunteers"].append({
-                "id": v.id,
-                "name": f"{v.first_name} {v.last_name}",
-                "display_time": ""
-            })
+            station_data[display_station]["volunteers"].append(
+                build_volunteer_entry(v, row=row, display_time="")
+            )
 
         # STEP 2: Apply normal assignment overrides
         assignments = Assignment.query.all()
@@ -991,40 +1012,35 @@ def debug_hourly_final():
                 s["volunteers"] = [
                     v for v in s["volunteers"] if v["id"] != volunteer.id
                 ]
+            email = (volunteer.email or "").strip().lower()
+            row = sheet_row_by_email.get(email, {})
 
-            station_data[station_name]["volunteers"].append({
-                "id": volunteer.id,
-                "name": f"{volunteer.first_name} {volunteer.last_name}",
-                "display_time": ""
-            })
+            station_data[station_name]["volunteers"].append(
+                build_volunteer_entry(volunteer, row=row, display_time="")
+            )
 
         # STEP 3: Apply partial absences last
         absent_station_name = "Absent"
+
+        assignments_by_volunteer_id = {
+            a.volunteer_id: a
+            for a in assignments
+            if a.volunteer_id is not None
+        }
 
         for v in volunteers:
             absence = Absence.query\
                 .filter(
                     Absence.volunteer_id == v.id,
                     Absence.start_date <= today,
-                    Absence.end_date >= today
+                    Absence.end_date >= today,
+                    Absence.is_partial == True
                 )\
                 .order_by(Absence.absence_id.desc())\
                 .first()
 
-            if not absence or not absence.is_partial:
+            if not absence:
                 continue
-
-            email = (v.email or "").strip().lower()
-            row = sheet_row_by_email.get(email)
-            if not row:
-                continue
-
-            typical_station = str(row.get("Typical Station", "")).strip().lower()
-            if typical_station not in station_name_map:
-                continue
-
-            station_name = station_name_map[typical_station]
-            full_shift_hours = parse_hour_list(str(row.get("Typical Shift", "")).strip())
 
             absent_start = absence.partial_start_hour
             absent_end = absence.partial_end_hour
@@ -1032,7 +1048,35 @@ def debug_hourly_final():
             if absent_start is None or absent_end is None:
                 continue
 
-            # remove volunteer from everywhere first
+            email = (v.email or "").strip().lower()
+            row = sheet_row_by_email.get(email)
+            if not row:
+                continue
+
+            full_shift_hours = parse_hour_list(str(row.get("Typical Shift", "")).strip())
+            if not full_shift_hours:
+                continue
+
+            # use the volunteer's current assigned station if there is one,
+            # otherwise fall back to the sheet typical station
+            assignment = assignments_by_volunteer_id.get(v.id)
+
+            station_name = None
+            if assignment and assignment.station_id:
+                assigned_station = next(
+                    (s for s in stations if s.station_id == assignment.station_id),
+                    None
+                )
+                if assigned_station:
+                    station_name = str(assigned_station.station_name)
+
+            if not station_name:
+                typical_station_key = str(row.get("Typical Station", "")).strip().lower()
+                if typical_station_key not in station_name_map:
+                    continue
+                station_name = station_name_map[typical_station_key]
+
+            # remove volunteer from every station first
             for s in station_data.values():
                 s["volunteers"] = [
                     entry for entry in s["volunteers"] if entry["id"] != v.id
@@ -1040,21 +1084,39 @@ def debug_hourly_final():
 
             # add absent segment
             station_data.setdefault(absent_station_name, {"volunteers": []})
-            station_data[absent_station_name]["volunteers"].append({
-                "id": v.id,
-                "name": f"{v.first_name} {v.last_name}",
-                "display_time": format_hour_range(absent_start, absent_end)
-            })
+            absent_entry = build_volunteer_entry(
+                v,
+                row=row,
+                display_time=format_hour_range(absent_start, absent_end)
+            )
+            absent_entry["absence_id"] = absence.absence_id
+            absent_entry["absence_start_date"] = absence.start_date.isoformat() if absence.start_date else ""
+            absent_entry["absence_end_date"] = absence.end_date.isoformat() if absence.end_date else ""
+            absent_entry["absence_is_partial"] = absence.is_partial
+            absent_entry["absence_partial_start_hour"] = absence.partial_start_hour
+            absent_entry["absence_partial_end_hour"] = absence.partial_end_hour
+            absent_entry["absence_notes"] = absence.notes or ""
+
+            station_data[absent_station_name]["volunteers"].append(absent_entry)
 
             # add working segment
-            if full_shift_hours:
-                shift_end = max(full_shift_hours)
-                if absent_end <= shift_end:
-                    station_data[station_name]["volunteers"].append({
-                        "id": v.id,
-                        "name": f"{v.first_name} {v.last_name}",
-                        "display_time": format_hour_range(absent_end, shift_end)
-                    })
+            shift_end = max(full_shift_hours)
+            if absent_end <= shift_end:
+                station_data.setdefault(station_name, {"volunteers": []})
+                working_entry = build_volunteer_entry(
+                    v,
+                    row=row,
+                    display_time=format_hour_range(absent_end, shift_end)
+                )
+                working_entry["absence_id"] = absence.absence_id
+                working_entry["absence_start_date"] = absence.start_date.isoformat() if absence.start_date else ""
+                working_entry["absence_end_date"] = absence.end_date.isoformat() if absence.end_date else ""
+                working_entry["absence_is_partial"] = absence.is_partial
+                working_entry["absence_partial_start_hour"] = absence.partial_start_hour
+                working_entry["absence_partial_end_hour"] = absence.partial_end_hour
+                working_entry["absence_notes"] = absence.notes or ""
+
+                station_data[station_name]["volunteers"].append(working_entry)
 
         return station_data
 
