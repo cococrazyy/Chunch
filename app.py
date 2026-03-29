@@ -533,13 +533,21 @@ def update_absence():
     mode = data.get("mode")
     new_end_date = data.get("new_end_date")
 
-    absence = Absence.query\
-        .filter(Absence.volunteer_id == volunteer_id)\
-        .order_by(Absence.absence_id.desc())\
-        .first()
+    today = date.today()
 
-    if not absence:
+    active_absences = Absence.query\
+        .filter(
+            Absence.volunteer_id == volunteer_id,
+            Absence.start_date <= today,
+            Absence.end_date >= today
+        )\
+        .order_by(Absence.absence_id.desc())\
+        .all()
+
+    if not active_absences:
         return jsonify({"error": "Absence not found"}), 404
+
+    active_absence = active_absences[0]
 
     assignment = Assignment.query.filter_by(
         volunteer_id=volunteer_id,
@@ -564,7 +572,8 @@ def update_absence():
             assignment.is_absent = False
             assignment.absence_id = None
 
-        db.session.delete(absence)
+        for absence in active_absences:
+            db.session.delete(absence)
 
     elif mode == "shorten":
         if not new_end_date:
@@ -575,14 +584,11 @@ def update_absence():
         except ValueError:
             return jsonify({"error": "Invalid new end date"}), 400
 
-        absence.end_date = new_end_date
-
-        # shorten should NOT move reserves back immediately here
-        # the auto-revert route will handle that when the new date/time is reached
+        active_absence.end_date = new_end_date
 
         if assignment:
             assignment.is_absent = True
-            assignment.absence_id = absence.absence_id
+            assignment.absence_id = active_absence.absence_id
 
     db.session.commit()
 
