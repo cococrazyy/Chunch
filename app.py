@@ -158,11 +158,12 @@ class Schedule(db.Model, SoftDeleteMixin):
 # creating assignment table
 class Assignment(db.Model):
     __tablename__ = "assignments"
+
     assignment_id = Column(Integer, primary_key=True)
     
-    volunteer = relationship("Volunteer", foreign_keys=[volunteer_id])
-    station = relationship("Station", foreign_keys=[station_id])
-    schedule = relationship("Schedule", backref="assignments")
+    volunteer_id = Column(Integer, ForeignKey("volunteers.id"))
+    station_id = Column(Integer, ForeignKey("station.station_id"))
+    schedule_id = Column(Integer, ForeignKey("schedule.schedule_id"))
     
     created_by = Column(Integer, ForeignKey("user_account.user_id"))
 
