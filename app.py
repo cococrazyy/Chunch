@@ -871,48 +871,42 @@ def save_need_coverage():
 #    return {"message": f"Deleted {len(assignments)} assignments for volunteer {volunteer_id}"}
 @app.route("/admin/debug-hourly-final")
 def debug_hourly_final():
-    volunteers = Volunteer.query\
-        .filter(Volunteer.deleted_at.is_(None))\
-        .all()
+    try:
+        volunteers = Volunteer.query.all()
+        assignments = Assignment.query.all()
+        stations = Station.query.all()
 
-    stations = Station.query\
-        .filter(Station.station_name != "Other")\
-        .all()
+        station_data = {}
 
-    station_data = {}
+        for s in stations:
+            station_data[str(s.station_name)] = {"volunteers": []}
 
-    for station in stations:
-        station_data[str(station.station_name)] = {
-            "volunteers": []
+        volunteer_by_id = {
+            v.id: f"{v.first_name} {v.last_name}"
+            for v in volunteers
         }
 
-    assignments = Assignment.query.all()
+        for a in assignments:
+            if not a.station_id or not a.volunteer_id:
+                continue
 
-    volunteer_by_id = {
-        v.id: f"{v.first_name} {v.last_name}"
-        for v in volunteers
-    }
+            station = Station.query.get(a.station_id)
+            if not station:
+                continue
 
-    for a in assignments:
-        if not a.station_id or not a.volunteer_id:
-            continue
+            station_name = str(station.station_name)
 
-        station = next(
-            (s for s in stations if s.station_id == a.station_id),
-            None
-        )
-        if not station:
-            continue
+            station_data.setdefault(station_name, {"volunteers": []})
+            station_data[station_name]["volunteers"].append({
+                "id": a.volunteer_id,
+                "name": volunteer_by_id.get(a.volunteer_id, "Unknown"),
+                "display_time": ""
+            })
 
-        station_name = str(station.station_name)
+        return station_data
 
-        station_data[station_name]["volunteers"].append({
-            "id": a.volunteer_id,
-            "name": volunteer_by_id.get(a.volunteer_id, "Unknown"),
-            "display_time": ""
-        })
-
-    return station_data
+    except Exception as e:
+        return {"error": str(e)}, 500
 # @app.route("/admin/debug-hourly-final")
 # def debug_hourly_final():
 #     try:
