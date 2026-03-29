@@ -306,14 +306,10 @@ def coverage_details():
     if not absent_volunteer:
         return {"error": "Volunteer not found"}, 404
 
-        latest_absence = Absence.query\
-            .filter(
-                Absence.volunteer_id == v.id,
-                Absence.start_date <= today,
-                Absence.end_date >= today
-            )\
-            .order_by(Absence.absence_id.desc())\
-            .first()
+    latest_absence = Absence.query\
+        .filter(Absence.volunteer_id == volunteer_id)\
+        .order_by(Absence.absence_id.desc())\
+        .first()
 
     if not latest_absence:
         return "<pre>No absence record found for this volunteer.</pre>", 404
