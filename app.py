@@ -1219,6 +1219,99 @@ def debug_hourly_final():
 
             processed_volunteer_ids.add(volunteer_id)
 
+
+        # FINAL OVERRIDE: force active partial absences to display correctly
+        latest_assignment_by_volunteer_id = {}
+        for assignment in assignments:
+            if assignment.volunteer_id is None:
+                continue
+            latest_assignment_by_volunteer_id[assignment.volunteer_id] = assignment
+
+        for v in volunteers:
+            absence = Absence.query\
+                .filter(
+                    Absence.volunteer_id == v.id,
+                    Absence.start_date <= today,
+                    Absence.end_date >= today,
+                    Absence.is_partial == True
+                )\
+                .order_by(Absence.absence_id.desc())\
+                .first()
+
+            if not absence:
+                continue
+
+            email_key = v.email.strip().lower() if v.email else ""
+            sheet_row = sheet_row_by_email.get(email_key, {})
+            full_shift_hours = volunteer_typical_shift_hours.get(v.id, [])
+
+            if not full_shift_hours:
+                shift_text = str(sheet_row.get("Typical Shift", "")).strip()
+                full_shift_hours = parse_hour_list(shift_text)
+
+            if not full_shift_hours:
+                continue
+
+            assignment = latest_assignment_by_volunteer_id.get(v.id)
+
+            station_id = None
+            if assignment and assignment.station_id is not None:
+                station_id = assignment.station_id
+            else:
+                typical_station_key = str(sheet_row.get("Typical Station", "")).strip().lower()
+                station_id = station_name_to_id.get(typical_station_key)
+
+            if station_id is None or absent_station_id is None:
+                continue
+
+            absent_start = absence.partial_start_hour
+            absent_end = absence.partial_end_hour
+
+            if absent_start is None or absent_end is None:
+                continue
+
+            remove_existing_entries(v.id)
+
+            absent_row = dict(volunteer_rows_by_id[v.id])
+            absent_row["display_time"] = format_hour_range(absent_start, absent_end)
+            station_entries.setdefault(absent_station_id, []).append(absent_row)
+
+            shift_end = max(full_shift_hours)
+            if absent_end <= shift_end:
+                station_row = dict(volunteer_rows_by_id[v.id])
+                station_row["display_time"] = format_hour_range(absent_end, shift_end)
+                station_entries.setdefault(station_id, []).append(station_row)
+
+      
+        for assignment in assignments:
+            if not assignment.is_covering or assignment.volunteer_id is None or assignment.station_id is None:
+                continue
+
+            coverage_absence = None
+            if assignment.absence_id:
+                coverage_absence = Absence.query.get(assignment.absence_id)
+
+            if not coverage_absence:
+                continue
+
+            if not (
+                coverage_absence.is_partial and
+                coverage_absence.start_date <= today <= coverage_absence.end_date
+            ):
+                continue
+
+            reserve_id = assignment.volunteer_id
+
+            remove_existing_entries(reserve_id)
+
+            cover_row = dict(volunteer_rows_by_id[reserve_id])
+            cover_row["display_time"] = format_hour_range(
+                coverage_absence.partial_start_hour,
+                coverage_absence.partial_end_hour
+            )
+            station_entries.setdefault(assignment.station_id, []).append(cover_row)
+
+
         station_data = {}
 
         for station in stations:
