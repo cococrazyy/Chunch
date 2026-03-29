@@ -424,7 +424,7 @@ def coverage_details():
         )
 
     typical_shift = str(absent_row.get("Typical Shift", "")).strip()
-    full_shift_hours = parse_hour_list(typical_shift)
+    _hours = parse_hour_list(typical_shift)
 
     if latest_absence.is_partial:
         shift_hours = list(range(
@@ -433,7 +433,7 @@ def coverage_details():
         ))
         shift_label = format_ranges(shift_hours)
     else:
-        shift_hours = full_shift_hours
+        shift_hours = _hours
         shift_label = typical_shift
 
     shift_hour_set = set(shift_hours)
@@ -1074,11 +1074,17 @@ def debug_hourly_final():
                     if entry.get("id") != volunteer_id
                 ]
 
+        processed_volunteer_ids = set()
+
         for assignment in assignments:
             if assignment.volunteer_id is None:
                 continue
 
             volunteer_id = assignment.volunteer_id
+
+            if volunteer_id in processed_volunteer_ids:
+                continue
+
             volunteer_row = volunteer_rows_by_id.get(volunteer_id)
             if not volunteer_row:
                 continue
@@ -1094,17 +1100,12 @@ def debug_hourly_final():
                 linked_absence.start_date <= today <= linked_absence.end_date
             )
 
-            # covering reserve must be handled FIRST
+            # covering reserve must be handled first so it never lands in Absent
             if assignment.is_covering and assignment.station_id is not None:
                 remove_existing_entries(volunteer_id)
 
                 cover_row = dict(volunteer_row)
-
-                if (
-                    linked_absence and
-                    linked_absence.is_partial and
-                    absence_active_today
-                ):
+                if linked_absence and linked_absence.is_partial and absence_active_today:
                     cover_row["display_time"] = format_hour_range(
                         linked_absence.partial_start_hour,
                         linked_absence.partial_end_hour
@@ -1113,21 +1114,51 @@ def debug_hourly_final():
                     cover_row["display_time"] = ""
 
                 station_entries.setdefault(assignment.station_id, []).append(cover_row)
+                processed_volunteer_ids.add(volunteer_id)
+                continue
+
+            # active partial absence: show volunteer in Absent and also in station
+            if (
+                linked_absence and
+                linked_absence.is_partial and
+                absence_active_today and
+                assignment.station_id is not None and
+                absent_station_id is not None
+            ):
+                remove_existing_entries(volunteer_id)
+
+                absent_start = linked_absence.partial_start_hour
+                absent_end = linked_absence.partial_end_hour
+                full_shift_hours = volunteer_typical_shift_hours.get(volunteer_id, [])
+
+                absent_row = dict(volunteer_row)
+                absent_row["display_time"] = format_hour_range(absent_start, absent_end)
+                station_entries.setdefault(absent_station_id, []).append(absent_row)
+
+                if full_shift_hours and absent_end is not None:
+                    shift_end = max(full_shift_hours)
+                    if absent_end <= shift_end:
+                        station_row = dict(volunteer_row)
+                        station_row["display_time"] = format_hour_range(absent_end, shift_end)
+                        station_entries.setdefault(assignment.station_id, []).append(station_row)
+
+                processed_volunteer_ids.add(volunteer_id)
                 continue
 
             remove_existing_entries(volunteer_id)
-
 
             if assignment.is_absent and absence_active_today and absent_station_id is not None:
                 absent_row = dict(volunteer_row)
                 absent_row["display_time"] = ""
                 station_entries.setdefault(absent_station_id, []).append(absent_row)
+                processed_volunteer_ids.add(volunteer_id)
                 continue
 
             if assignment.station_id is not None:
                 station_row = dict(volunteer_row)
                 station_row["display_time"] = ""
                 station_entries.setdefault(assignment.station_id, []).append(station_row)
+                processed_volunteer_ids.add(volunteer_id)
 
         station_data = {}
 
