@@ -1386,6 +1386,19 @@ def master_list():
     return render_template("master-list.html", volunteers=volunteer_rows)
     
 
+@app.route("/admin/edit-volunteer", methods=["POST"])
+def edit_volunteer():
+    data = request.get_json()
+
+    volunteer = Volunteer.query.get_or_404(data["id"])
+
+    volunteer.email = data["email"]
+    volunteer.phone = data["phone"]
+
+    db.session.commit()
+
+    return {"success": True}
+    
 @app.route("/admin/master-list/add-volunteer", methods=["POST"])
 def add_volunteer():
     if "user_id" not in session:
