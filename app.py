@@ -1180,7 +1180,9 @@ def debug_hourly_final():
 
             remove_existing_entries(volunteer_id)
 
-            if assignment.is_absent and absence_active_today and absent_station_id is not None:
+            if absence_active_today and not (linked_absence and linked_absence.is_partial) and absent_station_id is not None:
+                remove_existing_entries(volunteer_id)
+
                 absent_row = dict(volunteer_row)
                 absent_row["display_time"] = ""
                 station_entries.setdefault(absent_station_id, []).append(absent_row)
