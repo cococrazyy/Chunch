@@ -1094,42 +1094,29 @@ def debug_hourly_final():
                 linked_absence.start_date <= today <= linked_absence.end_date
             )
 
-            if (
-                linked_absence and
-                linked_absence.is_partial and
-                absence_active_today and
-                assignment.station_id is not None and
-                absent_station_id is not None
-            ):
+            # covering reserve must be handled FIRST
+            if assignment.is_covering and assignment.station_id is not None:
                 remove_existing_entries(volunteer_id)
 
-                full_shift_hours = volunteer_typical_shift_hours.get(volunteer_id, [])
-                absent_start = linked_absence.partial_start_hour
-                absent_end = linked_absence.partial_end_hour
+                cover_row = dict(volunteer_row)
 
-                working_hours = [
-                    h for h in full_shift_hours
-                    if absent_start is not None and absent_end is not None and not (absent_start <= h <= absent_end)
-                ]
+                if (
+                    linked_absence and
+                    linked_absence.is_partial and
+                    absence_active_today
+                ):
+                    cover_row["display_time"] = format_hour_range(
+                        linked_absence.partial_start_hour,
+                        linked_absence.partial_end_hour
+                    )
+                else:
+                    cover_row["display_time"] = ""
 
-                absent_row = dict(volunteer_row)
-                absent_row["display_time"] = format_hour_range(absent_start, absent_end)
-                station_entries.setdefault(absent_station_id, []).append(absent_row)
-
-                if working_hours:
-                    station_row = dict(volunteer_row)
-                    station_row["display_time"] = format_hour_range(min(working_hours), max(working_hours))
-                    station_entries.setdefault(assignment.station_id, []).append(station_row)
-
+                station_entries.setdefault(assignment.station_id, []).append(cover_row)
                 continue
 
             remove_existing_entries(volunteer_id)
 
-            if assignment.is_covering and assignment.station_id is not None:
-                cover_row = dict(volunteer_row)
-                cover_row["display_time"] = ""
-                station_entries.setdefault(assignment.station_id, []).append(cover_row)
-                continue
 
             if assignment.is_absent and absence_active_today and absent_station_id is not None:
                 absent_row = dict(volunteer_row)
