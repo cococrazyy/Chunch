@@ -1058,7 +1058,18 @@ def debug_hourly_final():
         today = now.date()
         current_hour = now.hour
 
-        assignments = Assignment.query.all()
+        raw_assignments = Assignment.query\
+            .filter(Assignment.schedule_id.is_(None))\
+            .order_by(Assignment.assignment_id.asc())\
+            .all()
+
+        latest_assignment_by_volunteer_id = {}
+        for assignment in raw_assignments:
+            if assignment.volunteer_id is None:
+                continue
+            latest_assignment_by_volunteer_id[assignment.volunteer_id] = assignment
+
+        assignments = list(latest_assignment_by_volunteer_id.values())
 
         for assignment in assignments:
             if assignment.is_covering and assignment.absence_id:
@@ -1087,10 +1098,7 @@ def debug_hourly_final():
                     assignment.original_station_id = None
                     assignment.absence_id = None
 
-                    covered = Assignment.query.filter_by(
-                        volunteer_id=absence.volunteer_id,
-                        schedule_id=None
-                    ).first()
+                    covered = latest_assignment_by_volunteer_id.get(absence.volunteer_id)
 
                     if covered and not Absence.query.filter(
                         Absence.volunteer_id == absence.volunteer_id,
@@ -1123,6 +1131,7 @@ def debug_hourly_final():
             volunteer_row = volunteer_rows_by_id.get(volunteer_id)
             if not volunteer_row:
                 continue
+
             volunteer_absence = Absence.query\
                 .filter(
                     Absence.volunteer_id == volunteer_id,
@@ -1134,12 +1143,10 @@ def debug_hourly_final():
 
             volunteer_absence_active_today = volunteer_absence is not None
 
-
             if assignment.is_covering and assignment.station_id is not None:
                 remove_existing_entries(volunteer_id)
 
                 cover_row = dict(volunteer_row)
-
 
                 coverage_absence = None
                 if assignment.absence_id:
@@ -1160,7 +1167,6 @@ def debug_hourly_final():
                 station_entries.setdefault(assignment.station_id, []).append(cover_row)
                 processed_volunteer_ids.add(volunteer_id)
                 continue
-
 
             if (
                 volunteer_absence and
@@ -1231,7 +1237,6 @@ def debug_hourly_final():
 
     except Exception as e:
         return {"error": str(e)}, 500
-
 @app.route("/admin/debug-other-check")
 def debug_other_check():
     volunteers = Volunteer.query\
