@@ -897,11 +897,11 @@ async function loadStationBoard() {
             throw new Error(stationData.error || "Failed to load station board.");
         }
         
-        document.getElementById("passing").innerHTML = `
-            <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
-                Passed initial checks.
-            </div>
-        `;
+        // document.getElementById("passing").innerHTML = `
+        //     <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
+        //         Passed initial checks.
+        //     </div>
+        // `;
 
         renderStationBoard(stationData);
     } catch (error) {
