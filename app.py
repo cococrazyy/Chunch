@@ -1392,9 +1392,9 @@ def student_spotlight():
         spotlight_entries = []
 
         for row in rows:
-            name = str(row.get("name", "")).strip()
-            year = str(row.get("year", "")).strip()
-            quote = str(row.get("quote", "")).strip()
+            name = str(row.get("Name", "")).strip()
+            year = str(row.get("Year", "")).strip()
+            quote = str(row.get("Quote", "")).strip()
 
             if not name and not year and not quote:
                 continue
