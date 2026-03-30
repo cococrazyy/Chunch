@@ -275,9 +275,9 @@ def edit_volunteer():
     data = request.get_json()
 
     volunteer = Volunteer.query.get_or_404(data["id"])
-
-   # volunteer.first_name = data.get("first_name")
-  #  volunteer.last_name = data.get("last_name")
+    
+    volunteer.first_name = data.get("first_name")
+    volunteer.last_name = data.get("last_name")
     volunteer.email = data.get("email")
     volunteer.phone = data.get("phone")
 
