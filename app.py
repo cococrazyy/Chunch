@@ -1270,7 +1270,7 @@ def add_volunteer():
     last_name = request.form.get("last_name").strip()
     email = request.form.get("email").strip().lower()
 
-    existing = Volunteer.query.filter_by(email=email).first()
+    existing = Volunteer.query.filter_by(first_name = first_name, email=email).first()
     if existing:
         flash("Volunteer with that email already exists.")
         return redirect("/admin/master-list")
@@ -1854,10 +1854,11 @@ def sync_volunteers():
         for row in rows:
             email = str(row.get("Email", "")).strip().lower()
             phone = str(row.get("Phone Number", "")).strip()
-            if not email:
+            first_name = str(row.get("First Name", "")).strip()
+            if not first_name:
                 continue
             
-            volunteer = Volunteer.query.filter_by(email=email).first()
+            volunteer = Volunteer.query.filter_by(first_name, email=email).first()
 
             if not volunteer:
                 volunteer = Volunteer(
@@ -1869,6 +1870,8 @@ def sync_volunteers():
                 db.session.add(volunteer)
             if not volunteer.phone and phone:
                 volunteer.phone = phone
+            if not volunteer.email and email:
+                volunteer.email = email
             
         db.session.commit()
 
