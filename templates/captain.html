@@ -501,7 +501,7 @@ body {
     </div>
 
     <div class="grid" id="scheduleGrid"></div>
-    <div class="grid" id="passing"></div>"
+    <!-- <div class="grid" id="passing"></div>" -->
 </div>
 
 <script>
@@ -764,15 +764,15 @@ function renderStationBoard(stationData) {
     currentStationData = stationData || {};
 
     const grid = document.getElementById("scheduleGrid");
-    const grid2 = document.getElementByID("passing");
+    // const grid2 = document.getElementByID("passing");
     grid.innerHTML = "";
-    grid2.innerHTML = "";
+    // grid2.innerHTML = "";
 
     const stationNames = Object.keys(stationData);
     let totalVolunteers = 0;
     let assignedVolunteers = 0;
     // let captainsCount = 0;
-    let reserveCount = 0;
+    // let reserveCount = 0;
 
     const seenVolunteerKeys = new Set();
     const seenCaptainKeys = new Set();
@@ -816,7 +816,7 @@ function renderStationBoard(stationData) {
 
                         if (isCaptain(volunteer) && !seenCaptainKeys.has(uniqueKey)) {
                             seenCaptainKeys.add(uniqueKey);
-                            // captainsCount += 1;
+                            captainsCount += 1;
                         }
 
                         const displayTime = volunteer.display_time ? ` (${volunteer.display_time})` : "";
@@ -851,7 +851,6 @@ function renderStationBoard(stationData) {
                 <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
                     <h3>${stationName}</h3>
                 </div>
-                <div class="station-count">${formatCountLabel(volunteers.length)}</div>
             </div>
             ${volunteerHTML}
         `;
@@ -861,7 +860,7 @@ function renderStationBoard(stationData) {
 
     document.getElementById("totalVolunteersCount").textContent = totalVolunteers;
     document.getElementById("assignedVolunteersCount").textContent = assignedVolunteers;
-    // document.getElementById("captainsCount").textContent = captainsCount;
+    document.getElementById("captainsCount").textContent = captainsCount;
     document.getElementById("reserveCount").textContent = reserveCount;
 }
 
@@ -874,11 +873,11 @@ async function loadStationBoard() {
             throw new Error(stationData.error || "Failed to load station board.");
         }
         
-        document.getElementById("passing").innerHTML = `
-            <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
-                Passed initial checks.
-            </div>
-        `;
+        // document.getElementById("passing").innerHTML = `
+        //     <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
+        //         Passed initial checks.
+        //     </div>
+        // `;
 
         renderStationBoard(stationData);
     } catch (error) {
