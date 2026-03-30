@@ -324,7 +324,7 @@
           <label>Station:</label>
           <select name="station_id" required>
             {% for station in stations %}
-              <option value="{{ station.id }}">{{ station.name }}</option>
+              <option value="{{ station.id }}">{{ station.station_name }}</option>
             {% endfor %}
           </select>
 
@@ -334,7 +334,7 @@
             <select name="schedule_id" required>
               {% for s in schedules %}
                 <option value="{{ s.schedule_id }}">
-                    {{ s.day }} - {{ s.start_hour }}:00 → {{ s.end_hour }}:00
+                    {{ s.date }} - {{ s.time }}
                 </option>
               {% endfor %}
             </select>
