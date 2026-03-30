@@ -1165,10 +1165,14 @@ def inbox():
     return render_template("inbox.html", applicants=applicants, rejected=rejected, 
                            stations=stations, schedules=schedules)
 
-@app.route("/admin/inbox/accept-with-assignment/<int:applicants_id>", methods=["POST"])
+@app.route("/admin/inbox/accept-with-assignment", methods=["POST"])
 def accept_applicant(applicants_id):
     if "user_id" not in session:
         return redirect("/")
+    applicants_id = request.form.get("applicant_id")
+    station_id = request.form.get("station_id")
+    schedule_id = request.form.get("schedule_id")
+    
     applicant = Applicant.query.get_or_404(applicants_id)
     volunteer = Volunteer(
         first_name=applicant.first_name,
