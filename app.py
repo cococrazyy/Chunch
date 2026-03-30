@@ -1400,9 +1400,9 @@ def student_spotlight():
                 continue
 
             spotlight_entries.append({
-                "Name": name,
-                "Year": year,
-                "Quote": quote
+                "name": name,
+                "year": year,
+                "quote": quote
             })
 
         random.shuffle(spotlight_entries)
@@ -1487,6 +1487,9 @@ def volunteer_hours():
             .order_by(Station.station_name)\
             .all()
 
+        sheet = get_sheet()
+        rows = sheet.get_all_records()
+
         def parse_hours(availability_rows):
             cleaned_hours = []
             for row in availability_rows:
@@ -1503,9 +1506,11 @@ def volunteer_hours():
         def build_ranges(hours):
             if not hours:
                 return []
+
             ranges = []
             start = hours[0]
             prev = hours[0]
+
             for h in hours[1:]:
                 if h == prev + 1:
                     prev = h
@@ -1513,6 +1518,7 @@ def volunteer_hours():
                     ranges.append([start, prev])
                     start = h
                     prev = h
+
             ranges.append([start, prev])
             return ranges
 
@@ -1527,6 +1533,8 @@ def volunteer_hours():
                 return f"{h-12}PM"
 
         volunteer_rows_by_id = {}
+        volunteer_lookup = {}
+
         for v in volunteers:
             hours = parse_hours(v.availability)
             ranges = build_ranges(hours)
@@ -1540,15 +1548,19 @@ def volunteer_hours():
                 range_label = "N/A"
 
             volunteer_rows_by_id[v.id] = {
+                "id": v.id,
                 "name": f"{v.first_name} {v.last_name}",
-                "email": v.email,
                 "hours": hours,
                 "ranges": ranges,
                 "range_label": range_label
             }
 
-        sheet = get_sheet()
-        rows = sheet.get_all_records()
+            key = (
+                (v.first_name or "").strip().lower(),
+                (v.last_name or "").strip().lower(),
+                (v.email or "").strip().lower()
+            )
+            volunteer_lookup[key] = v.id
 
         station_to_volunteer_ids = {
             station.station_id: set()
@@ -1560,23 +1572,17 @@ def volunteer_hours():
             for station in stations
         }
 
-        volunteer_id_by_email = {
-            v.email.strip().lower(): v.id
-            for v in volunteers
-            if v.email
-        }
-
         for row in rows:
+            first_name = str(row.get("First Name", "")).strip().lower()
+            last_name = str(row.get("Last Name", "")).strip().lower()
             email = str(row.get("Email", "")).strip().lower()
             typical_station = str(row.get("Typical Station", "")).strip().lower()
 
-            if not email or not typical_station:
+            if not typical_station or typical_station in ["reserve", "absent", "other"]:
                 continue
 
-            if typical_station in {"reserve", "absent", "other"}:
-                continue
-
-            volunteer_id = volunteer_id_by_email.get(email)
+            key = (first_name, last_name, email)
+            volunteer_id = volunteer_lookup.get(key)
             station_id = station_name_to_id.get(typical_station)
 
             if volunteer_id is None or station_id is None:
@@ -1584,19 +1590,73 @@ def volunteer_hours():
 
             station_to_volunteer_ids[station_id].add(volunteer_id)
 
+        today = date.today()
+        assignments = Assignment.query.all()
+
+        for assignment in assignments:
+            if assignment.is_covering and assignment.absence_id:
+                absence = Absence.query.get(assignment.absence_id)
+                if absence and absence.end_date < today:
+                    if assignment.original_station_id is not None:
+                        assignment.station_id = assignment.original_station_id
+
+                    assignment.is_covering = False
+                    assignment.covering_for_volunteer_id = None
+                    assignment.original_station_id = None
+                    assignment.absence_id = None
+
+                    covered = Assignment.query.filter_by(
+                        volunteer_id=absence.volunteer_id
+                    ).first()
+
+                    if covered:
+                        covered.is_absent = False
+
+        db.session.commit()
+
+        for assignment in assignments:
+            if assignment.volunteer_id is None:
+                continue
+
+            if assignment.volunteer_id not in volunteer_rows_by_id:
+                continue
+
+            for volunteer_ids in station_to_volunteer_ids.values():
+                volunteer_ids.discard(assignment.volunteer_id)
+
+            if assignment.is_absent:
+                continue
+
+            if assignment.station_id is None:
+                continue
+
+            station = Station.query.get(assignment.station_id)
+            if not station:
+                continue
+
+            station_name = str(station.station_name).strip()
+            if station_name in ["Reserve", "Absent", "Other"]:
+                continue
+
+            station_to_volunteer_ids.setdefault(
+                assignment.station_id, set()
+            ).add(assignment.volunteer_id)
+
         station_data = {}
 
         for station in stations:
             station_name = str(station.station_name)
             assigned_ids = station_to_volunteer_ids.get(station.station_id, set())
 
-            station_data[station_name] = [
+            volunteers_for_station = [
                 volunteer_rows_by_id[vid]
                 for vid in assigned_ids
                 if vid in volunteer_rows_by_id
             ]
 
-            station_data[station_name].sort(key=lambda x: x["name"])
+            volunteers_for_station.sort(key=lambda x: x["name"])
+
+            station_data[station_name] = volunteers_for_station
 
         return render_template(
             "volunteer-hours.html",
@@ -1605,7 +1665,6 @@ def volunteer_hours():
 
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
-
 @app.route("/admin/debug-hourly-matches")
 def debug_hourly_matches():
     volunteers = Volunteer.query\
