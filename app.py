@@ -168,10 +168,13 @@ class Assignment(db.Model):
     covering_for_volunteer_id = Column(Integer, ForeignKey("volunteers.id"), nullable=True)
     original_station_id = Column(Integer, ForeignKey("station.station_id"), nullable=True)
     absence_id = Column(Integer, ForeignKey("absences.absence_id"), nullable=True)
+    cover_start_hour = Column(Integer, nullable=True)
+    cover_end_hour = Column(Integer, nullable=True)
 
     volunteer = relationship("Volunteer", foreign_keys=[volunteer_id])
     station = relationship("Station", foreign_keys=[station_id])
     schedule = relationship("Schedule", backref="assignments")
+    
 
 # creating a class that will store the availiablity hours for each person
 class Availability(db.Model, SoftDeleteMixin):
@@ -206,6 +209,15 @@ with app.app_context():
     db.session.execute(text("""
         ALTER TABLE assignments
         ADD COLUMN IF NOT EXISTS absence_id INTEGER
+    """))
+    db.session.execute(text("""
+    ALTER TABLE assignments
+    ADD COLUMN IF NOT EXISTS cover_start_hour INTEGER
+    """))
+
+    db.session.execute(text("""
+        ALTER TABLE assignments
+        ADD COLUMN IF NOT EXISTS cover_end_hour INTEGER
     """))
 
     db.session.commit()
@@ -658,6 +670,9 @@ def assign_reserve_coverage():
         absent_volunteer_id = request.form.get("absent_volunteer_id", type=int)
         reserve_volunteer_id = request.form.get("reserve_volunteer_id", type=int)
 
+        cover_start_hour = request.form.get("cover_start_hour", type=int)
+        cover_end_hour = request.form.get("cover_end_hour", type=int)
+
         if not absence_id or not absent_volunteer_id or not reserve_volunteer_id:
             return "<pre>Missing required coverage fields.</pre>", 400
 
@@ -708,6 +723,7 @@ def assign_reserve_coverage():
             )
             db.session.add(absent_assignment)
             db.session.flush()
+
         reserve_assignment = Assignment.query.filter_by(
             volunteer_id=reserve_volunteer_id
         ).first()
@@ -724,8 +740,103 @@ def assign_reserve_coverage():
             )
             db.session.add(reserve_assignment)
             db.session.flush()
+
         if reserve_assignment.station_id != reserve_station.station_id:
             return "<pre>Selected volunteer is not currently in the reserve pool.</pre>", 400
+
+        if cover_start_hour is None or cover_end_hour is None:
+            if absence.is_partial:
+                cover_start_hour = absence.partial_start_hour
+                cover_end_hour = absence.partial_end_hour
+            else:
+                sheet = get_sheet()
+                rows = sheet.get_all_records()
+
+                absent_volunteer = Volunteer.query.get(absent_volunteer_id)
+                absent_email = (absent_volunteer.email or "").strip().lower()
+
+                absent_row = None
+                for row in rows:
+                    row_email = str(row.get("Email", "")).strip().lower()
+                    if row_email == absent_email:
+                        absent_row = row
+                        break
+
+                if not absent_row:
+                    return "<pre>Absent volunteer not found in sheet for shift hours.</pre>", 404
+
+                typical_shift = str(absent_row.get("Typical Shift", "")).strip()
+
+                def parse_time_to_hour(time_str):
+                    time_str = str(time_str).strip().upper().replace(" ", "")
+
+                    if not time_str:
+                        return None
+
+                    if time_str.endswith("AM"):
+                        raw = time_str[:-2]
+                        if ":" in raw:
+                            raw = raw.split(":")[0]
+                        if not raw.isdigit():
+                            return None
+                        hour = int(raw)
+                        return 0 if hour == 12 else hour
+
+                    if time_str.endswith("PM"):
+                        raw = time_str[:-2]
+                        if ":" in raw:
+                            raw = raw.split(":")[0]
+                        if not raw.isdigit():
+                            return None
+                        hour = int(raw)
+                        return hour if hour == 12 else hour + 12
+
+                    return None
+
+                def parse_hour_list(text):
+                    text = str(text).strip()
+                    if not text:
+                        return []
+
+                    normalized = text.replace("–", "-").replace("—", "-")
+                    parts = [part.strip() for part in normalized.split(",") if part.strip()]
+
+                    hours = set()
+
+                    for part in parts:
+                        if "-" in part:
+                            start_str, end_str = part.split("-", 1)
+                            start_hour = parse_time_to_hour(start_str)
+                            end_hour = parse_time_to_hour(end_str)
+
+                            if start_hour is None or end_hour is None:
+                                continue
+
+                            if start_hour > end_hour:
+                                continue
+
+                            for hour in range(start_hour, end_hour + 1):
+                                hours.add(hour)
+                        else:
+                            single_hour = parse_time_to_hour(part)
+                            if single_hour is not None:
+                                hours.add(single_hour)
+
+                    return sorted(hours)
+
+                shift_hours = parse_hour_list(typical_shift)
+
+                if not shift_hours:
+                    return "<pre>Could not determine absent volunteer shift hours.</pre>", 400
+
+                cover_start_hour = min(shift_hours)
+                cover_end_hour = max(shift_hours)
+
+        if cover_start_hour is None or cover_end_hour is None:
+            return "<pre>Missing coverage hours.</pre>", 400
+
+        if cover_start_hour > cover_end_hour:
+            return "<pre>Coverage start hour cannot be after end hour.</pre>", 400
 
         absent_assignment.is_absent = True
 
@@ -734,6 +845,8 @@ def assign_reserve_coverage():
         reserve_assignment.is_covering = True
         reserve_assignment.covering_for_volunteer_id = absent_volunteer_id
         reserve_assignment.absence_id = absence_id
+        reserve_assignment.cover_start_hour = cover_start_hour
+        reserve_assignment.cover_end_hour = cover_end_hour
 
         db.session.commit()
 
@@ -1665,6 +1778,7 @@ def volunteer_hours():
 
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
+
 @app.route("/admin/debug-hourly-matches")
 def debug_hourly_matches():
     volunteers = Volunteer.query\
