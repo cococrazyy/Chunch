@@ -34,6 +34,13 @@
             font-size: 15px;
         }
 
+        .top-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
         .section {
             background: white;
             border-radius: 14px;
@@ -195,6 +202,10 @@
             <h1>Applicant Inbox</h1>
             <p>Review, approve, or manage application decisions.</p>
         </div>
+        
+        <div class="top-actions">
+            <button class="secondary" onclick="window.location.href='/admin'">Back</button>
+        </div>
 
         <div class="section">
             <div class="section-header">
@@ -228,7 +239,7 @@
                             <div class="actions">
                                 <button class="btn-accept" 
                                     onclick="openAssignmentModal(
-                                        {{ a.id }},
+                                        '{{ a.id }}',
                                         '{{ a.first_name }} {{ a.last_name }}',
                                         '{{ a.phone }}'
                                     )">
