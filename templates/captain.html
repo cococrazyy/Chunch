@@ -526,9 +526,9 @@ const stationClassMap = {
 let currentStationData = {};
 let currentAbsentEditVolunteer = null;
 
-function formatCountLabel(count) {
-    return count === 1 ? "1 volunteer" : `${count} volunteers`;
-}
+// function formatCountLabel(count) {
+//     return count === 1 ? "1 volunteer" : `${count} volunteers`;
+// }
 
 function getVolunteerDisplayName(volunteer) {
     if (typeof volunteer === "string") return volunteer;
@@ -561,47 +561,47 @@ function formatHourPretty(h) {
     return `${h - 12} PM`;
 }
 
-function openAbsentEditPicker() {
-    const select = document.getElementById("absentVolunteerSelect");
-    if (!select) return;
+// function openAbsentEditPicker() {
+//     const select = document.getElementById("absentVolunteerSelect");
+//     if (!select) return;
 
-    select.innerHTML = "";
+//     select.innerHTML = "";
 
-    const absentStation = currentStationData["Absent"] || { volunteers: [] };
-    const absentVolunteers = absentStation.volunteers || [];
+//     const absentStation = currentStationData["Absent"] || { volunteers: [] };
+//     const absentVolunteers = absentStation.volunteers || [];
 
-    if (absentVolunteers.length === 0) {
-        const option = document.createElement("option");
-        option.value = "";
-        option.textContent = "No absent volunteers";
-        select.appendChild(option);
-    } else {
-        absentVolunteers.forEach(volunteer => {
-            const option = document.createElement("option");
-            option.value = String(volunteer.id || "");
-            option.textContent = volunteer.name || "Volunteer";
-            select.appendChild(option);
-        });
-    }
+//     if (absentVolunteers.length === 0) {
+//         const option = document.createElement("option");
+//         option.value = "";
+//         option.textContent = "No absent volunteers";
+//         select.appendChild(option);
+//     } else {
+//         absentVolunteers.forEach(volunteer => {
+//             const option = document.createElement("option");
+//             option.value = String(volunteer.id || "");
+//             option.textContent = volunteer.name || "Volunteer";
+//             select.appendChild(option);
+//         });
+//     }
 
-    document.getElementById("absentEditOverlay").classList.add("open");
-    document.getElementById("absentEditModal").classList.add("open");
-}
+//     document.getElementById("absentEditOverlay").classList.add("open");
+//     document.getElementById("absentEditModal").classList.add("open");
+// }
 
-function closeAbsentEditPicker() {
-    document.getElementById("absentEditOverlay").classList.remove("open");
-    document.getElementById("absentEditModal").classList.remove("open");
-}
+// function closeAbsentEditPicker() {
+//     document.getElementById("absentEditOverlay").classList.remove("open");
+//     document.getElementById("absentEditModal").classList.remove("open");
+// }
 
-function closeAbsenceActionModal() {
-    document.getElementById("absenceActionOverlay").classList.remove("open");
-    document.getElementById("absenceActionModal").classList.remove("open");
-}
+// function closeAbsenceActionModal() {
+//     document.getElementById("absenceActionOverlay").classList.remove("open");
+//     document.getElementById("absenceActionModal").classList.remove("open");
+// }
 
-function closeReserveDecisionModal() {
-    document.getElementById("reserveDecisionOverlay").classList.remove("open");
-    document.getElementById("reserveDecisionModal").classList.remove("open");
-}
+// function closeReserveDecisionModal() {
+//     document.getElementById("reserveDecisionOverlay").classList.remove("open");
+//     document.getElementById("reserveDecisionModal").classList.remove("open");
+// }
 
 function showAbsenceActionSection(sectionName) {
     document.getElementById("extendAbsenceSection").style.display = "none";
@@ -617,35 +617,35 @@ function showAbsenceActionSection(sectionName) {
     }
 }
 
-function startAbsentEdit() {
-    const select = document.getElementById("absentVolunteerSelect");
-    if (!select) return;
+// function startAbsentEdit() {
+//     const select = document.getElementById("absentVolunteerSelect");
+//     if (!select) return;
 
-    const selectedId = Number(select.value);
-    if (!selectedId) return;
+//     const selectedId = Number(select.value);
+//     if (!selectedId) return;
 
-    const absentStation = currentStationData["Absent"] || { volunteers: [] };
-    const absentVolunteers = absentStation.volunteers || [];
+//     const absentStation = currentStationData["Absent"] || { volunteers: [] };
+//     const absentVolunteers = absentStation.volunteers || [];
 
-    const volunteer = absentVolunteers.find(v => Number(v.id) === selectedId);
-    if (!volunteer) return;
+//     const volunteer = absentVolunteers.find(v => Number(v.id) === selectedId);
+//     if (!volunteer) return;
 
-    currentAbsentEditVolunteer = volunteer;
+//     currentAbsentEditVolunteer = volunteer;
 
-    document.getElementById("absenceActionVolunteerName").textContent =
-        volunteer.name || "Volunteer";
+//     document.getElementById("absenceActionVolunteerName").textContent =
+//         volunteer.name || "Volunteer";
 
-    document.getElementById("extendAbsenceNewEndDate").value =
-        volunteer.absence_end_date || "";
-    document.getElementById("shortenAbsenceNewEndDate").value =
-        volunteer.absence_end_date || "";
+//     document.getElementById("extendAbsenceNewEndDate").value =
+//         volunteer.absence_end_date || "";
+//     document.getElementById("shortenAbsenceNewEndDate").value =
+//         volunteer.absence_end_date || "";
 
-    showAbsenceActionSection("extend");
+//     showAbsenceActionSection("extend");
 
-    closeAbsentEditPicker();
-    document.getElementById("absenceActionOverlay").classList.add("open");
-    document.getElementById("absenceActionModal").classList.add("open");
-}
+//     closeAbsentEditPicker();
+//     document.getElementById("absenceActionOverlay").classList.add("open");
+//     document.getElementById("absenceActionModal").classList.add("open");
+// }
 
 function startExtendFlow() {
     const newEndDate = document.getElementById("extendAbsenceNewEndDate").value;
@@ -712,51 +712,51 @@ function startEndAbsenceFlow() {
     document.getElementById("reserveDecisionModal").classList.add("open");
 }
 
-async function handleReserveDecision(choice) {
-    if (!currentAbsentEditVolunteer) {
-        alert("No absence selected.");
-        return;
-    }
+// async function handleReserveDecision(choice) {
+//     if (!currentAbsentEditVolunteer) {
+//         alert("No absence selected.");
+//         return;
+//     }
 
-    try {
-        const payload = {
-            volunteer_id: currentAbsentEditVolunteer.id,
-            action: choice,
-            mode: currentActionMode,
-            new_end_date: pendingShortenDate
-        };
+//     try {
+//         const payload = {
+//             volunteer_id: currentAbsentEditVolunteer.id,
+//             action: choice,
+//             mode: currentActionMode,
+//             new_end_date: pendingShortenDate
+//         };
 
-        const response = await fetch("/admin/absence/update", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(payload)
-        });
+//         const response = await fetch("/admin/absence/update", {
+//             method: "POST",
+//             headers: {
+//                 "Content-Type": "application/json"
+//             },
+//             body: JSON.stringify(payload)
+//         });
 
-        let data;
-        try {
-            data = await response.json();
-        } catch (e) {
-            const text = await response.text();
-            console.error("Server returned non-JSON:", text);
-            alert("Server error — check console");
-            return;
-        }
+//         let data;
+//         try {
+//             data = await response.json();
+//         } catch (e) {
+//             const text = await response.text();
+//             console.error("Server returned non-JSON:", text);
+//             alert("Server error — check console");
+//             return;
+//         }
 
-        if (!response.ok) {
-            throw new Error(data.error || "Update failed");
-        }
+//         if (!response.ok) {
+//             throw new Error(data.error || "Update failed");
+//         }
 
-        closeReserveDecisionModal();
+//         closeReserveDecisionModal();
 
-        // reload board immediately
-        loadStationBoard();
+//         // reload board immediately
+//         loadStationBoard();
 
-    } catch (err) {
-        alert(err.message || "Something went wrong");
-    }
-}
+//     } catch (err) {
+//         alert(err.message || "Something went wrong");
+//     }
+// }
 
 function renderStationBoard(stationData) {
     currentStationData = stationData || {};
@@ -867,14 +867,14 @@ async function loadStationBoard() {
         const stationData = await response.json();
 
         if (!response.ok || stationData.error) {
-            throw new Error(stationData.error || "Failed to load station board.");
+            throw new Error(stationData.error || "Failed to load station board not ok.");
         }
 
         renderStationBoard(stationData);
     } catch (error) {
         document.getElementById("scheduleGrid").innerHTML = `
             <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
-                Failed to load station board.
+                Failed to load station board error.
             </div>
         `;
     }
@@ -905,31 +905,31 @@ async function loadSchedule() {
     }
 }
 
-function enableEdit() {
-    alert("Edit mode placeholder.");
-}
+// function enableEdit() {
+//     alert("Edit mode placeholder.");
+// }
 
-function requestCoverage() {
-    document.getElementById("coverageBox").style.display = "block";
-}
+// function requestCoverage() {
+//     document.getElementById("coverageBox").style.display = "block";
+// }
 
-function submitAbsent() {
-    const selected = document.getElementById("absentSelect").value;
-    alert(`Coverage flow placeholder for volunteer ID ${selected}`);
-}
+// function submitAbsent() {
+//     const selected = document.getElementById("absentSelect").value;
+//     alert(`Coverage flow placeholder for volunteer ID ${selected}`);
+// }
 
 function openVolunteerPanel(volunteerJson) {
     const volunteer = JSON.parse(volunteerJson);
-    document.getElementById("editName").style.display = "none";
-    document.getElementById("editEmail").style.display = "none";
-    document.getElementById("editPhone").style.display = "none";
+    // document.getElementById("editName").style.display = "none";
+    // document.getElementById("editEmail").style.display = "none";
+    // document.getElementById("editPhone").style.display = "none";
     
     document.getElementById("detailName").style.display = "inline";
     document.getElementById("detailEmail").style.display = "block";
     document.getElementById("detailPhone").style.display = "block";
 
-    document.getElementById("editBtn").style.display = "inline-block";
-    document.getElementById("saveBtn").style.display = "none";
+    // document.getElementById("editBtn").style.display = "inline-block";
+    // document.getElementById("saveBtn").style.display = "none";
 
     
     currentVolunteer = volunteer;
@@ -990,73 +990,73 @@ function closeVolunteerPanel() {
     document.getElementById("detailPanel").classList.remove("open");
     document.getElementById("detailOverlay").classList.remove("open");
 
-    document.getElementById("editName").style.display = "none";
-    document.getElementById("editEmail").style.display = "none";
-    document.getElementById("editPhone").style.display = "none";
+    // document.getElementById("editName").style.display = "none";
+    // document.getElementById("editEmail").style.display = "none";
+    // document.getElementById("editPhone").style.display = "none";
 
     document.getElementById("detailName").style.display = "inline";
     document.getElementById("detailEmail").style.display = "block";
     document.getElementById("detailPhone").style.display = "block";
 
-    document.getElementById("editBtn").style.display = "inline-block";
-    document.getElementById("saveBtn").style.display = "none";
+    // document.getElementById("editBtn").style.display = "inline-block";
+    // document.getElementById("saveBtn").style.display = "none";
 
-    document.getElementById("editName").value = "";
-    document.getElementById("editEmail").value = "";
-    document.getElementById("editPhone").value = "";
+    // document.getElementById("editName").value = "";
+    // document.getElementById("editEmail").value = "";
+    // document.getElementById("editPhone").value = "";
 
     currentVolunteer = null;
     
 }
 
-function editVolunteer() {
-    if(!currentVolunteer) return;
-    document.getElementById("detailName").style.display = "none";
-    document.getElementById("detailEmail").style.display = "none";
-    document.getElementById("detailPhone").style.display = "none";
+// function editVolunteer() {
+//     if(!currentVolunteer) return;
+//     document.getElementById("detailName").style.display = "none";
+//     document.getElementById("detailEmail").style.display = "none";
+//     document.getElementById("detailPhone").style.display = "none";
 
-    const nameInput = document.getElementById("editName");
-    const emailInput = document.getElementById("editEmail");
-    const phoneInput = document.getElementById("editPhone");
+//     const nameInput = document.getElementById("editName");
+//     const emailInput = document.getElementById("editEmail");
+//     const phoneInput = document.getElementById("editPhone");
 
-    nameInput.style.display = "block";
-    emailInput.style.display = "block";
-    phoneInput.style.display = "block";
+//     nameInput.style.display = "block";
+//     emailInput.style.display = "block";
+//     phoneInput.style.display = "block";
 
-    nameInput.value = currentVolunteer.name || "";
-    emailInput.value = currentVolunteer.email || "";
-    phoneInput.value = currentVolunteer.phone || "";
+//     nameInput.value = currentVolunteer.name || "";
+//     emailInput.value = currentVolunteer.email || "";
+//     phoneInput.value = currentVolunteer.phone || "";
 
-    document.getElementById("editBtn").style.display = "none";
-    document.getElementById("saveBtn").style.display = "inline-block";
+//     document.getElementById("editBtn").style.display = "none";
+//     document.getElementById("saveBtn").style.display = "inline-block";
     
-}
+// }
 
-function saveVolunteer() {
-    const fullName = document.getElementById("editName").value.trim();
-    const [firstName, ...rest] = fullName.split(" ");
-    const lastName = rest.join(" ");
-    const updatedData = {
-        id: currentVolunteer.id,
-        first_name: firstName,
-        last_name: lastName,
-        email: document.getElementById("editEmail").value,
-        phone: document.getElementById("editPhone").value
-    };
+// function saveVolunteer() {
+//     const fullName = document.getElementById("editName").value.trim();
+//     const [firstName, ...rest] = fullName.split(" ");
+//     const lastName = rest.join(" ");
+//     const updatedData = {
+//         id: currentVolunteer.id,
+//         first_name: firstName,
+//         last_name: lastName,
+//         email: document.getElementById("editEmail").value,
+//         phone: document.getElementById("editPhone").value
+//     };
 
-    fetch("/admin/edit-volunteer", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(updatedData)
-    })
-    .then(res => res.json())
-    .then(data => {
-        location.reload();
-    })
-    .catch(err => console.error(err));
-}
+//     fetch("/admin/edit-volunteer", {
+//         method: "POST",
+//         headers: {
+//             "Content-Type": "application/json"
+//         },
+//         body: JSON.stringify(updatedData)
+//     })
+//     .then(res => res.json())
+//     .then(data => {
+//         location.reload();
+//     })
+//     .catch(err => console.error(err));
+// }
 
 window.addEventListener("DOMContentLoaded", loadStationBoard);
 </script>
@@ -1067,12 +1067,12 @@ window.addEventListener("DOMContentLoaded", loadStationBoard);
     <div class="detail-panel-header">
         <div class="detail-panel-title">
             <span id="detailName">Volunteer</span>
-            <input id="editName" style="display:none;">
+            <!-- <input id="editName" style="display:none;"> -->
         </div>
         <div class="detail-panel-actions">
             <button class="detail-btn back" type="button" onclick="closeVolunteerPanel()">Back</button>
-            <button class="detail-btn edit" type="button" id = "editBtn" onclick="editVolunteer()">Edit</button>
-            <button class="detail-btn save" type="button" id="saveBtn" onclick="saveVolunteer()" style="display:none;">Save changes</button>
+            <!-- <button class="detail-btn edit" type="button" id = "editBtn" onclick="editVolunteer()">Edit</button> -->
+            <!-- <button class="detail-btn save" type="button" id="saveBtn" onclick="saveVolunteer()" style="display:none;">Save changes</button> -->
         </div>
     </div>
 
@@ -1081,7 +1081,7 @@ window.addEventListener("DOMContentLoaded", loadStationBoard);
             <div class="detail-label">Email</div>
             <div class="detail-value">
                 <span id="detailEmail">—</span>
-                <input id = "editEmail" style="display:none;">
+                <!-- <input id = "editEmail" style="display:none;"> -->
             </div>
         </div>
 
@@ -1089,7 +1089,7 @@ window.addEventListener("DOMContentLoaded", loadStationBoard);
             <div class="detail-label">Phone</div>
             <div class="detail-value">
                 <span id="detailPhone">—</span>
-                <input id = "editPhone" style="display:none;">
+                <!-- <input id = "editPhone" style="display:none;"> -->
             </div>
         </div>
 
@@ -1125,14 +1125,14 @@ window.addEventListener("DOMContentLoaded", loadStationBoard);
     </div>
 </div>
 
-<div id="absentEditOverlay" class="detail-overlay" onclick="closeAbsentEditPicker()"></div>
+<!-- <div id="absentEditOverlay" class="detail-overlay" onclick="closeAbsentEditPicker()"></div> -->
 
-<div id="absentEditModal" class="detail-panel">
+<!-- <div id="absentEditModal" class="detail-panel">
     <div class="detail-panel-header">
         <div class="detail-panel-title">Edit Absence</div>
         <div class="detail-panel-actions">
             <button class="detail-btn back" type="button" onclick="closeAbsentEditPicker()">Back</button>
-            <button class="detail-btn edit" type="button" onclick="startAbsentEdit()">Next</button>
+            <!-- <button class="detail-btn edit" type="button" onclick="startAbsentEdit()">Next</button> -->
         </div>
     </div>
 
@@ -1142,7 +1142,7 @@ window.addEventListener("DOMContentLoaded", loadStationBoard);
             <select id="absentVolunteerSelect" class="date-picker" style="width:100%;"></select>
         </div>
     </div>
-</div>
+</div> -->
 
 <div id="absenceActionOverlay" class="detail-overlay" onclick="closeAbsenceActionModal()"></div>
 
@@ -1188,9 +1188,9 @@ window.addEventListener("DOMContentLoaded", loadStationBoard);
     </div>
 </div>
 
-<div id="reserveDecisionOverlay" class="detail-overlay" onclick="closeReserveDecisionModal()"></div>
+<!-- <div id="reserveDecisionOverlay" class="detail-overlay" onclick="closeReserveDecisionModal()"></div> -->
 
-<div id="reserveDecisionModal" class="detail-panel">
+<!-- <div id="reserveDecisionModal" class="detail-panel">
     <div class="detail-panel-header">
         <div class="detail-panel-title" id="reserveDecisionTitle">Reserve Decision</div>
         <div class="detail-panel-actions">
@@ -1216,6 +1216,6 @@ window.addEventListener("DOMContentLoaded", loadStationBoard);
             </div>
         </div>
     </div>
-</div>
+</div> -->
 </body>
 </html>
