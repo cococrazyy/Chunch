@@ -976,6 +976,18 @@ function submitAbsent() {
 
 function openVolunteerPanel(volunteerJson) {
     const volunteer = JSON.parse(volunteerJson);
+    document.getElementById("editName").style.display = "none";
+    document.getElementById("editEmail").style.display = "none";
+    document.getElementById("editPhone").style.display = "none";
+    
+    document.getElementById("detailName").style.display = "inline";
+    document.getElementById("detailEmail").style.display = "block";
+    document.getElementById("detailPhone").style.display = "block";
+
+    document.getElementById("editBtn").style.display = "inline-block";
+    document.getElementById("saveBtn").style.display = "none";
+
+    
     currentVolunteer = volunteer;
 
     document.getElementById("detailName").textContent = volunteer.name || "Volunteer";
@@ -1033,6 +1045,24 @@ function openVolunteerPanel(volunteerJson) {
 function closeVolunteerPanel() {
     document.getElementById("detailPanel").classList.remove("open");
     document.getElementById("detailOverlay").classList.remove("open");
+
+    document.getElementById("editName").style.display = "none";
+    document.getElementById("editEmail").style.display = "none";
+    document.getElementById("editPhone").style.display = "none";
+
+    document.getElementById("detailName").style.display = "inline";
+    document.getElementById("detailEmail").style.display = "block";
+    document.getElementById("detailPhone").style.display = "block";
+
+    document.getElementById("editBtn").style.display = "inline-block";
+    document.getElementById("saveBtn").style.display = "none";
+
+    document.getElementById("editName").value = "";
+    document.getElementById("editEmail").value = "";
+    document.getElementById("editPhone").value = "";
+
+    currentVolunteer = null;
+    
 }
 
 function editVolunteer() {
