@@ -785,7 +785,8 @@ function renderStationBoard(stationData) {
         const station = stationData[stationName];
         const volunteers = station.volunteers || [];
 
-        stationString += {station}.toString() + " ";
+        stationString += station.toString();
+        stationString += " ";
 
         totalVolunteers += volunteers.length;
 
@@ -797,6 +798,7 @@ function renderStationBoard(stationData) {
         }
 
         const card = document.createElement("div");
+        const card2 = document.createElement("div");
         const cssClass = stationClassMap[stationName];
         if (!cssClass) return;
 
@@ -854,6 +856,11 @@ function renderStationBoard(stationData) {
         //         </button>
         //     `
         //     : "";
+        passing.innerHTML = `
+            <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
+                ${stationsHTML}
+            </div>
+        `;
 
         card.innerHTML = `
             <div class="card-top">
@@ -864,11 +871,11 @@ function renderStationBoard(stationData) {
             ${volunteerHTML}
         `;
 
-        document.getElementById("passing").innerHTML = `
-            <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
-                Passed initial checks.
-            </div>
-        `;
+        // document.getElementById("passing").innerHTML = `
+        //     <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
+        //         ${stationsHTML}
+        //     </div>
+        // `;
 
         grid.appendChild(card);
     });
@@ -890,11 +897,11 @@ async function loadStationBoard() {
             throw new Error(stationData.error || "Failed to load station board.");
         }
         
-        document.getElementById("passing").innerHTML = `
-            <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
-                Passed initial checks.
-            </div>
-        `;
+        // document.getElementById("passing").innerHTML = `
+        //     <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
+        //         Passed initial checks.
+        //     </div>
+        // `;
 
         renderStationBoard(stationData);
     } catch (error) {
@@ -904,11 +911,11 @@ async function loadStationBoard() {
             </div>
             `;
         }
-        document.getElementById("passing").innerHTML = `
-            <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
-                {}.
-            </div>
-        `;
+        // document.getElementById("passing").innerHTML = `
+        //     <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
+        //         {}.
+        //     </div>
+        // `;
 }
 
 async function loadSchedule() {
