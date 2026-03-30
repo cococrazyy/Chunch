@@ -1171,8 +1171,17 @@ def accept_applicant(applicants_id):
         return redirect("/")
     applicants_id = int(request.form.get("applicant_id"))
     station_id = int(request.form.get("station_id"))
-    schedule_id = int(request.form.get("schedule_id"))
-    
+    start_hour = int(request.form["start_hour"])
+    end_hour = int(request.form["end_hour"])
+
+    if end_hour <= start_hour:
+        return "Invalid time range", 400
+        
+    for hour in range(start_hour, end_hour):
+        availability = Availability(
+            volunteer_id=volunteer_id,
+            hour=hour
+    )
     applicant = Applicant.query.get_or_404(applicants_id)
     volunteer = Volunteer(
         first_name=applicant.first_name,
@@ -1180,13 +1189,20 @@ def accept_applicant(applicants_id):
         email=applicant.email,
         phone=applicant.phone
     )
+    
     db.session.add(volunteer)
     db.session.flush()  
+    
+    for hour in range(start_hour, end_hour):
+        availability = Availability(
+            volunteer_id=volunteer_id,
+            hour=hour
+    )
+    db.session.add(availability)
     
     assignment = Assignment(
         volunteer_id=volunteer.id,
         station_id=station_id,
-        schedule_id=schedule_id
     )
     db.session.add(assignment)
 
