@@ -501,7 +501,7 @@ body {
     </div>
 
     <div class="grid" id="scheduleGrid"></div>
-    <!-- <div class="grid" id="passing"></div>" -->
+    <div class="grid" id="passing"></div>"
 </div>
 
 <script>
@@ -764,15 +764,17 @@ function renderStationBoard(stationData) {
     currentStationData = stationData || {};
 
     const grid = document.getElementById("scheduleGrid");
-    // const grid2 = document.getElementByID("passing");
+    const grid2 = document.getElementByID("passing");
     grid.innerHTML = "";
-    // grid2.innerHTML = "";
+    grid2.innerHTML = "";
 
     const stationNames = Object.keys(stationData);
     let totalVolunteers = 0;
     let assignedVolunteers = 0;
-    // let captainsCount = 0;
-    // let reserveCount = 0;
+    let captainsCount = 0;
+    let reserveCount = 0;
+
+    let stationString = "";
 
     const seenVolunteerKeys = new Set();
     const seenCaptainKeys = new Set();
@@ -782,6 +784,8 @@ function renderStationBoard(stationData) {
 
         const station = stationData[stationName];
         const volunteers = station.volunteers || [];
+
+        stationString += {station}.toString() + " ";
 
         totalVolunteers += volunteers.length;
 
@@ -799,6 +803,7 @@ function renderStationBoard(stationData) {
         card.className = `card ${cssClass}`;
 
         let volunteerHTML = "";
+        let stationsHTML = "";
 
         if (volunteers.length > 0) {
             volunteerHTML = `
@@ -832,7 +837,11 @@ function renderStationBoard(stationData) {
         } else {
             volunteerHTML = `<div class="empty-state">No volunteers assigned</div>`;
         }
-
+        stationsHTML = `
+            <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
+                <h2>${stationString}</h2>
+            </div>
+        `;
         // const absentEditButton = stationName === "Absent"
         //     ? `
         //         <button
@@ -855,6 +864,12 @@ function renderStationBoard(stationData) {
             ${volunteerHTML}
         `;
 
+        document.getElementById("passing").innerHTML = `
+            <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
+                Passed initial checks.
+            </div>
+        `;
+
         grid.appendChild(card);
     });
 
@@ -868,25 +883,32 @@ async function loadStationBoard() {
     try {
         const response = await fetch("/admin/debug-hourly-final");
         const stationData = await response.json();
-        
+
+        stationData.data
+
         if (!response.ok || stationData.error) {
             throw new Error(stationData.error || "Failed to load station board.");
         }
         
-        // document.getElementById("passing").innerHTML = `
-        //     <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
-        //         Passed initial checks.
-        //     </div>
-        // `;
+        document.getElementById("passing").innerHTML = `
+            <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
+                Passed initial checks.
+            </div>
+        `;
 
         renderStationBoard(stationData);
     } catch (error) {
         document.getElementById("scheduleGrid").innerHTML = `
+        <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
+            Failed to load station board.
+            </div>
+            `;
+        }
+        document.getElementById("passing").innerHTML = `
             <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
-                Failed to load station board.
+                {}.
             </div>
         `;
-    }
 }
 
 async function loadSchedule() {
