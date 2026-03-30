@@ -865,13 +865,15 @@ async function loadStationBoard() {
     try {
         const response = await fetch("/admin/debug-hourly-final");
         const stationData = await response.json();
-
+        
         if (!response.ok || stationData.error) {
             throw new Error(stationData.error || "Failed to load station board.");
         }
 
         console.log("passed initial");
-        <p>passed initial</p>
+        <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
+            Passed initial checks.
+        </div>
 
         renderStationBoard(stationData);
     } catch (error) {
