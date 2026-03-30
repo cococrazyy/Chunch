@@ -1169,19 +1169,11 @@ def inbox():
 def accept_applicant():
     if "user_id" not in session:
         return redirect("/")
-    applicants_id = int(request.form.get("applicant_id"))
-    station_id = int(request.form.get("station_id"))
-    start_hour = int(request.form["start_hour"])
-    end_hour = int(request.form["end_hour"])
-
-    if end_hour <= start_hour:
-        return "Invalid time range", 400
-        
-    for hour in range(start_hour, end_hour):
-        availability = Availability(
-            volunteer_id=volunteer_id,
-            hour=hour
-    )
+    applicants_id = request.form.get("applicant_id", type=int)
+    station_id = request.form.get("station_id", type=int)
+    start_hour = request.form.get("start_hour", type=int)
+    end_hour = request.form.get("end_hour", type=int)
+  
     applicant = Applicant.query.get_or_404(applicants_id)
     volunteer = Volunteer(
         first_name=applicant.first_name,
@@ -1193,9 +1185,12 @@ def accept_applicant():
     db.session.add(volunteer)
     db.session.flush()  
     
+    if end_hour <= start_hour:
+        return "Invalid time range", 400
+        
     for hour in range(start_hour, end_hour):
         availability = Availability(
-            volunteer_id=volunteer_id,
+            volunteer_id=volunteer.id,
             hour=hour
     )
     db.session.add(availability)
