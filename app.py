@@ -284,6 +284,11 @@ def edit_volunteer():
     db.session.commit()
 
     return {"success": True}
+@app.route("/captain")
+def captain_page():
+    if "user_id" not in session:
+            return redirect("/")
+    return render_template("captain.html")
     
 @app.route("/admin")
 def admin_page():
