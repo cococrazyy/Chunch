@@ -501,6 +501,7 @@ body {
     </div>
 
     <div class="grid" id="scheduleGrid"></div>
+    <div class="grid" id="passing"></div>"
 </div>
 
 <script>
@@ -762,6 +763,7 @@ function renderStationBoard(stationData) {
     currentStationData = stationData || {};
 
     const grid = document.getElementById("scheduleGrid");
+    const grid2 = document.getElementByID("passing");
     grid.innerHTML = "";
 
     const stationNames = Object.keys(stationData);
@@ -811,7 +813,7 @@ function renderStationBoard(stationData) {
 
                         if (isCaptain(volunteer) && !seenCaptainKeys.has(uniqueKey)) {
                             seenCaptainKeys.add(uniqueKey);
-                            captainsCount += 1;
+                            // captainsCount += 1;
                         }
 
                         const displayTime = volunteer.display_time ? ` (${volunteer.display_time})` : "";
@@ -828,18 +830,18 @@ function renderStationBoard(stationData) {
             volunteerHTML = `<div class="empty-state">No volunteers assigned</div>`;
         }
 
-        const absentEditButton = stationName === "Absent"
-            ? `
-                <button
-                    class="absent-edit-btn"
-                    type="button"
-                    title="Edit Absences"
-                    onclick="openAbsentEditPicker()"
-                >
-                    ✏️
-                </button>
-            `
-            : "";
+        // const absentEditButton = stationName === "Absent"
+        //     ? `
+        //         <button
+        //             // class="absent-edit-btn"
+        //             type="button"
+        //             // title="Edit Absences"
+        //             onclick="openAbsentEditPicker()"
+        //         >
+        //             ✏️
+        //         </button>
+        //     `
+        //     : "";
 
         card.innerHTML = `
             <div class="card-top">
@@ -855,10 +857,10 @@ function renderStationBoard(stationData) {
         grid.appendChild(card);
     });
 
-    document.getElementById("totalVolunteersCount").textContent = totalVolunteers;
-    document.getElementById("assignedVolunteersCount").textContent = assignedVolunteers;
-    document.getElementById("captainsCount").textContent = captainsCount;
-    document.getElementById("reserveCount").textContent = reserveCount;
+    // document.getElementById("totalVolunteersCount").textContent = totalVolunteers;
+    // document.getElementById("assignedVolunteersCount").textContent = assignedVolunteers;
+    // document.getElementById("captainsCount").textContent = captainsCount;
+    // document.getElementById("reserveCount").textContent = reserveCount;
 }
 
 async function loadStationBoard() {
@@ -870,7 +872,7 @@ async function loadStationBoard() {
             throw new Error(stationData.error || "Failed to load station board.");
         }
         
-        document.getElementById("scheduleGrid").innerHTML = `
+        document.getElementById("passing").innerHTML = `
             <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
                 Passed initial checks.
             </div>
@@ -1124,10 +1126,10 @@ window.addEventListener("DOMContentLoaded", loadStationBoard);
             <div class="detail-value" id="detailAbsence">—</div>
         </div>
 
-        <div class="detail-card" id="detailAbsenceMessageCard" style="display:none;">
+        <!-- <div class="detail-card" id="detailAbsenceMessageCard" style="display:none;">
             <div class="detail-label">Reason for Absence</div>
             <div class="detail-value" id="detailAbsenceMessage">—</div>
-        </div>
+        </div> -->
     </div>
 </div>
 
@@ -1138,7 +1140,7 @@ window.addEventListener("DOMContentLoaded", loadStationBoard);
         <div class="detail-panel-title">Edit Absence</div>
         <div class="detail-panel-actions">
             <button class="detail-btn back" type="button" onclick="closeAbsentEditPicker()">Back</button>
-            <!-- <button class="detail-btn edit" type="button" onclick="startAbsentEdit()">Next</button> -->
+            <button class="detail-btn edit" type="button" onclick="startAbsentEdit()">Next</button>
         </div>
     </div>
 
@@ -1150,9 +1152,9 @@ window.addEventListener("DOMContentLoaded", loadStationBoard);
     </div>
 </div> -->
 
-<div id="absenceActionOverlay" class="detail-overlay" onclick="closeAbsenceActionModal()"></div>
+<!-- <div id="absenceActionOverlay" class="detail-overlay" onclick="closeAbsenceActionModal()"></div> -->
 
-<div id="absenceActionModal" class="detail-panel">
+<!-- <div id="absenceActionModal" class="detail-panel">
     <div class="detail-panel-header">
         <div class="detail-panel-title">
             Edit Absence: <span id="absenceActionVolunteerName">Volunteer</span>
@@ -1192,7 +1194,7 @@ window.addEventListener("DOMContentLoaded", loadStationBoard);
         </div>
 
     </div>
-</div>
+</div> -->
 
 <!-- <div id="reserveDecisionOverlay" class="detail-overlay" onclick="closeReserveDecisionModal()"></div> -->
 
