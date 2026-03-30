@@ -288,6 +288,8 @@ def edit_volunteer():
 @app.route("/captain")
 def captain_page():
     try:
+        debug_admin = request.args.get("debug_admin") == "1"
+        
         if "user_id" not in session:
             return redirect("/")
         volunteers = Volunteer.query\
