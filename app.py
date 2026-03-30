@@ -287,21 +287,18 @@ def edit_volunteer():
 
 @app.route("/captain")
 def captain_page():
-    if "user_id" not in session:
-            return redirect("/")
-    return render_template("captain.html")
     try:
-        debug_admin = request.args.get("debug_admin") == "1"
-
-        if "user_id" not in session and not debug_admin:
+        if "user_id" not in session:
             return redirect("/")
-
         volunteers = Volunteer.query\
             .filter(Volunteer.deleted_at.is_(None))\
             .order_by(Volunteer.last_name)\
             .all()
 
         return render_template("captain.html", volunteers=volunteers)
+
+    except Exception as e:
+        return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
