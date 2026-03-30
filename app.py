@@ -1011,6 +1011,23 @@ def debug_hourly_final():
                 station_to_volunteer_ids.setdefault(
                     assignment.station_id, set()
                 ).add(assignment.volunteer_id)
+        all_assigned_ids = set()
+
+        for ids in station_to_volunteer_ids.values():
+            all_assigned_ids.update(ids)
+
+        unassigned_ids = set(volunteer_rows_by_id.keys()) - all_assigned_ids
+
+
+        if unassigned_ids:
+            station_data = {}  # ensure exists if not yet
+            station_data["Unassigned"] = {
+                "volunteers": [
+                    volunteer_rows_by_id[vid]
+                    for vid in unassigned_ids
+                    if vid in volunteer_rows_by_id
+                ]
+        }
         station_data = {}
 
         for station in stations:
@@ -1028,6 +1045,20 @@ def debug_hourly_final():
             station_data[station_name] = {
                 "volunteers": volunteers_for_station
             }
+
+        all_assigned_ids = set()
+        for ids in station_to_volunteer_ids.values():
+            all_assigned_ids.update(ids)
+
+        unassigned_ids = set(volunteer_rows_by_id.keys()) - all_assigned_ids
+
+        if unassigned_ids:
+            station_data["Unassigned"] = {
+                "volunteers": sorted(
+                    [volunteer_rows_by_id[vid] for vid in unassigned_ids],
+                    key=lambda x: x["name"]
+            )
+        }
 
         return station_data
 
