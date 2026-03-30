@@ -6,6 +6,7 @@ from sqlalchemy import Column, Integer, String, Enum, Date, Time, Boolean
 from sqlalchemy.orm import DeclarativeBase, relationship
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship, backref
+import random
 import os
 from flask import request, jsonify, session, redirect, url_for, flash
 from google.oauth2 import id_token
@@ -1399,10 +1400,12 @@ def student_spotlight():
                 continue
 
             spotlight_entries.append({
-                "name": name,
-                "year": year,
-                "quote": quote
+                "Name": name,
+                "Year": year,
+                "Quote": quote
             })
+
+        random.shuffle(spotlight_entries)
 
         return render_template(
             "student-spotlight.html",

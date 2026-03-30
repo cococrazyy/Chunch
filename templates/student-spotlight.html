@@ -19,6 +19,7 @@ body {
     color: #1f2937;
 }
 
+/* NAVBAR */
 .navbar {
     background: #0f172a;
     padding: 18px 40px;
@@ -41,6 +42,7 @@ body {
     background: #2563eb;
 }
 
+/* CONTAINER */
 .container {
     max-width: 1100px;
     margin: 80px auto;
@@ -61,12 +63,7 @@ h1 {
     margin-bottom: 40px;
 }
 
-.spotlight-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 24px;
-    margin-top: 20px;
-}
+/* CTA */
 .cta {
     margin: 30px 0 40px;
 }
@@ -92,13 +89,30 @@ h1 {
     background: #1d4ed8;
 }
 
+/* MASONRY LAYOUT */
+.spotlight-grid {
+    column-count: 3;
+    column-gap: 24px;
+    margin-top: 20px;
+}
+
+/* CARDS */
 .spotlight-card {
-    background: white;
+    display: inline-block;
+    width: 100%;
+    margin: 0 0 24px;
+
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+    page-break-inside: avoid;
+
     border-radius: 18px;
     padding: 24px;
     text-align: left;
+
     box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
-    border: 1px solid #e5e7eb;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -107,6 +121,15 @@ h1 {
     box-shadow: 0 16px 32px rgba(15, 23, 42, 0.12);
 }
 
+/* COLOR THEMES */
+.spotlight-card:nth-child(6n+1) { background: #eff6ff; }
+.spotlight-card:nth-child(6n+2) { background: #ecfeff; }
+.spotlight-card:nth-child(6n+3) { background: #f5f3ff; }
+.spotlight-card:nth-child(6n+4) { background: #fef3c7; }
+.spotlight-card:nth-child(6n+5) { background: #ecfccb; }
+.spotlight-card:nth-child(6n+6) { background: #fce7f3; }
+
+/* TEXT */
 .student-name {
     font-size: 22px;
     font-weight: 700;
@@ -151,6 +174,13 @@ h1 {
     font-size: 17px;
 }
 
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+    .spotlight-grid {
+        column-count: 2;
+    }
+}
+
 @media (max-width: 768px) {
     .navbar {
         gap: 12px;
@@ -167,6 +197,10 @@ h1 {
 
     .subtitle {
         font-size: 16px;
+    }
+
+    .spotlight-grid {
+        column-count: 1;
     }
 }
 </style>
@@ -185,12 +219,13 @@ h1 {
 <div class="container">
     <h1>Student Spotlight</h1>
     <p class="subtitle">Hear directly from students about what Chunch means to them.</p>
+
     <div class="cta">
-    <p>Have something to say?</p>
-    <a href="https://docs.google.com/forms/d/e/1FAIpQLSfz55ZJ2GFwnNhRyz69MfZYN2_6Hn_bMDhvHZwtIEb8jn9VBw/viewform?usp=header" target="_blank">
-        Share Your Story
-    </a>
-</div>
+        <p>Have something to say?</p>
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSfz55ZJ2GFwnNhRyz69MfZYN2_6Hn_bMDhvHZwtIEb8jn9VBw/viewform?usp=header" target="_blank">
+            Share Your Story
+        </a>
+    </div>
 
     {% if spotlight_entries %}
         <div class="spotlight-grid">
