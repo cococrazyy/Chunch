@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Dashboard</title>
+<title>Captain Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
@@ -467,7 +467,7 @@ body {
 <div class="header">
     <div class="header-top">
         <div class="header-copy">
-            <h1>Admin Dashboard</h1>
+            <h1>Captain Dashboard</h1>
         </div>
 
         <div class="header-tools">
@@ -480,16 +480,6 @@ body {
     </div>
 
     <div class="header-actions">
-        <button onclick="window.location.href='/admin/inbox'">
-            <span class="icon">📬</span>
-            <span class="label">Inbox</span>
-        </button>
-
-        <button onclick="enableEdit()">
-            <span class="icon">✏️</span>
-            <span class="label">Edit</span>
-        </button>
-
         <button onclick="window.print()">
             <span class="icon">🖨️</span>
             <span class="label">Print</span>
@@ -499,43 +489,10 @@ body {
             <span class="icon">⏱️</span>
             <span class="label">Hourly View</span>
         </button>
-
-        <button class="secondary-btn" onclick="window.location.href='/admin/need-coverage'">
-            <span class="icon">🚨</span>
-            <span class="label">Need Coverage?</span>
-        </button>
-
-        <button onclick="window.location.href='/admin/master-list'">
-            <span class="icon">👥</span>
-            <span class="label">Volunteer Master List</span>
-        </button>
-
-        <button onclick="window.location.href='/captain'">
-            <span class=""label">Captain View</span>
-        </button>
     </div>
 </div>
 
 <div class="page">
-    <div class="summary-bar">
-        <div class="summary-card">
-            <div class="summary-label">Total Volunteers</div>
-            <div class="summary-value" id="totalVolunteersCount">0</div>
-        </div>
-        <div class="summary-card">
-            <div class="summary-label">Assigned Volunteers</div>
-            <div class="summary-value" id="assignedVolunteersCount">0</div>
-        </div>
-        <div class="summary-card">
-            <div class="summary-label">Total Captains</div>
-            <div class="summary-value" id="captainsCount">0</div>
-        </div>
-        <div class="summary-card">
-            <div class="summary-label">Available Reserves</div>
-            <div class="summary-value" id="reserveCount">0</div>
-        </div>
-    </div>
-
     <div class="board-header">
         <div>
             <h2>Station Board</h2>
@@ -544,23 +501,6 @@ body {
     </div>
 
     <div class="grid" id="scheduleGrid"></div>
-
-    <div id="coverageBox" class="coverage-box">
-        <h3>Request Coverage</h3>
-        <p>Select the volunteer who will be absent.</p>
-
-        <div class="coverage-controls">
-            <select id="absentSelect">
-                {% for v in volunteers %}
-                    <option value="{{ v.id }}">
-                        {{ v.first_name }} {{ v.last_name }}
-                    </option>
-                {% endfor %}
-            </select>
-
-            <button onclick="submitAbsent()">Next</button>
-        </div>
-    </div>
 </div>
 
 <script>
@@ -965,7 +905,6 @@ async function loadSchedule() {
     }
 }
 
-// TODO make this allow editing on admin page
 function enableEdit() {
     alert("Edit mode placeholder.");
 }
@@ -1069,8 +1008,6 @@ function closeVolunteerPanel() {
     currentVolunteer = null;
     
 }
-
-// TODO possible add change volunteer status so that volunteer can become captains
 
 function editVolunteer() {
     if(!currentVolunteer) return;

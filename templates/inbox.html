@@ -34,6 +34,13 @@
             font-size: 15px;
         }
 
+        .top-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
         .section {
             background: white;
             border-radius: 14px;
@@ -195,6 +202,10 @@
             <h1>Applicant Inbox</h1>
             <p>Review, approve, or manage application decisions.</p>
         </div>
+        
+        <div class="top-actions">
+            <button class="secondary" onclick="window.location.href='/admin'">Back</button>
+        </div>
 
         <div class="section">
             <div class="section-header">
@@ -226,12 +237,13 @@
                         <td class="muted">{{ a.phone }}</td>
                         <td colspan="2">
                             <div class="actions">
-                                <button class="btn-accept" 
-                                    onclick="openAssignmentModal(
+                                <button type = "button" class="btn-accept" 
+                                    onclick='openAssignmentModal(
                                         {{ a.id }},
-                                        '{{ a.first_name }} {{ a.last_name }}',
-                                        '{{ a.phone }}'
-                                    )">
+                                        {{ (a.first_name + " " + a.last_name) | tojson }},
+                                        {{ a.phone | tojson }},
+                                        {{ a.availability | tojson }}
+                                    )'>
                                         Accept
                                     </button>
 
@@ -307,26 +319,35 @@
 
         <form method="POST" action="/admin/inbox/accept-with-assignment">
           <input type="hidden" name="applicant_id" id="modalApplicantId">
+            
 
           <label>Station:</label>
           <select name="station_id" required>
+              <option value="" disabled selected>Select a station</option>
             {% for station in stations %}
-              <option value="{{ station.id }}">{{ station.name }}</option>
+              <option value="{{ station.id }}">{{ station.station_name }}</option>
             {% endfor %}
           </select>
 
           <br><br>
 
-          <label>Schedule:</label>
-            <select name="schedule_id" required>
-              {% for s in schedules %}
-                <option value="{{ s.schedule_id }}">
-                  {{ s.day }} - {{ s.hour }}:00
-                </option>
-              {% endfor %}
+            <label>Start Hour:</label>
+            <select name="start_hour" required>
+                {% for h in range(0, 24) %}
+                    <option value="{{ h }}">{{ h }}:00</option>
+                {% endfor %}
+            </select>
+
+            <br><br>
+            <label>End Hour:</label>
+            <select name="end_hour" required>
+                {% for h in range(1, 25) %}
+                    <option value="{{ h }}">{{ h }}:00</option>
+                {% endfor %}
             </select>
 
           <br><br>
+            <div id="availabilityDisplay" style="margin-bottom:15px;"></div> 
 
           <button type="submit" class="btn-accept">Confirm Assignment</button>
           <button type="button" onclick="closeModal()">Cancel</button>
@@ -335,10 +356,23 @@
       </div>
     </div>
     <script>
-    function openAssignmentModal(id, name, phone) {
+    function openAssignmentModal(id, name, phone, availability) {
         document.getElementById("assignmentModal").style.display = "block";
         document.getElementById("modalApplicantId").value = id;
         document.getElementById("modalName").innerText = name;
+
+        const availabilityDiv = document.getElementById("availabilityDisplay");
+        if (!availability || availability.length === 0) {
+        availabilityDiv.innerHTML = "<strong>No unavailability listed</strong>";
+        return;
+        }
+
+        availabilityDiv.innerHTML = `
+            <strong>Applicant Unavailability:</strong>
+            <ul>
+                ${availability.map(h => `<li>${h}:00</li>`).join("")}
+            </ul>
+        `;
     }
 
     function closeModal() {

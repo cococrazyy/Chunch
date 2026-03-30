@@ -270,6 +270,26 @@ def me():
         "role": session["role"]
     })
 
+@app.route("/admin/edit-volunteer", methods=["POST"])
+def edit_volunteer():
+    data = request.get_json()
+
+    volunteer = Volunteer.query.get_or_404(data["id"])
+    
+    volunteer.first_name = data.get("first_name")
+    volunteer.last_name = data.get("last_name")
+    volunteer.email = data.get("email")
+    volunteer.phone = data.get("phone")
+
+    db.session.commit()
+
+    return {"success": True}
+@app.route("/captain")
+def captain_page():
+    if "user_id" not in session:
+            return redirect("/")
+    return render_template("captain.html")
+    
 @app.route("/admin")
 def admin_page():
     try:
@@ -1150,10 +1170,15 @@ def inbox():
     return render_template("inbox.html", applicants=applicants, rejected=rejected, 
                            stations=stations, schedules=schedules)
 
-@app.route("/admin/inbox/accept-with-assignment/<int:applicants_id>", methods=["POST"])
-def accept_applicant(applicants_id):
+@app.route("/admin/inbox/accept-with-assignment", methods=["POST"])
+def accept_applicant():
     if "user_id" not in session:
         return redirect("/")
+    applicants_id = request.form.get("applicant_id", type=int)
+    station_id = request.form.get("station_id", type=int)
+    start_hour = request.form.get("start_hour", type=int)
+    end_hour = request.form.get("end_hour", type=int)
+  
     applicant = Applicant.query.get_or_404(applicants_id)
     volunteer = Volunteer(
         first_name=applicant.first_name,
@@ -1161,13 +1186,23 @@ def accept_applicant(applicants_id):
         email=applicant.email,
         phone=applicant.phone
     )
+    
     db.session.add(volunteer)
     db.session.flush()  
+    
+    if end_hour <= start_hour:
+        return "Invalid time range", 400
+        
+    for hour in range(start_hour, end_hour):
+        availability = Availability(
+            volunteer_id=volunteer.id,
+            hour=hour
+    )
+    db.session.add(availability)
     
     assignment = Assignment(
         volunteer_id=volunteer.id,
         station_id=station_id,
-        schedule_id=schedule_id
     )
     db.session.add(assignment)
 
