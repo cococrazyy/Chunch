@@ -330,13 +330,19 @@
 
           <br><br>
 
-          <label>Schedule:</label>
-            <select name="schedule_id" required>
-              {% for s in schedules %}
-                <option value="{{ s.schedule_id }}">
-                    {{ s.date }} - {{ s.time }}
-                </option>
-              {% endfor %}
+            <label>Start Hour:</label>
+            <select name="start_hour" required>
+                {% for h in range(0, 24) %}
+                    <option value="{{ h }}">{{ h }}:00</option>
+                {% endfor %}
+            </select>
+
+            <br><br>
+            <label>End Hour:</label>
+            <select name="end_hour" required>
+                {% for h in range(1, 25) %}
+                    <option value="{{ h }}">{{ h }}:00</option>
+                {% endfor %}
             </select>
 
           <br><br>
