@@ -6,6 +6,7 @@ from sqlalchemy import Column, Integer, String, Enum, Date, Time, Boolean
 from sqlalchemy.orm import DeclarativeBase, relationship
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship, backref
+import random
 import os
 from flask import request, jsonify, session, redirect, url_for, flash
 from google.oauth2 import id_token
@@ -1391,9 +1392,9 @@ def student_spotlight():
         spotlight_entries = []
 
         for row in rows:
-            name = str(row.get("Name", "")).strip()
-            year = str(row.get("Year", "")).strip()
-            quote = str(row.get("Quote", "")).strip()
+            name = str(row.get("name", "")).strip()
+            year = str(row.get("year", "")).strip()
+            quote = str(row.get("quote", "")).strip()
 
             if not name and not year and not quote:
                 continue
@@ -1403,6 +1404,8 @@ def student_spotlight():
                 "year": year,
                 "quote": quote
             })
+
+        random.shuffle(spotlight_entries)
 
         return render_template(
             "student-spotlight.html",
