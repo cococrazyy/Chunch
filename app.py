@@ -1083,6 +1083,16 @@ def debug_hourly_final():
             .order_by(Station.station_name)\
             .all()
 
+        station_name_to_id = {
+            str(station.station_name).strip().lower(): station.station_id
+            for station in stations
+        }
+
+        station_id_to_name = {
+            station.station_id: str(station.station_name)
+            for station in stations
+        }
+
         accounts = UserAccount.query.all()
         role_by_volunteer_id = {
             account.volunteer_id: account.role
@@ -1259,16 +1269,6 @@ def debug_hourly_final():
             for station in stations
         }
 
-        station_name_to_id = {
-            str(station.station_name).strip().lower(): station.station_id
-            for station in stations
-        }
-
-        station_id_to_name = {
-            station.station_id: str(station.station_name)
-            for station in stations
-        }
-
         for row in rows:
             first_name = str(row.get("First Name", "")).strip().lower()
             last_name = str(row.get("Last Name", "")).strip().lower()
@@ -1395,7 +1395,6 @@ def debug_hourly_final():
                     if entry.get("id") != volunteer_id
                 ]
 
-        # partial absence split: same volunteer in Absent and also in working station
         for volunteer_id, absence in active_partial_absence_by_volunteer.items():
             if volunteer_id not in volunteer_rows_by_id:
                 continue
@@ -1418,26 +1417,44 @@ def debug_hourly_final():
                 if h < absence.partial_start_hour or h >= absence.partial_end_hour
             ]
 
-            current_assignment = latest_non_covering_assignment_by_volunteer.get(volunteer_id)
-            normal_station_name = ""
+            normal_station_name = default_station_by_volunteer_id.get(volunteer_id, "")
 
-            if current_assignment and current_assignment.station_id is not None:
-                normal_station_name = station_id_to_name.get(current_assignment.station_id, "")
-            if not normal_station_name:
-                normal_station_name = default_station_by_volunteer_id.get(volunteer_id, "")
-            if normal_station_name in ["Absent", "Reserve", "Other"]:
-                normal_station_name = default_station_by_volunteer_id.get(volunteer_id, "")
+            for assignment in assignments:
+                if assignment.volunteer_id != volunteer_id:
+                    continue
+                if assignment.is_covering:
+                    continue
+                if assignment.station_id is None:
+                    continue
+
+                station_name = station_id_to_name.get(assignment.station_id, "")
+                if station_name and station_name not in ["Absent", "Reserve", "Other"]:
+                    normal_station_name = station_name
 
             remove_volunteer_from_all_stations(volunteer_id)
 
             if absent_hours and "Absent" in station_data:
                 absent_copy = dict(base_row)
                 absent_copy["display_time"] = format_ranges(absent_hours)
+                absent_copy["absence_id"] = absence.absence_id
+                absent_copy["absence_start_date"] = absence.start_date.isoformat() if absence.start_date else ""
+                absent_copy["absence_end_date"] = absence.end_date.isoformat() if absence.end_date else ""
+                absent_copy["absence_is_partial"] = True
+                absent_copy["absence_partial_start_hour"] = absence.partial_start_hour
+                absent_copy["absence_partial_end_hour"] = absence.partial_end_hour
+                absent_copy["absence_notes"] = absence.notes or ""
                 station_data["Absent"]["volunteers"].append(absent_copy)
 
             if remaining_hours and normal_station_name in station_data:
                 working_copy = dict(base_row)
                 working_copy["display_time"] = format_ranges(remaining_hours)
+                working_copy["absence_id"] = absence.absence_id
+                working_copy["absence_start_date"] = absence.start_date.isoformat() if absence.start_date else ""
+                working_copy["absence_end_date"] = absence.end_date.isoformat() if absence.end_date else ""
+                working_copy["absence_is_partial"] = True
+                working_copy["absence_partial_start_hour"] = absence.partial_start_hour
+                working_copy["absence_partial_end_hour"] = absence.partial_end_hour
+                working_copy["absence_notes"] = absence.notes or ""
                 station_data[normal_station_name]["volunteers"].append(working_copy)
 
         for station_name in station_data.keys():
