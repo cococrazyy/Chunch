@@ -564,6 +564,9 @@ body {
 </div>
 
 <script>
+
+let isEditMode = false;
+let isSelectionLocked = false;    
 let currentVolunteer = null;
 const stationClassMap = {
     "Setup Team": "setup",
@@ -967,7 +970,22 @@ async function loadSchedule() {
 
 // TODO make this allow editing on admin page
 function enableEdit() {
-    alert("Edit mode placeholder.");
+    isEditMode = !isEditMode;
+    isSelectionLocked = isEditMode;
+
+    const btn = document.querySelector(".header-actions button[onclick='enableEdit()']");
+
+    if (isEditMode) {
+        btn.innerHTML = `<span class="icon">❌</span><span class="label">Cancel</span>`;
+        document.body.classList.add("edit-mode");
+        document.body.classList.add("selection-locked");
+    } else {
+        btn.innerHTML = `<span class="icon">✏️</span><span class="label">Edit</span>`;
+        document.body.classList.remove("edit-mode");
+        document.body.classList.remove("selection-locked");
+    }
+
+    renderStationBoard(currentStationData);
 }
 
 function requestCoverage() {
