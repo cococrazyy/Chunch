@@ -471,11 +471,6 @@ body {
         </div>
 
         <div class="header-tools">
-            <input type="date" id="datePicker" class="date-picker">
-            <button class="load-btn" onclick="loadSchedule()">
-                <span class="icon">📅</span>
-                <span class="label">Load Date</span>
-            </button>
         </div>
     </div>
 
@@ -490,10 +485,6 @@ body {
             <span class="label">Edit</span>
         </button>
 
-        <button onclick="window.print()">
-            <span class="icon">🖨️</span>
-            <span class="label">Print</span>
-        </button>
 
         <button onclick="window.location.href='/admin/volunteer-hours'">
             <span class="icon">⏱️</span>
@@ -940,31 +931,6 @@ async function loadStationBoard() {
                 Failed to load station board.
             </div>
         `;
-    }
-}
-
-async function loadSchedule() {
-    const date = document.getElementById("datePicker").value;
-
-    if (!date) {
-        alert("Please select a date.");
-        return;
-    }
-
-    try {
-        const response = await fetch(`/api/schedule?date=${date}`);
-        const data = await response.json();
-
-        const converted = {};
-        data.forEach(station => {
-            converted[station.stationName] = {
-                volunteers: station.volunteers || []
-            };
-        });
-
-        renderStationBoard(converted);
-    } catch (error) {
-        alert("Could not load that schedule.");
     }
 }
 
