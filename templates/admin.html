@@ -970,8 +970,8 @@ async function loadSchedule() {
 
 // TODO make this allow editing on admin page
 function enableEdit() {
-    alert("Edit mode placeholder.")
-    /*
+    //alert("Edit mode placeholder.")
+    // added for edit
     isEditMode = !isEditMode;
     isSelectionLocked = isEditMode;
 
@@ -988,7 +988,6 @@ function enableEdit() {
     }
 
     renderStationBoard(currentStationData);
-    */
 }
 
 function requestCoverage() {
@@ -1002,11 +1001,9 @@ function submitAbsent() {
 
 function openVolunteerPanel(volunteerJson) {
     // added for edit
-    /*
     if (isSelectionLocked) {
         isSelectionLocked = false;
     }
-    */
 
     const volunteer = JSON.parse(volunteerJson);
     document.getElementById("editName").style.display = "none";
@@ -1150,7 +1147,7 @@ function saveVolunteer() {
 }
 
 // Added for edit
-/*
+
 document.addEventListener("click", function (e) {
     if (!isSelectionLocked) return;
 
@@ -1163,7 +1160,7 @@ document.addEventListener("click", function (e) {
     e.stopPropagation();
     e.preventDefault();
 }, true);
-*/
+
 
 // initial load
 loadStationBoard();
