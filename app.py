@@ -724,22 +724,19 @@ def assign_reserve_coverage():
             db.session.add(absent_assignment)
             db.session.flush()
 
-        reserve_assignment = Assignment.query.filter_by(
-            volunteer_id=reserve_volunteer_id
-        ).first()
+        reserve_assignment = Assignment(
+            volunteer_id=reserve_volunteer_id,
+            station_id=absent_assignment.station_id,
+            schedule_id=None,
+            is_covering=True,
+            covering_for_volunteer_id=absent_volunteer_id,
+            absence_id=absence_id,
+            cover_start_hour=cover_start_hour,
+            cover_end_hour=cover_end_hour
+        )
 
-        reserve_station = Station.query.filter_by(station_name="Reserve").first()
-        if not reserve_station:
-            return "<pre>Reserve station not found.</pre>", 404
-
-        if not reserve_assignment:
-            reserve_assignment = Assignment(
-                volunteer_id=reserve_volunteer_id,
-                station_id=reserve_station.station_id,
-                schedule_id=None
-            )
-            db.session.add(reserve_assignment)
-            db.session.flush()
+        db.session.add(reserve_assignment)
+        db.session.flush()
 
         if reserve_assignment.station_id != reserve_station.station_id:
             return "<pre>Selected volunteer is not currently in the reserve pool.</pre>", 400
@@ -840,13 +837,6 @@ def assign_reserve_coverage():
 
         absent_assignment.is_absent = True
 
-        reserve_assignment.original_station_id = reserve_assignment.station_id
-        reserve_assignment.station_id = absent_assignment.station_id
-        reserve_assignment.is_covering = True
-        reserve_assignment.covering_for_volunteer_id = absent_volunteer_id
-        reserve_assignment.absence_id = absence_id
-        reserve_assignment.cover_start_hour = cover_start_hour
-        reserve_assignment.cover_end_hour = cover_end_hour
 
         db.session.commit()
 
