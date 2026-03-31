@@ -600,7 +600,16 @@ function isCaptain(volunteer) {
 
 function formatDatePretty(dateStr) {
     if (!dateStr) return "";
-    const d = new Date(dateStr);
+
+    const parts = String(dateStr).split("-");
+    if (parts.length !== 3) return dateStr;
+
+    const year = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1;
+    const day = parseInt(parts[2], 10);
+
+    const d = new Date(year, month, day);
+
     return d.toLocaleDateString(undefined, {
         month: "long",
         day: "numeric"
