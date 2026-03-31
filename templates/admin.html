@@ -970,6 +970,8 @@ async function loadSchedule() {
 
 // TODO make this allow editing on admin page
 function enableEdit() {
+    alert("Edit mode placeholder.")
+    /*
     isEditMode = !isEditMode;
     isSelectionLocked = isEditMode;
 
@@ -986,6 +988,7 @@ function enableEdit() {
     }
 
     renderStationBoard(currentStationData);
+    */
 }
 
 function requestCoverage() {
@@ -998,6 +1001,13 @@ function submitAbsent() {
 }
 
 function openVolunteerPanel(volunteerJson) {
+    // added for edit
+    /*
+    if (isSelectionLocked) {
+        isSelectionLocked = false;
+    }
+    */
+
     const volunteer = JSON.parse(volunteerJson);
     document.getElementById("editName").style.display = "none";
     document.getElementById("editEmail").style.display = "none";
@@ -1138,6 +1148,25 @@ function saveVolunteer() {
     })
     .catch(err => console.error(err));
 }
+
+// Added for edit
+/*
+document.addEventListener("click", function (e) {
+    if (!isSelectionLocked) return;
+
+    const isVolunteer = e.target.closest(".volunteer-pill");
+    const isEditButton = e.target.closest("button[onclick='enableEdit()']");
+
+    if (isVolunteer || isEditButton) return;
+
+    // BLOCK everything else
+    e.stopPropagation();
+    e.preventDefault();
+}, true);
+*/
+
+// initial load
+loadStationBoard();
 
 window.addEventListener("DOMContentLoaded", loadStationBoard);
 </script>
