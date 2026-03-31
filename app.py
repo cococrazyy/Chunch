@@ -1050,7 +1050,7 @@ def debug_hourly_final():
                 "phone": v.phone or "",
                 "captain_status": captain_status,
                 "typical_shift": str(sheet_row.get("Typical Shift", "")).strip(),
-                "display_time": "",   # <-- ADDED
+                "display_time": "",
                 "unavailability": str(sheet_row.get("Unavailability", "")).strip(),
                 "capability_restrictions": str(
                     sheet_row.get("Capability Restrictions", "") or
@@ -1098,7 +1098,6 @@ def debug_hourly_final():
             last_name = str(row.get("Last Name", "")).strip().lower()
             email = str(row.get("Email", "")).strip().lower()
             typical_station = str(row.get("Typical Station", "")).strip().lower()
-
             key = (first_name, last_name, email)
             volunteer_id = volunteer_lookup.get(key)
 
@@ -1119,7 +1118,6 @@ def debug_hourly_final():
 
         assignments = Assignment.query.all()
 
-        # reset expired coverage
         for assignment in assignments:
             if assignment.is_covering and assignment.absence_id:
                 absence = Absence.query.get(assignment.absence_id)
@@ -1131,6 +1129,8 @@ def debug_hourly_final():
                     assignment.covering_for_volunteer_id = None
                     assignment.original_station_id = None
                     assignment.absence_id = None
+                    assignment.cover_start_hour = None
+                    assignment.cover_end_hour = None
 
                     covered = Assignment.query.filter_by(
                         volunteer_id=absence.volunteer_id
@@ -1141,15 +1141,10 @@ def debug_hourly_final():
 
         db.session.commit()
 
-        # apply assignments + set display_time
         for assignment in assignments:
             if assignment.volunteer_id is None:
                 continue
 
-            for volunteer_ids in station_to_volunteer_ids.values():
-                volunteer_ids.discard(assignment.volunteer_id)
-
-            # 🔥 THIS IS THE IMPORTANT PART
             if (
                 assignment.is_covering and
                 assignment.volunteer_id in volunteer_rows_by_id and
@@ -1161,6 +1156,9 @@ def debug_hourly_final():
                     f"{format_hour_label(assignment.cover_end_hour)}"
                 )
 
+            for volunteer_ids in station_to_volunteer_ids.values():
+                volunteer_ids.discard(assignment.volunteer_id)
+
             if assignment.is_absent and absent_station_id is not None:
                 station_to_volunteer_ids[absent_station_id].add(assignment.volunteer_id)
             elif assignment.station_id is not None:
@@ -1169,6 +1167,7 @@ def debug_hourly_final():
                 ).add(assignment.volunteer_id)
 
         all_assigned_ids = set()
+
         for ids in station_to_volunteer_ids.values():
             all_assigned_ids.update(ids)
 
@@ -1191,6 +1190,12 @@ def debug_hourly_final():
             station_data[station_name] = {
                 "volunteers": volunteers_for_station
             }
+
+        all_assigned_ids = set()
+        for ids in station_to_volunteer_ids.values():
+            all_assigned_ids.update(ids)
+
+        unassigned_ids = set(volunteer_rows_by_id.keys()) - all_assigned_ids
 
         if unassigned_ids:
             station_data["Unassigned"] = {
