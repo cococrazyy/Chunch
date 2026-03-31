@@ -339,6 +339,8 @@ def admin_page():
 @app.route("/admin/coverage/details")
 def coverage_details():
     volunteer_id = request.args.get("volunteer_id", type=int)
+    covered_start = request.args.get("covered_start", type=int)
+    covered_end = request.args.get("covered_end", type=int)
 
     if not volunteer_id:
         return {"error": "Missing volunteer_id"}, 400
@@ -561,7 +563,9 @@ def coverage_details():
             "start_date": latest_absence.start_date,
             "end_date": latest_absence.end_date,
             "is_partial": latest_absence.is_partial,
-            "notes": latest_absence.notes or ""
+            "notes": latest_absence.notes or "",
+            "covered_start": covered_start,
+            "covered_end": covered_end
         },
         fully_available_reserves=fully_available_reserves,
         partial_overlap_reserves=partial_overlap_reserves
@@ -841,7 +845,10 @@ def assign_reserve_coverage():
         return_volunteer_id = request.args.get("volunteer_id", type=int)
 
         if add_more and return_volunteer_id:
-            return redirect(f"/admin/coverage/details?volunteer_id={return_volunteer_id}")
+            return redirect(
+                f"/admin/coverage/details?volunteer_id={return_volunteer_id}"
+                f"&covered_start={cover_start_hour}&covered_end={cover_end_hour}"
+        )
 
         return redirect("/admin")
 
