@@ -30,6 +30,12 @@
             flex-wrap: wrap;
         }
 
+        .top-bar-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
         button {
             padding: 8px 12px;
             border-radius: 6px;
@@ -61,6 +67,14 @@
             border: 1px solid #e2e8f0;
         }
 
+        .station-heading {
+            margin: 0 0 14px 0;
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e293b;
+            text-align: center;
+        }
+
         #chartWrapper {
             width: 100%;
         }
@@ -69,6 +83,36 @@
             width: 100% !important;
             height: 500px !important;
         }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+            }
+
+            .top-bar,
+            .controls {
+                display: none !important;
+            }
+
+            .container {
+                max-width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+
+            .chart-card {
+                border: none;
+                box-shadow: none;
+                border-radius: 0;
+                padding: 0;
+            }
+
+            #hoursChart {
+                height: 700px !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -76,7 +120,10 @@
 
     <div class="top-bar">
         <h1>Volunteer Hours by Station</h1>
-        <button onclick="window.location.href='/admin'">Back to Dashboard</button>
+        <div class="top-bar-actions">
+            <button onclick="window.location.href='/admin'">Back to Dashboard</button>
+            <button onclick="printCurrentChart()">Print Current Chart</button>
+        </div>
     </div>
 
     <div class="controls">
@@ -85,6 +132,7 @@
     </div>
 
     <div class="chart-card">
+        <h2 id="stationHeading" class="station-heading"></h2>
         <div id="chartWrapper">
             <canvas id="hoursChart"></canvas>
         </div>
@@ -96,9 +144,11 @@
     const stationData = {{ station_data | tojson | safe }};
     const stationNames = Object.keys(stationData);
     const stationSelect = document.getElementById('stationSelect');
+    const stationHeading = document.getElementById('stationHeading');
     const ctx = document.getElementById('hoursChart').getContext('2d');
 
     let hoursChart = null;
+    let currentStationName = "";
 
     function formatHourLabel(value) {
         if (value === 12) return "12PM";
@@ -125,8 +175,10 @@
                         return [startHour, endHour];
                     }),
                     borderWidth: 1,
-                    barPercentage: 0.6,
-                    categoryPercentage: 0.7
+                    grouped: false,
+                    barThickness: 26,
+                    maxBarThickness: 26,
+                    categoryPercentage: 0.9
                 });
             });
         });
@@ -136,8 +188,10 @@
                 label: "No scheduled hours",
                 data: volunteers.map(() => null),
                 borderWidth: 1,
-                barPercentage: 0.6,
-                categoryPercentage: 0.7
+                grouped: false,
+                barThickness: 26,
+                maxBarThickness: 26,
+                categoryPercentage: 0.9
             });
         }
 
@@ -145,8 +199,11 @@
     }
 
     function renderChart(stationName) {
+        currentStationName = stationName;
         const volunteers = stationData[stationName] || [];
         const labels = volunteers.map(v => v.name);
+
+        stationHeading.textContent = stationName;
 
         if (hoursChart) {
             hoursChart.destroy();
@@ -162,6 +219,12 @@
                 indexAxis: 'x',
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: false,
+                layout: {
+                    padding: {
+                        top: 6
+                    }
+                },
                 plugins: {
                     legend: {
                         display: false
@@ -178,16 +241,19 @@
                         }
                     },
                     title: {
-                        display: true,
-                        text: stationName
+                        display: false
                     }
                 },
                 scales: {
                     x: {
+                        offset: true,
                         ticks: {
                             maxRotation: 45,
                             minRotation: 45,
                             autoSkip: false
+                        },
+                        grid: {
+                            display: false
                         }
                     },
                     y: {
@@ -209,6 +275,31 @@
             }
         });
     }
+
+    function printCurrentChart() {
+        if (hoursChart) {
+            hoursChart.resize();
+            setTimeout(() => {
+                window.print();
+            }, 100);
+        } else {
+            window.print();
+        }
+    }
+
+    window.addEventListener('beforeprint', () => {
+        if (hoursChart) {
+            hoursChart.resize();
+            hoursChart.update('none');
+        }
+    });
+
+    window.addEventListener('afterprint', () => {
+        if (hoursChart) {
+            hoursChart.resize();
+            hoursChart.update('none');
+        }
+    });
 
     stationNames.forEach(stationName => {
         const option = document.createElement('option');
