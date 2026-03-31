@@ -269,6 +269,8 @@ let activeAssignForm = null;
 let activeReserveName = "";
 let activeStationName = "";
 let parsedShiftHours = [];
+let selectedCoverageStart = null;
+let selectedCoverageEnd = null;
 
 function parseTimeToHour(timeStr) {
     timeStr = String(timeStr).trim().toUpperCase().replace(/\s+/g, "");
@@ -330,15 +332,19 @@ function formatHour(hour) {
     return `${hour - 12}PM`;
 }
 
-function fillHourSelect(selectEl, hours) {
+function formatRange(startHour, endHour) {
+    return `${formatHour(startHour)} - ${formatHour(endHour)}`;
+}
+
+function fillHourSelect(selectEl, startHour, endHour) {
     selectEl.innerHTML = "";
 
-    hours.forEach(hour => {
+    for (let hour = startHour; hour <= endHour; hour++) {
         const option = document.createElement("option");
         option.value = hour;
         option.textContent = formatHour(hour);
         selectEl.appendChild(option);
-    });
+    }
 }
 
 function openCoverageHourModal(form, reserveName, stationName, shiftText) {
@@ -353,16 +359,26 @@ function openCoverageHourModal(form, reserveName, stationName, shiftText) {
         return;
     }
 
-    document.getElementById("coverageHourSummary").textContent = `Shift: ${shiftText}`;
+    const shiftStart = Math.min(...parsedShiftHours);
+    const shiftEnd = Math.max(...parsedShiftHours);
+
+    document.getElementById("coverageHourSummary").textContent =
+        `Set the coverage hours for ${reserveName} at ${stationName}.`;
+
+    document.getElementById("coverageHourFullShiftLabel").textContent =
+        `Usual shift: ${formatRange(shiftStart, shiftEnd)}`;
+
+    document.getElementById("coverFullShiftText").textContent =
+        `Cover full shift (${formatRange(shiftStart, shiftEnd)})`;
 
     const startSelect = document.getElementById("coverStartHour");
     const endSelect = document.getElementById("coverEndHour");
 
-    fillHourSelect(startSelect, parsedShiftHours);
-    fillHourSelect(endSelect, parsedShiftHours);
+    fillHourSelect(startSelect, shiftStart, 16);
+    fillHourSelect(endSelect, shiftStart, 16);
 
-    startSelect.value = parsedShiftHours[0];
-    endSelect.value = parsedShiftHours[parsedShiftHours.length - 1];
+    startSelect.value = shiftStart;
+    endSelect.value = shiftEnd;
 
     document.getElementById("coverFullShiftCheckbox").checked = true;
     document.getElementById("customHourFields").style.display = "none";
@@ -384,10 +400,13 @@ document.getElementById("coverFullShiftCheckbox").addEventListener("change", fun
 function goToEmailPopup() {
     if (!activeAssignForm) return;
 
-    const fullShift = document.getElementById("coverFullShiftCheckbox").checked;
+    const shiftStart = Math.min(...parsedShiftHours);
+    const shiftEnd = Math.max(...parsedShiftHours);
 
-    let startHour = parsedShiftHours[0];
-    let endHour = parsedShiftHours[parsedShiftHours.length - 1];
+    let startHour = shiftStart;
+    let endHour = shiftEnd;
+
+    const fullShift = document.getElementById("coverFullShiftCheckbox").checked;
 
     if (!fullShift) {
         startHour = parseInt(document.getElementById("coverStartHour").value, 10);
@@ -399,10 +418,52 @@ function goToEmailPopup() {
         }
     }
 
+    selectedCoverageStart = startHour;
+    selectedCoverageEnd = endHour;
+
     activeAssignForm.querySelector(".cover-start-hour").value = startHour;
     activeAssignForm.querySelector(".cover-end-hour").value = endHour;
 
     closeCoverageHourModal();
+    openMoreCoveragePopup();
+}
+
+function openMoreCoveragePopup() {
+    const shiftStart = Math.min(...parsedShiftHours);
+    const shiftEnd = Math.max(...parsedShiftHours);
+
+    const usualLength = shiftEnd - shiftStart + 1;
+    const selectedLength = selectedCoverageEnd - selectedCoverageStart + 1;
+
+    let message = "";
+
+    if (selectedLength < usualLength) {
+        message =
+            `This assignment covers less than the volunteer's usual shift (${formatRange(shiftStart, shiftEnd)}). ` +
+            `Selected coverage: ${formatRange(selectedCoverageStart, selectedCoverageEnd)}. ` +
+            `Would you like to add another reserve to help cover the remaining time, or keep this coverage as-is?`;
+    } else {
+        message =
+            `Selected coverage: ${formatRange(selectedCoverageStart, selectedCoverageEnd)}. ` +
+            `Would you like to add another reserve as well, or keep this single coverage assignment?`;
+    }
+
+    document.getElementById("moreCoverageMessage").textContent = message;
+    document.getElementById("moreCoveragePopup").style.display = "block";
+}
+
+function closeMoreCoveragePopup() {
+    document.getElementById("moreCoveragePopup").style.display = "none";
+}
+
+function chooseMoreCoverage(choice) {
+    if (choice === "add") {
+        closeMoreCoveragePopup();
+        alert("Adding another reserve is the next step.");
+        return;
+    }
+
+    closeMoreCoveragePopup();
     openAssignPopup();
 }
 
@@ -425,6 +486,9 @@ function closeAssignPopup() {
     activeAssignForm = null;
     activeReserveName = "";
     activeStationName = "";
+    parsedShiftHours = [];
+    selectedCoverageStart = null;
+    selectedCoverageEnd = null;
     document.getElementById("assignPopup").style.display = "none";
 }
 
