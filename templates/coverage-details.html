@@ -265,6 +265,8 @@
     </div>
 </div>
 <script>
+let modalDefaultStart = null;
+let modalDefaultEnd = null;
 let activeAssignForm = null;
 let activeReserveName = "";
 let activeStationName = "";
@@ -387,6 +389,9 @@ function openCoverageHourModal(form, reserveName, stationName, shiftText) {
         }
     }
 
+    modalDefaultStart = defaultStart;
+    modalDefaultEnd = defaultEnd;
+
     document.getElementById("coverageHourSummary").textContent =
         `Set the coverage hours for ${reserveName} at ${stationName}.`;
 
@@ -425,11 +430,9 @@ document.getElementById("coverFullShiftCheckbox").addEventListener("change", fun
 function goToEmailPopup() {
     if (!activeAssignForm) return;
 
-    const shiftStart = remainingCoverageStart !== null ? remainingCoverageStart : Math.min(...parsedShiftHours);
-    const shiftEnd = remainingCoverageEnd !== null ? remainingCoverageEnd : Math.max(...parsedShiftHours);
+    let startHour = modalDefaultStart;
+    let endHour = modalDefaultEnd;
 
-    let startHour = shiftStart;
-    let endHour = shiftEnd;
     const fullShift = document.getElementById("coverFullShiftCheckbox").checked;
 
     if (!fullShift) {
