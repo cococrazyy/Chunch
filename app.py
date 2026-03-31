@@ -738,9 +738,6 @@ def assign_reserve_coverage():
         db.session.add(reserve_assignment)
         db.session.flush()
 
-        if reserve_assignment.station_id != reserve_station.station_id:
-            return "<pre>Selected volunteer is not currently in the reserve pool.</pre>", 400
-
         if cover_start_hour is None or cover_end_hour is None:
             if absence.is_partial:
                 cover_start_hour = absence.partial_start_hour
