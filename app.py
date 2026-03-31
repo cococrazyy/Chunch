@@ -850,6 +850,12 @@ def assign_reserve_coverage():
 
         db.session.commit()
 
+        add_more = request.args.get("add_more") == "1"
+        return_volunteer_id = request.args.get("volunteer_id", type=int)
+
+        if add_more and return_volunteer_id:
+            return redirect(f"/admin/coverage/details?volunteer_id={return_volunteer_id}")
+
         return redirect("/admin")
 
     except Exception as e:
