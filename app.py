@@ -626,11 +626,12 @@ def update_absence():
         covering_for_volunteer_id=volunteer_id
     ).all()
 
+    reserve_station = Station.query.filter_by(station_name="Reserve").first()
+
     if mode == "end":
 
         if action == "move_now":
             for reserve_assignment in reserve_assignments:
-                reserve_station = Station.query.filter_by(station_name="Reserve").first()
                 if reserve_station:
                     reserve_assignment.station_id = reserve_station.station_id
 
@@ -655,7 +656,6 @@ def update_absence():
 
         if action == "move_now":
             for reserve_assignment in reserve_assignments:
-                reserve_station = Station.query.filter_by(station_name="Reserve").first()
                 if reserve_station:
                     reserve_assignment.station_id = reserve_station.station_id
 
