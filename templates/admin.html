@@ -721,11 +721,20 @@ function startExtendFlow() {
     currentActionMode = "extend";
 
     const prettyNew = formatDatePretty(newEndDate);
+    const isPartial = !!currentAbsentEditVolunteer?.absence_is_partial;
 
     document.getElementById("reserveDecisionTitle").textContent = "Extend Absence";
 
-    document.getElementById("reserveDecisionSummary").textContent =
-        `This absence will now continue through ${prettyNew}. Any reserve coverage already assigned will stay in place.`;
+    if (isPartial) {
+        const startHour = formatHourPretty(currentAbsentEditVolunteer?.absence_partial_start_hour);
+        const endHour = formatHourPretty(currentAbsentEditVolunteer?.absence_partial_end_hour);
+
+        document.getElementById("reserveDecisionSummary").textContent =
+            `This partial absence (${startHour} - ${endHour}) will now continue through ${prettyNew}. Any reserve coverage already assigned for that time will stay in place.`;
+    } else {
+        document.getElementById("reserveDecisionSummary").textContent =
+            `This absence will now continue through ${prettyNew}. Any reserve coverage already assigned will stay in place.`;
+    }
 
     document.getElementById("reserveDecisionImmediateLabel").textContent =
         `Save new end date (${prettyNew})`;
@@ -745,7 +754,6 @@ function startExtendFlow() {
     document.getElementById("reserveDecisionOverlay").classList.add("open");
     document.getElementById("reserveDecisionModal").classList.add("open");
 }
-
 let pendingShortenDate = null;
 let currentActionMode = null;
 
