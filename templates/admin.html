@@ -1068,7 +1068,10 @@ function openVolunteerPanel(volunteerJson) {
     document.getElementById("detailName").textContent = volunteer.name || "Volunteer";
     document.getElementById("detailEmail").textContent = volunteer.email || "None listed";
     document.getElementById("detailPhone").textContent = volunteer.phone || "None listed";
-    document.getElementById("detailCaptain").textContent = volunteer.captain_status || "Volunteer";
+    document.getElementById("detailCaptain").textContent = volunteer.role || volunteer.captain_status || "Volunteer";
+    const roleSelect = document.getElementById("editRole");
+    roleSelect.value = (volunteer.role || "volunteer").toLowerCase();
+    
     document.getElementById("detailShift").textContent = volunteer.display_time || volunteer.typical_shift || "None listed";
     document.getElementById("detailUnavailability").textContent = volunteer.unavailability || "None listed";
     document.getElementById("detailRestrictions").textContent = volunteer.capability_restrictions || "None listed";
@@ -1153,6 +1156,7 @@ function closeVolunteerPanel() {
     document.getElementById("editShift").style.display = "none";
     document.getElementById("editUnavailability").style.display = "none";
     document.getElementById("editRestrictions").style.display = "none";
+    document.getElementById("editRole").style.display = "none";
 
     document.getElementById("detailName").style.display = "inline";
     document.getElementById("detailEmail").style.display = "block";
@@ -1160,7 +1164,9 @@ function closeVolunteerPanel() {
     document.getElementById("detailShift").style.display = "block";
     document.getElementById("detailUnavailability").style.display = "block";
     document.getElementById("detailRestrictions").style.display = "block";
-    
+    document.getElementById("detailCaptain").style.display = "block";
+
+
     document.getElementById("editBtn").style.display = "inline-block";
     document.getElementById("saveBtn").style.display = "none";
 
@@ -1170,6 +1176,7 @@ function closeVolunteerPanel() {
     document.getElementById("editShift").value = "";
     document.getElementById("editUnavailability").value = "";
     document.getElementById("editRestrictions").value = "";
+    document.getElementById("editRole").value = "volunteer";
 
     currentVolunteer = null;
     
@@ -1183,6 +1190,7 @@ function editVolunteer() {
     document.getElementById("detailEmail").style.display = "none";
     document.getElementById("detailPhone").style.display = "none";
     document.getElementById("detailShift").style.display = "none";
+    document.getElementById("detailCaptain").style.display = "none";
     document.getElementById("detailUnavailability").style.display = "none";
     document.getElementById("detailRestrictions").style.display = "none";
 
@@ -1193,21 +1201,24 @@ function editVolunteer() {
     const shiftInput = document.getElementById("editShift");
     const unavailabilityInput = document.getElementById("editUnavailability");
     const restrictionsInput = document.getElementById("editRestrictions");
-
+    const captainInput = document.getElementById("editRole");
+    
     nameInput.style.display = "block";
     emailInput.style.display = "block";
     phoneInput.style.display = "block";
     shiftInput.style.display = "block";
     unavailabilityInput.style.display = "block";
     restrictionsInput.style.display = "block";
-
+    captainInput.style.display = "block";
+    
     nameInput.value = currentVolunteer.name || "";
     emailInput.value = currentVolunteer.email || "";
     phoneInput.value = currentVolunteer.phone || "";
     shiftInput.value = currentVolunteer.typical_shift || "";
     unavailabilityInput.value = currentVolunteer.unavailability || "";
     restrictionsInput.value = currentVolunteer.capability_restrictions || "";
-
+    captainInput.value = currentVolunteer.role || "";
+    
     document.getElementById("editBtn").style.display = "none";
     document.getElementById("saveBtn").style.display = "inline-block";
     
@@ -1225,7 +1236,8 @@ function saveVolunteer() {
         phone: document.getElementById("editPhone").value, 
         typical_shift: document.getElementById("editShift").value,
         unavailability: document.getElementById("editUnavailability").value,
-        capability_restrictions: document.getElementById("editRestrictions").value
+        capability_restrictions: document.getElementById("editRestrictions").value,
+        role: document.getElementById("editRole").value
     };
 
     fetch("/admin/edit-volunteer", {
@@ -1295,8 +1307,16 @@ loadStationBoard();
         </div>
 
         <div class="detail-card">
-            <div class="detail-label">Captain Status</div>
+            <div class="detail-label">Role</div>
+        
             <div class="detail-value" id="detailCaptain">—</div>
+        
+            <select id="editRole" class="date-picker" style="display:none;">
+                <option value="admin">Admin</option>
+                <option value="captain">Captain</option>
+                <option value="volunteer">Volunteer</option>
+                <option value="other">Other</option>
+            </select>
         </div>
 
         <div class="detail-card">

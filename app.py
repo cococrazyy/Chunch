@@ -102,7 +102,7 @@ class UserAccount(db.Model):
             name="role_enum"
         ), nullable=False
     ) 
-    volunteer = relationship("Volunteer", backref="account")
+    volunteer = relationship("Volunteer", backref="account", uselist=False)
 
 # creating a stations table
 class Station(db.Model):
@@ -299,7 +299,9 @@ def edit_volunteer():
     volunteer.typical_shift = data.get("typical_shift")
     volunteer.unavailability = data.get("unavailability")
     volunteer.capability_restrictions = data.get("capability_restrictions")
-
+    if "role" in data and volunteer.account: 
+        volunteer.account.role = data["role"]
+    
     db.session.commit()
 
     return {"success": True}
@@ -1176,14 +1178,14 @@ def debug_hourly_final():
                     current_hour >= latest_absence.partial_end_hour
                 ):
                     latest_absence = None
-
+            account = v.account[0] if v.account else None
             volunteer_rows_by_id[v.id] = {
                 "id": v.id,
                 "name": f"{v.first_name} {v.last_name}",
                 "email": v.email or "",
                 "phone": v.phone or "",
-                "captain_status": captain_status,
-                "typical_shift": str(sheet_row.get("Typical Shift", "")).strip(),
+                "role": account.role if account else "volunteer",
+                "typical_shift": v.typical_shift,
                 "display_time": "",
                 "unavailability": v.unavailability,
                 "capability_restrictions": v.capability_restrictions,
@@ -2256,6 +2258,9 @@ def sync_volunteers():
             email = str(row.get("Email", "")).strip().lower()
             phone = str(row.get("Phone Number", "")).strip()
             first_name = str(row.get("First Name", "")).strip()
+            capability_restrictions = str(row.get("Capability Restrictions", "")).strip()
+            unavailability = str(row.get("Unavailability", "")).strip()
+            typical_shift = str(row.get("Typical Shift", "")).strip()
             if not first_name:
                 continue
             
@@ -2266,13 +2271,22 @@ def sync_volunteers():
                     first_name=row["First Name"],
                     last_name=row["Last Name"],
                     email=email,
-                    phone=phone
+                    phone=phone,
+                    capability_restrictions=capability_restrictions,
+                    unavailability = unavailability,
+                    typical_shift = typical_shift
                 )
                 db.session.add(volunteer)
             if not volunteer.phone and phone:
                 volunteer.phone = phone
             if not volunteer.email and email:
                 volunteer.email = email
+            if not volunteer.capability_restrictions and capability_restrictions:
+                volunteer.capability_restrictions = capability_restrictions
+            if not volunteer.typical_shift and typical_shift:
+                volunteer.typical_shift = typical_shift
+            if not volunteer.unavailability and unavailability:
+                volunteer.unavailability = unavailability
             
         db.session.commit()
 
