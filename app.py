@@ -299,7 +299,9 @@ def edit_volunteer():
     volunteer.typical_shift = data.get("typical_shift")
     volunteer.unavailability = data.get("unavailability")
     volunteer.capability_restrictions = data.get("capability_restrictions")
-
+    if "role" in data and volunteer.account: 
+        volunteer.account.role = data["role"]
+    
     db.session.commit()
 
     return {"success": True}
@@ -1182,7 +1184,7 @@ def debug_hourly_final():
                 "name": f"{v.first_name} {v.last_name}",
                 "email": v.email or "",
                 "phone": v.phone or "",
-                "captain_status": captain_status,
+                "role": v.account.role if v.account else "volunteer",
                 "typical_shift": v.typical_shift,
                 "display_time": "",
                 "unavailability": v.unavailability,
