@@ -296,6 +296,9 @@ def edit_volunteer():
     volunteer.last_name = data.get("last_name")
     volunteer.email = data.get("email")
     volunteer.phone = data.get("phone")
+    volunteer.typical_shift = data.get("typical_shift")
+    volunteer.unavailability = data.get("unavailability")
+    volunteer.capability_restrictions = data.get("capability_restrictions")
 
     db.session.commit()
 
