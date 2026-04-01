@@ -744,8 +744,9 @@ def update_absence():
 @app.route("/meet-the-team")
 def meet_the_team():
     try:
-        sheet = get_sheet("Meet the Team")
-        rows = sheet.get_all_records()
+        sheet = get_sheet()
+        worksheet = sheet.spreadsheet.worksheet("Meet the Team")
+        rows = worksheet.get_all_records()
 
         team_members = []
 
