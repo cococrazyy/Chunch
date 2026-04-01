@@ -1217,7 +1217,7 @@ def debug_hourly_final():
                     current_hour >= latest_absence.partial_end_hour
                 ):
                     latest_absence = None
-            account = v.account[0] if v.account else None
+            account = v.account if v.account else None
             volunteer_rows_by_id[v.id] = {
                 "id": v.id,
                 "name": f"{v.first_name} {v.last_name}",
