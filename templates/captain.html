@@ -485,7 +485,7 @@ body {
             <span class="label">Print</span>
         </button>
 
-        <button onclick="window.location.href='/admin/volunteer-hours'">
+        <button onclick="window.location.href='/captain/volunteer-hours-cap'">
             <span class="icon">⏱️</span>
             <span class="label">Hourly View</span>
         </button>
@@ -572,10 +572,6 @@ function renderStationBoard(stationData) {
     grid.innerHTML = "";
 
     const stationNames = Object.keys(stationData);
-    let totalVolunteers = 0;
-    let assignedVolunteers = 0;
-    let captainsCount = 0;
-    let reserveCount = 0;
 
     const seenVolunteerKeys = new Set();
     const seenCaptainKeys = new Set();
