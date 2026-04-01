@@ -139,21 +139,27 @@
                             <div class="warning">⚠ {{ r.special_notes }}</div>
                         {% endif %}
 
-                        <form method="POST" action="/admin/coverage/assign" style="margin-top: 10px;" class="assign-form">
+                        <form method="POST" action="/admin/coverage/assign" class="assign-form" style="margin-top: 10px;">
                             <input type="hidden" name="absence_id" value="{{ absent_volunteer.absence_id }}">
                             <input type="hidden" name="absent_volunteer_id" value="{{ absent_volunteer.id }}">
-                            <input type="hidden"
-                                name="reserve_volunteer_id"
-                                value="{{ r.id }}"
-                                data-email="{{ r.email }}">
+                            <input type="hidden" name="reserve_volunteer_id" value="{{ r.id }}">
                             <input type="hidden" name="send_email" value="no">
+
+                            <!-- coverage hours -->
                             <input type="hidden" name="cover_start_hour" class="cover-start-hour">
                             <input type="hidden" name="cover_end_hour" class="cover-end-hour">
 
+                            <input type="hidden" class="reserve-email" value="{{ r.email or '' }}">
+
                             <button
                                 type="button"
-                                onclick="openCoverageHourModal(this.form, '{{ r.name|escape }}', '{{ absent_volunteer.station_name|default('Assigned Station', true)|escape }}', '{{ absent_volunteer.typical_shift|default('', true)|escape }}')">
-                                Assign This Reserve
+                                    onclick="openCoverageHourModal(
+                                        this.form,
+                                        '{{ r.name|escape }}',
+                                        '{{ absent_volunteer.station_name|default('Assigned Station', true)|escape }}',
+                                        '{{ absent_volunteer.typical_shift|default('', true)|escape }}'
+                                    )">
+                                    Assign This Reserve
                             </button>
                         </form>
                     </div>
@@ -550,7 +556,7 @@ function submitAssignWithEmail(sendEmail) {
 
     closeAssignPopup();
     activeAssignForm.submit();
-}
+}t
 
 </script>
 
