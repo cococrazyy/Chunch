@@ -287,7 +287,7 @@ body {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 22px;
 }
-.passing {
+.pass {
     border-radius: 22px;
     padding: 22px;
     background-color: white;
@@ -609,11 +609,12 @@ function renderStationBoard(stationData) {
         // }
 
         const card = document.createElement("div");
-        const card2 = document.createElement("div");
+        const pass = document.createElement("div");
         const cssClass = stationClassMap[stationName];
         if (!cssClass) return;
 
         card.className = `card ${cssClass}`;
+        pass.className = `pass ${cssClass}`;
 
         let volunteerHTML = "";
         let stationsHTML = "";
@@ -715,7 +716,7 @@ async function loadStationBoard() {
     } catch (error) {
         document.getElementById("scheduleGrid").innerHTML = `
         <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
-            Failed to load station board error.
+            Failed to load station board ${error}.
             </div>
             `;
     }
