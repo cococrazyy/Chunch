@@ -683,7 +683,13 @@ def update_absence():
 
     reserve_station = Station.query.filter_by(station_name="Reserve").first()
 
-    if mode == "end":
+    if mode == "extend":
+        if not new_end_date:
+            return jsonify({"error": "Missing new end date"}), 400
+
+        absence.end_date = date.fromisoformat(new_end_date)
+
+    elif mode == "end":
 
         if action == "move_now":
             for reserve_assignment in reserve_assignments:
@@ -707,7 +713,7 @@ def update_absence():
         if not new_end_date:
             return jsonify({"error": "Missing new end date"}), 400
 
-        absence.end_date = new_end_date
+        absence.end_date = date.fromisoformat(new_end_date)
 
         if action == "move_now":
             for reserve_assignment in reserve_assignments:
