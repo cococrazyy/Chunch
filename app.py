@@ -734,6 +734,47 @@ def update_absence():
 
     return jsonify({"success": True})
 
+
+@app.route("/meet-the-team")
+def meet_the_team():
+    try:
+        sheet = get_sheet()
+        worksheet = sheet.worksheet("Meet the Team")
+        rows = worksheet.get_all_records()
+
+        team_members = []
+
+        for row in rows:
+            participation = str(row.get("Participation", "")).strip().lower()
+
+            if participation != "yes":
+                continue
+
+            first_name = str(row.get("First name", "")).strip()
+            last_name = str(row.get("Last name", "")).strip()
+            station = str(row.get("Station", "")).strip()
+            hobbies = str(row.get("Hobbies", "")).strip()
+            highlight = str(row.get("Highlight", "")).strip()
+            advice = str(row.get("Advice", "")).strip()
+
+            full_name = f"{first_name} {last_name}".strip()
+
+            if not full_name:
+                continue
+
+            team_members.append({
+                "name": full_name,
+                "station": station,
+                "hobbies": hobbies,
+                "highlight": highlight,
+                "advice": advice
+            })
+
+        return render_template("meet-the-team.html", team_members=team_members)
+
+    except Exception as e:
+        return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
+
 @app.route("/admin/coverage/assign", methods=["POST"])
 def assign_reserve_coverage():
     try:
