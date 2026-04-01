@@ -21,6 +21,7 @@
         .page-header {
             margin-bottom: 24px;
         }
+        
 
         .page-header h1 {
             margin: 0;
@@ -125,6 +126,38 @@
 
         .muted {
             color: #6b7280;
+        }
+
+        .view-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .applicant-name {
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .view-indicator {
+            font-size: 12px;
+            font-weight: 600;
+            color: #2563eb;
+            background: #eff6ff;
+            padding: 4px 10px;
+            border-radius: 999px;
+            transition: 0.2s ease;
+        }
+
+        /* Hover effect */
+        .view-link:hover .view-indicator {
+            background: #2563eb;
+            color: white;
+        }
+
+        tr:hover .view-indicator {
+            transform: translateX(2px);
         }
 
         .actions {
