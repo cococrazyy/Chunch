@@ -1185,12 +1185,8 @@ def debug_hourly_final():
                 "captain_status": captain_status,
                 "typical_shift": str(sheet_row.get("Typical Shift", "")).strip(),
                 "display_time": "",
-                "unavailability": str(sheet_row.get("Unavailability", "")).strip(),
-                "capability_restrictions": str(
-                    sheet_row.get("Capability Restrictions", "") or
-                    sheet_row.get("Restrictions", "") or
-                    sheet_row.get("Other Info", "")
-                ).strip(),
+                "unavailability": v.unavailability,
+                "capability_restrictions": v.capability_restrictions,
                 "absence_id": latest_absence.absence_id if latest_absence else None,
                 "absence_start_date": latest_absence.start_date.isoformat() if latest_absence and latest_absence.start_date else "",
                 "absence_end_date": latest_absence.end_date.isoformat() if latest_absence and latest_absence.end_date else "",
