@@ -999,17 +999,7 @@ def assign_reserve_coverage():
         db.session.commit()
 
         if send_email:
-            if not reserve_volunteer.email:
-                return "<pre>Assignment saved, but no email was sent because this reserve has no email address.</pre>", 400
-
-            try:
-                send_coverage_email(
-                    reserve_volunteer.email,
-                    f"{reserve_volunteer.first_name} {reserve_volunteer.last_name}".strip(),
-                    absent_assignment.station.station_name if absent_assignment.station else "Assigned Station"
-                )
-            except Exception as e:
-                return f"<pre>Assignment saved, but email failed: {str(e)}</pre>", 500
+            print("Email draft opened in client mail app for:", reserve_volunteer.email)
 
         add_more = request.args.get("add_more") == "1"
         return_volunteer_id = request.args.get("volunteer_id", type=int)
