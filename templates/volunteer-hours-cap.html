@@ -122,6 +122,7 @@
         <h1>Volunteer Hours by Station</h1>
         <div class="top-bar-actions">
             <button onclick="window.location.href='/captain'">Back to Dashboard</button>
+            <button onclick="printCurrentChart()">Print Current Chart</button>
         </div>
     </div>
 
@@ -140,9 +141,7 @@
 </div>
 
 <script>
-    // TODO: what is stationData supposed to be doing???
-    let currentStation = null;
-    const stationData = station_data || tojson || safe;
+    const stationData = {{ station_data | tojson | safe }};
     const stationNames = Object.keys(stationData);
     const stationSelect = document.getElementById('stationSelect');
     const stationHeading = document.getElementById('stationHeading');
