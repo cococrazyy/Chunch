@@ -8,6 +8,8 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship, backref
 import random
 import os
+import smtplib
+from email.message import EmailMessage
 from flask import request, jsonify, session, redirect, url_for, flash
 from google.oauth2 import id_token
 from google.auth.transport import requests as grequests
@@ -785,6 +787,35 @@ def meet_the_team():
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
+def send_coverage_email(to_email, reserve_name, station_name):
+    smtp_email = "YOUR_EMAIL@gmail.com"
+    smtp_password = "YOUR_APP_PASSWORD"
+
+    subject = f"Coverage Assignment for {station_name}"
+    body = (
+        f"Hi {reserve_name},\n\n"
+        f"You have been assigned to help cover {station_name} at Chunch.\n\n"
+        f"Please review the training materials here:\n"
+        f"https://drive.google.com/drive/folders/1IwmKyFWKEvAB86WKg9I7C9N1BBvrSzD-\n\n"
+        f"Thank you.\n\n"
+        f"- Bryan & Cheryl"
+    )
+
+    msg = EmailMessage()
+    msg["Subject"] = subject
+    msg["From"] = smtp_email
+    msg["To"] = to_email
+    msg.set_content(body)
+
+    try:
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+            smtp.login(smtp_email, smtp_password)
+            smtp.send_message(msg)
+            print("EMAIL SENT TO:", to_email)
+    except Exception as e:
+        print("EMAIL ERROR:", e)
+        raise
+    
 @app.route("/admin/coverage/assign", methods=["POST"])
 def assign_reserve_coverage():
     try:
@@ -794,9 +825,9 @@ def assign_reserve_coverage():
         absence_id = request.form.get("absence_id", type=int)
         absent_volunteer_id = request.form.get("absent_volunteer_id", type=int)
         reserve_volunteer_id = request.form.get("reserve_volunteer_id", type=int)
-
         cover_start_hour = request.form.get("cover_start_hour", type=int)
         cover_end_hour = request.form.get("cover_end_hour", type=int)
+        send_email = (request.form.get("send_email", "no") == "yes")
 
         if not absence_id or not absent_volunteer_id or not reserve_volunteer_id:
             return "<pre>Missing required coverage fields.</pre>", 400
@@ -848,6 +879,10 @@ def assign_reserve_coverage():
             )
             db.session.add(absent_assignment)
             db.session.flush()
+
+        reserve_volunteer = Volunteer.query.get(reserve_volunteer_id)
+        if not reserve_volunteer:
+            return "<pre>Reserve volunteer not found.</pre>", 404
 
         reserve_assignment = Assignment(
             volunteer_id=reserve_volunteer_id,
@@ -957,10 +992,24 @@ def assign_reserve_coverage():
         if cover_start_hour > cover_end_hour:
             return "<pre>Coverage start hour cannot be after end hour.</pre>", 400
 
+        reserve_assignment.cover_start_hour = cover_start_hour
+        reserve_assignment.cover_end_hour = cover_end_hour
         absent_assignment.is_absent = True
 
-
         db.session.commit()
+
+        if send_email:
+            if not reserve_volunteer.email:
+                return "<pre>Assignment saved, but no email was sent because this reserve has no email address.</pre>", 400
+
+            try:
+                send_coverage_email(
+                    reserve_volunteer.email,
+                    f"{reserve_volunteer.first_name} {reserve_volunteer.last_name}".strip(),
+                    absent_assignment.station.station_name if absent_assignment.station else "Assigned Station"
+                )
+            except Exception as e:
+                return f"<pre>Assignment saved, but email failed: {str(e)}</pre>", 500
 
         add_more = request.args.get("add_more") == "1"
         return_volunteer_id = request.args.get("volunteer_id", type=int)
@@ -969,7 +1018,7 @@ def assign_reserve_coverage():
             return redirect(
                 f"/admin/coverage/details?volunteer_id={return_volunteer_id}"
                 f"&covered_start={cover_start_hour}&covered_end={cover_end_hour}"
-        )
+            )
 
         return redirect("/admin")
 
