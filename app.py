@@ -1217,7 +1217,9 @@ def debug_hourly_final():
                     current_hour >= latest_absence.partial_end_hour
                 ):
                     latest_absence = None
+
             account = v.account[0] if v.account else None
+
             volunteer_rows_by_id[v.id] = {
                 "id": v.id,
                 "name": f"{v.first_name} {v.last_name}",
@@ -1284,10 +1286,20 @@ def debug_hourly_final():
 
         absent_station = Station.query.filter_by(station_name="Absent").first()
         absent_station_id = absent_station.station_id if absent_station else None
+        reserve_station = Station.query.filter_by(station_name="Reserve").first()
 
         assignments = Assignment.query.all()
 
+        latest_assignment_by_volunteer = {}
         for assignment in assignments:
+            if assignment.volunteer_id is None:
+                continue
+
+            current = latest_assignment_by_volunteer.get(assignment.volunteer_id)
+            if current is None or assignment.assignment_id > current.assignment_id:
+                latest_assignment_by_volunteer[assignment.volunteer_id] = assignment
+
+        for assignment in latest_assignment_by_volunteer.values():
             if assignment.is_covering and assignment.absence_id:
                 absence = Absence.query.get(assignment.absence_id)
 
@@ -1309,7 +1321,6 @@ def debug_hourly_final():
                         should_reset = True
 
                 if should_reset:
-                    reserve_station = Station.query.filter_by(station_name="Reserve").first()
                     if reserve_station:
                         assignment.station_id = reserve_station.station_id
 
@@ -1329,7 +1340,17 @@ def debug_hourly_final():
 
         db.session.commit()
 
-        for assignment in assignments:
+        latest_assignment_by_volunteer = {}
+        refreshed_assignments = Assignment.query.all()
+        for assignment in refreshed_assignments:
+            if assignment.volunteer_id is None:
+                continue
+
+            current = latest_assignment_by_volunteer.get(assignment.volunteer_id)
+            if current is None or assignment.assignment_id > current.assignment_id:
+                latest_assignment_by_volunteer[assignment.volunteer_id] = assignment
+
+        for assignment in latest_assignment_by_volunteer.values():
             if assignment.volunteer_id is None:
                 continue
 
