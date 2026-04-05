@@ -266,12 +266,17 @@ def google_login():
 
     if not user:
         return jsonify({"error": "Unauthorized"}), 403
-
+    
     # create a login session
     session["user_id"] = user.user_id
     session["role"] = user.role
     session["email"] = email
 
+    # if user.role is "admin":
+    #     render_template("admin.html")
+    # elif user.role is "captain":
+    #     render_template("captain.html")
+    
     return jsonify({"success": True})
 
 @app.route("/debug/absent-id")
@@ -331,7 +336,7 @@ def edit_volunteer():
 @app.route("/captain")
 def captain_page():
     try:
-        if "user_id" not in session:
+        if "user_id" not in session: # or "role" is not "captain":
             return redirect("/")
         volunteers = Volunteer.query\
             .filter(Volunteer.deleted_at.is_(None))\
@@ -339,6 +344,7 @@ def captain_page():
             .all()
 
         return render_template("captain.html", volunteers=volunteers)
+        # return redirect("/captain", volunteers=volunteers)
 
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
@@ -347,10 +353,12 @@ def captain_page():
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
 # Sign out of admin/captain
-@app.route("/google-logout")
+@app.route("/api/google-logout", methods=["POST"])
 def google_logout():
-    session.clear()
-    return redirect(".", "index.html")
+    if "user_id" not in session:
+        session.clear()
+        return redirect("/")
+    return jsonify({"success": True})
 
 @app.route("/captain/volunteer-hours-cap")
 def volunteer_hours_captain():
@@ -373,6 +381,7 @@ def volunteer_hours_captain():
             "Greeters",
             "Baked Potato Bar",
             "Salad Bar"
+            "Vegan Station"
         ]
 
         existing_station_names = {
@@ -577,9 +586,11 @@ def admin_page():
     try:
         debug_admin = request.args.get("debug_admin") == "1"
 
-        if "user_id" not in session and not debug_admin:
+        if "user_id" not in session and not debug_admin: 
             return redirect("/")
-
+        elif "captain" in "role":
+            return redirect("/captain")
+            # return render_template("captain.html", volunteers=volunteers)
         volunteers = Volunteer.query\
             .filter(Volunteer.deleted_at.is_(None))\
             .order_by(Volunteer.last_name)\
