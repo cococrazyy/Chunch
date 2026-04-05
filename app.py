@@ -1466,6 +1466,7 @@ def debug_hourly_final():
                     sheet_row.get("Restrictions", "") or
                     sheet_row.get("Other Info", "")
                 ).strip(),
+                "station_id": v.station_id,
                 "absence_id": latest_absence.absence_id if latest_absence else None,
                 "absence_start_date": latest_absence.start_date.isoformat() if latest_absence and latest_absence.start_date else "",
                 "absence_end_date": latest_absence.end_date.isoformat() if latest_absence and latest_absence.end_date else "",
