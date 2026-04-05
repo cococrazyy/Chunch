@@ -43,18 +43,16 @@ body {
     margin-bottom: 6px;
 }
 
-.header-tools {
+.header-top {
     display: flex;
     align-items: center;
     gap: 10px;
     flex-wrap: wrap;
 }
-
-.logout-btn {
-    align-items: right;
-    background: rgb(178,59,59);
+.header-top.button {
+    background: rgb(178, 59, 59);
 }
-.logout-btn.hover { background: rgb(107, 29, 29); }
+.header-top.button.hover { background: rgb(107, 29, 29); }
 
 .date-picker {
     padding: 10px 12px;
@@ -476,6 +474,10 @@ body {
         <div class="header-copy">
             <h1>Admin Dashboard</h1>
         </div>
+        <button onclick="signOut();">
+            <span class="icon">🚪</span>
+            <span class="label">Sign Out</span>
+        </button>
     </div>
 
     <div class="header-actions">
@@ -498,16 +500,9 @@ body {
             <span class="label">Volunteer Master List</span>
         </button>
 
-        <!-- <button onclick="window.location.href='/captain'">
+        <button onclick="window.location.href='/captain'">
             <span class="label">Captain View</span>
-        </button> -->
-
-        <div class="logout-btn">
-            <button onclick="signOut();">
-                <span class="icon">🚪</span>
-                <span class="label">Sign Out</span>
-            </button>
-        </div>
+        </button>
     </div>
 </div>
 
@@ -577,6 +572,7 @@ const stationClassMap = {
     "Greeters": "greeters",
     "Baked Potato Bar": "potato",
     "Salad Bar": "salad",
+    "Vegan Station": "vegan",
     "Absent": "absent",
     "Other": "other"
 };
