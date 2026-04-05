@@ -65,6 +65,7 @@ class Volunteer(db.Model, SoftDeleteMixin):
     unavailability = Column(String(100))
     capability_restrictions = Column(String(500))
     station_id = Column(Integer, ForeignKey("station.station_id"))
+    account = relationship("UserAccount", back_populates="volunteer", uselist=False)
     #station = relationship("Station")
 
 #for people signing up to volunteer that will be placed in inbox
@@ -104,8 +105,7 @@ class UserAccount(db.Model):
             name="role_enum"
         ), nullable=False
     ) 
-    volunteer = relationship("Volunteer", backref="account", uselist=False)
-
+    volunteer = relationship("Volunteer", back_populates="account")
 # creating a stations table
 class Station(db.Model):
     __tablename__ = "station"
@@ -302,8 +302,27 @@ def edit_volunteer():
     volunteer.typical_shift = data.get("typical_shift")
     volunteer.unavailability = data.get("unavailability")
     volunteer.capability_restrictions = data.get("capability_restrictions")
-    if "role" in data and volunteer.account: 
-        volunteer.account.role = data["role"]
+    volunteer.station_id = data.get("station_id")
+    
+    if "role" in data:
+        new_role = data["role"]
+        
+        if new_role not in {"admin", "captain", "volunteer", "other"}:
+            return {"error": "Invalid role"}, 400
+        
+        if volunteer.account:
+            if new_role in {"admin", "captain"}:
+                volunteer.account.role = new_role
+            else:
+                db.session.delete(volunteer.account)
+        
+        elif new_role in {"admin", "captain"}:
+            new_account = UserAccount(
+                volunteer_id=volunteer.id,
+                password="TEMP_PASSWORD",  # replace later with hashed
+                role=new_role
+            )
+            db.session.add(new_account)
     
     db.session.commit()
 
@@ -1393,8 +1412,8 @@ def debug_hourly_final():
         for v in volunteers:
             key = (
                 (v.first_name or "").strip().lower(),
-                (v.last_name or "").strip().lower(),
-                (v.email or "").strip().lower()
+                (v.last_name or "").strip().lower()#,
+                #(v.email or "").strip().lower()
             )
             volunteer_lookup[key] = v.id
 
@@ -1448,7 +1467,7 @@ def debug_hourly_final():
                 "name": f"{v.first_name} {v.last_name}",
                 "email": v.email or "",
                 "phone": v.phone or "",
-                "role": role_by_volunteer_id.get(v.id, "volunteer"),
+                "role": v.account.role if v.account else "volunteer",
                 "typical_shift": v.typical_shift or str(sheet_row.get("Typical Shift", "")).strip(),
                 "display_time": "",
                 "unavailability": v.unavailability or str(sheet_row.get("Unavailability", "")).strip(),
@@ -1457,6 +1476,7 @@ def debug_hourly_final():
                     sheet_row.get("Restrictions", "") or
                     sheet_row.get("Other Info", "")
                 ).strip(),
+                "station_id": v.station_id,
                 "absence_id": latest_absence.absence_id if latest_absence else None,
                 "absence_start_date": latest_absence.start_date.isoformat() if latest_absence and latest_absence.start_date else "",
                 "absence_end_date": latest_absence.end_date.isoformat() if latest_absence and latest_absence.end_date else "",
@@ -1491,7 +1511,7 @@ def debug_hourly_final():
             last_name = str(row.get("Last Name", "")).strip().lower()
             email = str(row.get("Email", "")).strip().lower()
             typical_station = str(row.get("Typical Station", "")).strip().lower()
-            key = (first_name, last_name, email)
+            key = (first_name, last_name)
             volunteer_id = volunteer_lookup.get(key)
 
             if not email or not typical_station or typical_station == "other":
@@ -2537,6 +2557,7 @@ def sync_volunteers():
             email = str(row.get("Email", "")).strip().lower()
             phone = str(row.get("Phone Number", "")).strip()
             first_name = str(row.get("First Name", "")).strip()
+            last_name = str(row.get("Last Name", "")).strip()
             capability_restrictions = str(row.get("Capability Restrictions", "")).strip()
             unavailability = str(row.get("Unavailability", "")).strip()
             typical_shift = str(row.get("Typical Shift", "")).strip()
@@ -2550,7 +2571,7 @@ def sync_volunteers():
                 station_id = None
 
             
-            volunteer = Volunteer.query.filter_by(first_name = first_name, email=email).first()
+            volunteer = Volunteer.query.filter_by(first_name = first_name, last_name = last_name).first()
 
             if not volunteer:
                 volunteer = Volunteer(

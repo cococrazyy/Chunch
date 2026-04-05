@@ -1218,7 +1218,8 @@ function saveVolunteer() {
         typical_shift: document.getElementById("editShift").value,
         unavailability: document.getElementById("editUnavailability").value,
         capability_restrictions: document.getElementById("editRestrictions").value,
-        role: document.getElementById("editRole").value
+        role: document.getElementById("editRole").value,
+        station_id: currentVolunteer.station_id
     };
 
     fetch("/admin/edit-volunteer", {
