@@ -486,7 +486,6 @@ function renderStationBoard(stationData) {
 
                         if (isCaptain(volunteer) && !seenCaptainKeys.has(uniqueKey)) {
                             seenCaptainKeys.add(uniqueKey);
-                            captainsCount += 1;
                         }
 
                         const displayTime = volunteer.display_time ? ` (${volunteer.display_time})` : "";
