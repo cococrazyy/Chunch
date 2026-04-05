@@ -2547,6 +2547,7 @@ def sync_volunteers():
             email = str(row.get("Email", "")).strip().lower()
             phone = str(row.get("Phone Number", "")).strip()
             first_name = str(row.get("First Name", "")).strip()
+            last_name = str(row.get("Last Name", "")).strip()
             capability_restrictions = str(row.get("Capability Restrictions", "")).strip()
             unavailability = str(row.get("Unavailability", "")).strip()
             typical_shift = str(row.get("Typical Shift", "")).strip()
@@ -2560,7 +2561,7 @@ def sync_volunteers():
                 station_id = None
 
             
-            volunteer = Volunteer.query.filter_by(first_name = first_name, email=email).first()
+            volunteer = Volunteer.query.filter_by(first_name = first_name, last_name = last_name).first()
 
             if not volunteer:
                 volunteer = Volunteer(
