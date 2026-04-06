@@ -355,10 +355,10 @@ def captain_page():
 # Sign out of admin/captain
 @app.route("/api/google-logout", methods=["POST"])
 def google_logout():
-    if "user_id" not in session:
+    if "user_id" in session:
         session.clear()
         return redirect("/")
-    return jsonify({"success": True})
+    return jsonify({"fail": False, "message": "User was not logged in", })
 
 @app.route("/captain/volunteer-hours-cap")
 def volunteer_hours_captain():
