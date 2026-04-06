@@ -960,7 +960,8 @@ function renderStationBoard(stationData) {
                         return `
                             <button class="volunteer-pill" type="button" onclick='openVolunteerPanel(${JSON.stringify(JSON.stringify({...volunteer, 
                                 // added for station
-                                station: stationName
+                                station: stationName,
+                                station_id: station.station_id
                                 }))})'>
                                 ${displayName}${displayTime}
                             </button>
@@ -1067,7 +1068,7 @@ function openVolunteerPanel(volunteerJson) {
 
     // added for station
     document.getElementById("detailStation").textContent = volunteer.station || "Unassigned";
-    document.getElementById("editStation").value = volunteer.station || "Other";
+    document.getElementById("editStation").value = volunteer.station_id || "";
 
     const absenceCard = document.getElementById("detailAbsenceCard");
     const absenceText = document.getElementById("detailAbsence");
