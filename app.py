@@ -1832,6 +1832,7 @@ def accept_applicant():
         last_name=applicant.last_name,
         email=applicant.email,
         phone=applicant.phone
+        station_id = station_id
     )
     
     db.session.add(volunteer)
@@ -1840,7 +1841,7 @@ def accept_applicant():
     if end_hour <= start_hour:
         return "Invalid time range", 400
         
-    for hour in range(start_hour, end_hour+1):
+    for hour in range(start_hour, end_hour):
         availability = Availability(
             volunteer_id=volunteer.id,
             hour=hour
