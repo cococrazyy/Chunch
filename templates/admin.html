@@ -958,7 +958,10 @@ function renderStationBoard(stationData) {
                         const displayTime = volunteer.display_time ? ` (${volunteer.display_time})` : "";
 
                         return `
-                            <button class="volunteer-pill" type="button" onclick='openVolunteerPanel(${JSON.stringify(JSON.stringify(volunteer))})'>
+                            <button class="volunteer-pill" type="button" onclick='openVolunteerPanel(${JSON.stringify(JSON.stringify(...volunteer, 
+                                // added for station
+                                station: stationName
+                            ))})'>
                                 ${displayName}${displayTime}
                             </button>
                         `;
@@ -1062,31 +1065,9 @@ function openVolunteerPanel(volunteerJson) {
     document.getElementById("detailUnavailability").textContent = volunteer.unavailability || "None listed";
     document.getElementById("detailRestrictions").textContent = volunteer.capability_restrictions || "None listed";
 
-    // added for edit mode
-    /*if (isEditMode) {
-        document.getElementById("editName").style.display = "block";
-        document.getElementById("editEmail").style.display = "block";
-        document.getElementById("editPhone").style.display = "block";
+    // added for station
+    document.getElementById("detailStation").textContent = volunteer.station || "Unassigned";
 
-        document.getElementById("detailName").style.display = "none";
-        document.getElementById("detailEmail").style.display = "none";
-        document.getElementById("detailPhone").style.display = "none";
-
-        document.getElementById("editBtn").style.display = "inline-block"; // still visible
-        document.getElementById("saveBtn").style.display = "inline-block";
-    } else {
-        document.getElementById("editName").style.display = "none";
-        document.getElementById("editEmail").style.display = "none";
-        document.getElementById("editPhone").style.display = "none";
-
-        document.getElementById("detailName").style.display = "inline";
-        document.getElementById("detailEmail").style.display = "block";
-        document.getElementById("detailPhone").style.display = "block";
-
-        document.getElementById("editBtn").style.display = "inline-block";
-        document.getElementById("saveBtn").style.display = "none";
-    }
-    */
 
     const absenceCard = document.getElementById("detailAbsenceCard");
     const absenceText = document.getElementById("detailAbsence");
@@ -1371,6 +1352,12 @@ loadStationBoard();
         <div class="detail-card" id="detailAbsenceMessageCard" style="display:none;">
             <div class="detail-label">Reason for Absence</div>
             <div class="detail-value" id="detailAbsenceMessage">—</div>
+        </div>
+
+        <!-- added for station-->
+        <div class="detail-card">
+            <div class="detail-label">Station</div>
+            <div id="detailStation" class="detail-value"></div>
         </div>
     </div>
 </div>
