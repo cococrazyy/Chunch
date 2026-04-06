@@ -1218,6 +1218,9 @@ function saveVolunteer() {
     const fullName = document.getElementById("editName").value.trim();
     const [firstName, ...rest] = fullName.split(" ");
     const lastName = rest.join(" ");
+    // added for station
+    const stationSelect = document.getElementById("editStation");
+    const stationId = stationSelect.value;
     const updatedData = {
         id: currentVolunteer.id,
         first_name: firstName,
@@ -1228,7 +1231,9 @@ function saveVolunteer() {
         unavailability: document.getElementById("editUnavailability").value,
         capability_restrictions: document.getElementById("editRestrictions").value,
         role: document.getElementById("editRole").value,
-        station_id: currentVolunteer.station_id
+        //station_id: currentVolunteer.station_id
+        // added for station
+        station_id: stationId
     };
 
     fetch("/admin/edit-volunteer", {
