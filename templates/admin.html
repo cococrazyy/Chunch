@@ -1253,7 +1253,7 @@ function saveVolunteer() {
         role: document.getElementById("editRole").value,
         //station_id: currentVolunteer.station_id
         // added for station
-        station_id: stationId
+        station_id: document.getElementById("editStation").value
     };
 
     fetch("/admin/edit-volunteer", {
