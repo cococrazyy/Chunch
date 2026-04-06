@@ -1831,7 +1831,7 @@ def accept_applicant():
         first_name=applicant.first_name,
         last_name=applicant.last_name,
         email=applicant.email,
-        phone=applicant.phone
+        phone=applicant.phone,
         station_id = station_id
     )
     
