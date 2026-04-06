@@ -1265,6 +1265,9 @@ function saveVolunteer() {
         location.reload();
     })
     .catch(err => console.error(err));
+
+    // reload station board to show new update
+    loadStationBoard()
 }
 
 // Added for edit
