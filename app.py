@@ -127,8 +127,8 @@ class Station(db.Model):
             "Greeters",
             "Baked Potato Bar",
             "Salad Bar",
-            "Vegan Station",
             "Absent",
+            "Vegan Station",
             "Other",
             name="station_enum"
         )
