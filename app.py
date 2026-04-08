@@ -65,6 +65,8 @@ class Volunteer(db.Model, SoftDeleteMixin):
     unavailability = Column(String(100))
     capability_restrictions = Column(String(500))
     station_id = Column(Integer, ForeignKey("station.station_id"))
+    # added for station
+    station = relationship("Station", foreign_keys=[station_id])
     account = relationship("UserAccount", back_populates="volunteer", uselist=False)
     #station = relationship("Station")
 
@@ -328,6 +330,9 @@ def edit_volunteer():
                 role=new_role
             )
             db.session.add(new_account)
+
+    # added for station
+
     
     db.session.commit()
 
