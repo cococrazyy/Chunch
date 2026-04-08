@@ -1722,7 +1722,7 @@ def debug_other_check():
                 "volunteer_id": v.id,
                 "is_assigned": v.id in assigned_volunteer_ids
             }
-            for v in volunteers[:15]
+            for v in volunteers[:16]
         ]
     }
 
