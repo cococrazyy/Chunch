@@ -1550,20 +1550,6 @@ def debug_hourly_final():
             if current is None or assignment.assignment_id > current.assignment_id:
                 latest_assignment_by_volunteer[assignment.volunteer_id] = assignment
 
-        # added for station
-        for v in volunteers:
-            if v.id not in volunteer_rows_by_id:
-            continue
-
-        # Remove from all stations first
-        for volunteer_ids in station_to_volunteer_ids.values():
-            volunteer_ids.discard(v.id)
-
-        # Add to their actual DB station
-        if v.station_id is not None:
-            station_to_volunteer_ids.setdefault(v.station_id, set()).add(v.id)
-
-        #
 
         for assignment in latest_assignment_by_volunteer.values():
             if assignment.is_covering and assignment.absence_id:
@@ -1603,6 +1589,16 @@ def debug_hourly_final():
 
                     if covered:
                         covered.is_absent = False
+
+        # added for station
+        # Fix volunteers whose assignment.station_id doesn't match computed station
+        for station_id, volunteer_ids in station_to_volunteer_ids.items():
+            for vid in volunteer_ids:
+                assignment = latest_assignment_by_volunteer.get(vid)
+                if assignment and assignment.station_id != station_id:
+                    #print(f"Updating volunteer {vid} station from {assignment.station_id} to {station_id}")
+                    assignment.station_id = station_id
+
 
         db.session.commit()
 
