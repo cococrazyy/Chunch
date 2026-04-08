@@ -1592,12 +1592,12 @@ def debug_hourly_final():
 
         # added for station
         # Fix volunteers whose assignment.station_id doesn't match computed station
-        #for station_id, volunteer_ids in station_to_volunteer_ids.items():
-            #for vid in volunteer_ids:
-             #   assignment = latest_assignment_by_volunteer.get(vid)
-              #  if assignment and assignment.station_id != station_id:
+        for station_id, volunteer_ids in station_to_volunteer_ids.items():
+            for vid in volunteer_ids:
+                assignment = latest_assignment_by_volunteer.get(vid)
+                if assignment and assignment.station_id != station_id:
                     #print(f"Updating volunteer {vid} station from {assignment.station_id} to {station_id}")
-               #     assignment.station_id = station_id
+                    assignment.station_id = station_id
 
 
         db.session.commit()
