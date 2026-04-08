@@ -277,7 +277,14 @@ def google_login():
     # elif user.role is "captain":
     #     render_template("captain.html")
     
-    return jsonify({"success": True})
+    return jsonify({"success": True, "role": user.role})
+
+# def get_account():
+#     if "user_id" not in session:
+#         return jsonify({"error": "Not logged in"}), 401
+
+#     user = UserAccount.query.get(session["user_id"])
+#     return jsonify({user});
 
 @app.route("/debug/absent-id")
 def get_absent_id():

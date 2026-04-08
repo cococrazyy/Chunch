@@ -178,6 +178,11 @@
                 gap: 10px;
             }
         }
+        cite {
+            display: block;
+            margin-top: 8px;
+            font-size: 12px;
+        }
         </style>
     </head>
 
@@ -195,7 +200,8 @@
                 <section class="header">
                     <!-- will have a colored background -->
                     <h1>About Us</h1>
-                    <p>Taste and see that the Lord is good, Ps 34:8</p>
+                    <p>“Taste and see that the Lord is good.”</p>
+                    <cite>– PSALM 34:8</cite>
                 </section>
                 <section class="define">
                     <h2>What is Chunch?</h2>
@@ -292,23 +298,27 @@
 
         // Google Sign-In
         async function handleCredentialResponse(response) {
-        const res = await fetch("/api/google-login", {
-            method: "POST", 
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                credential: response.credential
-            })
-        });
+            const res = await fetch("/api/google-login", {
+                method: "POST", 
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    credential: response.credential
+                })
+            });
 
             const data = await res.json();
 
             if (data.success) {
-                window.location.href = "/admin";
-            } else {
+                if(data.role === "admin" || data.role === "tech") {
+                    window.location.href = "/admin";
+                } else if (data.role === "captain") {
+                    window.location.href = "/captain";
+                } else {
                 alert("You are not authorized.");
                 closeModal();
+                }
             }
         }
 
@@ -318,7 +328,7 @@
             return JSON.parse(atob(base64));
         }
 
-        </script>
+    </script>
 
     </body>
 </html>
