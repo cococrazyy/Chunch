@@ -454,6 +454,8 @@ function renderStationBoard(stationData) {
     grid.innerHTML = "";
 
     const stationNames = Object.keys(stationData);
+    let totalVolunteers = 0; // Used for debugging/checking that counts are correct
+    let assignedVolunteers = 0;
 
     const seenVolunteerKeys = new Set();
     const seenCaptainKeys = new Set();
@@ -463,6 +465,8 @@ function renderStationBoard(stationData) {
 
         const station = stationData[stationName];
         const volunteers = station.volunteers || [];
+        
+        totalVolunteers += volunteers.length;
 
         const card = document.createElement("div");
         const cssClass = stationClassMap[stationName];
@@ -509,6 +513,7 @@ function renderStationBoard(stationData) {
                 <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
                     <h3>${stationName}</h3>
                 </div>
+                <div class="station-count">${count===1 ? "1 volunteer" : `${volunteers.length} volunteers`}</div>
             </div>
             ${volunteerHTML}
         `;
