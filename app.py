@@ -1880,6 +1880,9 @@ def accept_applicant():
         return redirect("/")
     applicants_id = request.form.get("applicant_id", type=int)
     station_id = request.form.get("station_id", type=int)
+    if not station_id:
+        return "station is required", 400
+    
     start_hour = request.form.get("start_hour", type=int)
     end_hour = request.form.get("end_hour", type=int)
   
