@@ -513,7 +513,7 @@ function renderStationBoard(stationData) {
                 <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
                     <h3>${stationName}</h3>
                 </div>
-                <div class="station-count">${count===1 ? "1 volunteer" : `${volunteers.length} volunteers`}</div>
+                <div class="station-count">${volunteers.length === 1 ? "1 volunteer" : `${volunteers.length} volunteers`}</div>
             </div>
             ${volunteerHTML}
         `;
