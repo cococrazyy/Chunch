@@ -271,7 +271,15 @@ button.logout-btn:hover { background: rgb(178, 59, 59); }
     font-weight: 800;
     line-height: 1.2;
 }
-
+.station-count {
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 999px;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
 .volunteer-list {
     display: flex;
     flex-direction: column;
@@ -488,10 +496,6 @@ function renderStationBoard(stationData) {
 
                         if (!seenVolunteerKeys.has(uniqueKey)) {
                             seenVolunteerKeys.add(uniqueKey);
-                        }
-
-                        if (isCaptain(volunteer) && !seenCaptainKeys.has(uniqueKey)) {
-                            seenCaptainKeys.add(uniqueKey);
                         }
 
                         const displayTime = volunteer.display_time ? ` (${volunteer.display_time})` : "";
