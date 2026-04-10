@@ -318,24 +318,25 @@ def edit_volunteer():
     volunteer.capability_restrictions = data.get("capability_restrictions")
     volunteer.station_id = data.get("station_id")
 
-    # assignment = Assignment.query.filter_by(volunteer_id=volunteer.id).order_by(Assignment.assignment_id.desc()).first()
-    assignment = Assignment.query.filter_by(volunteer_id=volunteer.id).all() # returns None if volunteer is not in the system
-    prev_station = assignment.get(volunteer.station_id) if assignment else None
-    if assignment is None:
-        return jsonify({"error": "Volunteer has no assignment"}), 404 
-    prev_station = {} # assignment.station_id
-    # if the stations aren't the same, add the volunteer to the new station and remove them from the old station
-    if(prev_station != volunteer.station_id):
-        # assigned_id.append(data["id"])
-        db.session.delete(Assignment(volunteer_id=volunteer.id, station_id=prev_station[assignment.volunteer_id]))
-        db.session.add(Assignment(volunteer_id=volunteer.id, station_id=volunteer.station_id))
-        assignment.station_id = volunteer.station_id 
-        current = prev_station.get(assignment.volunteer_id)
-        if current is None or assignment.assignment_id != current.assignment_id:
-            prev_station[assignment.volunteer_id] = assignment
-            db.session.add(assignment)
-            db.session.delete(prev_station)
-            db.session.commit()
+    assignment = Assignment.query.filter_by(volunteer_id=volunteer.id).order_by(Assignment.assignment_id.desc()).first()
+    # commenting out for reverting
+    # assignment = Assignment.query.filter_by(volunteer_id=volunteer.id).all() # returns None if volunteer is not in the system
+    # prev_station = assignment.get(volunteer.station_id) if assignment else None
+    # if assignment is None:
+    #     return jsonify({"error": "Volunteer has no assignment"}), 404 
+    # prev_station = {} # assignment.station_id
+    # # if the stations aren't the same, add the volunteer to the new station and remove them from the old station
+    # if(prev_station != volunteer.station_id):
+    #     # assigned_id.append(data["id"])
+    #     db.session.delete(Assignment(volunteer_id=volunteer.id, station_id=prev_station[assignment.volunteer_id]))
+    #     db.session.add(Assignment(volunteer_id=volunteer.id, station_id=volunteer.station_id))
+    #     assignment.station_id = volunteer.station_id 
+    #     current = prev_station.get(assignment.volunteer_id)
+    #     if current is None or assignment.assignment_id != current.assignment_id:
+    #         prev_station[assignment.volunteer_id] = assignment
+    #         db.session.add(assignment)
+    #         db.session.delete(prev_station)
+    #         db.session.commit()
     
     # The assignment of the new station, list of volunteers for that station
     # check for volunteer in this assignment    
@@ -400,7 +401,8 @@ def google_logout():
     if "user_id" in session:
         session.clear()
         return redirect("/")
-    return jsonify({"success": True, "message": "User was not logged in", })
+    #return jsonify({"success": True, "message": "User was not logged in", })
+    return jsonify({"fail": False, "message": "User was not logged in", })
 
 @app.route("/captain/volunteer-hours-cap")
 def volunteer_hours_captain():
