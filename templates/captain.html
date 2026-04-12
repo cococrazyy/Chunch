@@ -483,8 +483,36 @@ function renderStationBoard(stationData) {
         if (stationName === "Other") return;
 
         const station = stationData[stationName];
-        const volunteers = station.volunteers || [];
-        
+        //const volunteers = station.volunteers || [];
+
+        // added for A-Z stations
+        let volunteers = (station.volunteers || []).slice(); // copy so we don't mutate original
+
+        volunteers.sort((a, b) => {
+            const roleA = (a.role || "").toLowerCase();
+            const roleB = (b.role || "").toLowerCase();
+
+            // Priority: admin (0), captain (1), others (2)
+            const getPriority = (role) => {
+                if (role === "admin") return 0;
+                if (role === "captain") return 1;
+                return 2;
+            };
+
+            const priorityA = getPriority(roleA);
+            const priorityB = getPriority(roleB);
+
+            if (priorityA !== priorityB) {
+                return priorityA - priorityB;
+            }
+
+            // Same role, sort alphabetically
+            const nameA = (a.name || "").toLowerCase();
+            const nameB = (b.name || "").toLowerCase();
+
+            return nameA.localeCompare(nameB);
+        });
+
         totalVolunteers += volunteers.length;
 
         const card = document.createElement("div");
