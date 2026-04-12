@@ -443,6 +443,12 @@ function isCaptain(volunteer) {
     return captainStatus === "captain" || role === "captain";
 }
 
+// added for admin symbol
+function isAdmin(volunteer) {
+    if (!volunteer || typeof volunteer === "string") return false;
+    return (volunteer.role || "").toString().toLowerCase() === "admin";
+}
+
 function formatDatePretty(dateStr) {
     if (!dateStr) return "";
     const d = new Date(dateStr);
