@@ -65,6 +65,7 @@ class Volunteer(db.Model, SoftDeleteMixin):
     unavailability = Column(String(100))
     capability_restrictions = Column(String(500))
     station_id = Column(Integer, ForeignKey("station.station_id"))
+    is_floater = Column(Boolean)
     # added for station
     station = relationship("Station", foreign_keys=[station_id])
     account = relationship("UserAccount", back_populates="volunteer", uselist=False)
@@ -274,10 +275,10 @@ def google_login():
     session["role"] = user.role
     session["email"] = email
 
-    # if user.role is "admin":
-    #     render_template("admin.html")
-    # elif user.role is "captain":
-    #     render_template("captain.html")
+    if user.role is "admin" or user.role is "tech":
+        render_template("admin.html")
+    elif user.role is "captain":
+        render_template("captain.html")
     
     return jsonify({"success": True, "role": user.role})
 
@@ -317,6 +318,7 @@ def edit_volunteer():
     volunteer.unavailability = data.get("unavailability")
     volunteer.capability_restrictions = data.get("capability_restrictions")
     volunteer.station_id = data.get("station_id")
+    volunteer.is_floater = data.get("is_floater")
 
     assignment = Assignment.query.filter_by(volunteer_id=volunteer.id).order_by(Assignment.assignment_id.desc()).first()
     # commenting out for reverting
@@ -348,12 +350,12 @@ def edit_volunteer():
             return {"error": "Invalid role"}, 400
         
         if volunteer.account:
-            if new_role in {"admin", "captain"}:
+            if new_role in {"admin", "captain", "tech"}:
                 volunteer.account.role = new_role
             else:
                 db.session.delete(volunteer.account)
         
-        elif new_role in {"admin", "captain"}:
+        elif new_role in {"admin", "captain", "tech"}:
             new_account = UserAccount(
                 volunteer_id=volunteer.id,
                 password="TEMP_PASSWORD",  # replace later with hashed
@@ -371,7 +373,7 @@ def edit_volunteer():
             volunteer.station = station
         else:
             volunteer.station = None
-    
+
     db.session.commit()
 
     return {"success": True}
@@ -1532,6 +1534,7 @@ def debug_hourly_final():
                     sheet_row.get("Other Info", "")
                 ).strip(),
                 "station_id": v.station_id,
+                "is_floater": v.is_floater,
                 "absence_id": latest_absence.absence_id if latest_absence else None,
                 "absence_start_date": latest_absence.start_date.isoformat() if latest_absence and latest_absence.start_date else "",
                 "absence_end_date": latest_absence.end_date.isoformat() if latest_absence and latest_absence.end_date else "",
@@ -1894,7 +1897,8 @@ def accept_applicant():
         last_name=applicant.last_name,
         email=applicant.email,
         phone=applicant.phone,
-        station_id = station_id
+        station_id = station_id,
+        is_floater = False
     )
     
     db.session.add(volunteer)
@@ -1965,7 +1969,8 @@ def master_list():
             "last_name": v.last_name,
             "email": v.email,
             "phone": v.phone,
-            "captain_status": user.role.capitalize() if user is not None else "Volunteer"
+            "role": user.role.capitalize() if user is not None else "Volunteer",
+            "is_floater": v.is_floater
         })
 
     return render_template("master-list.html", volunteers=volunteer_rows)
@@ -1979,6 +1984,9 @@ def add_volunteer():
     first_name = request.form.get("first_name", "").strip()
     last_name = request.form.get("last_name", "").strip()
     email = request.form.get("email", "").strip().lower()
+    phone = request.form.get("phone", "").strip()
+    # default is false if get has no return, if true then becomes true
+    is_floater = (request.form.get("is_floater", "no") == "yes") 
 
     existing = Volunteer.query.filter_by(first_name = first_name, email=email).first()
     if existing:
@@ -1988,7 +1996,9 @@ def add_volunteer():
     new_volunteer = Volunteer(
         first_name=first_name,
         last_name=last_name,
-        email=email
+        email=email,
+        phone=phone,
+        is_floater=is_floater
     )
 
     db.session.add(new_volunteer)
@@ -2035,6 +2045,40 @@ def undo_delete(volunteer_id):
         volunteer.deleted_at = None
         db.session.commit()
     return redirect("/admin/master-list/deleted-volunteers")
+
+@app.route("/admin/master-list/edit-volunteer/<int:volunteer_id>", methods=["POST"])
+def edit_volunteer(volunteer_id):
+    if "user_id" not in session:
+        return redirect("/")
+
+    volunteer = Volunteer.query.get_or_404(volunteer_id)
+    if not volunteer:
+        return redirect("/admin/master-list")
+
+    first_name = request.form.get("first_name", "").strip()
+    last_name = request.form.get("last_name", "").strip()
+    email = request.form.get("email", "").strip().lower()
+    phone = request.form.get("phone", "").strip()
+    is_floater = request.form.get("is_floater", "no") == "yes"
+
+    if not first_name or not last_name or not email:
+        flash("All fields are required.")
+        return redirect(f"/admin/master-list/edit-volunteer/{volunteer_id}")
+
+    existing = Volunteer.query.filter_by(email=email).first()
+    if existing and existing.id != volunteer.id:
+        flash("Volunteer with that email already exists.")
+        return redirect(f"/admin/master-list/edit-volunteer/{volunteer_id}")
+
+    volunteer.first_name = first_name
+    volunteer.last_name = last_name
+    volunteer.email = email
+    volunteer.phone = phone
+    volunteer.is_floater = is_floater
+
+    db.session.commit()
+
+    return redirect("/admin/master-list")
 
 @app.route("/student-spotlight")
 def student_spotlight():
