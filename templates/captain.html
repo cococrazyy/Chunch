@@ -466,6 +466,16 @@ function formatHourPretty(h) {
     return `${h - 12} PM`;
 }
 
+// Make the phone number more readable e.g. (123) 456-7890 or +1 (123) 456-7890
+function formatPhonePretty(phone) {
+    if (phone.length === 10) {
+        return `(${phone.slice(0,3)}) ${phone.slice(3,6)}-${phone.slice(6)}`;
+    } else if (phone.length === 11 && phone[0] === '1') {
+        return `+1 (${phone.slice(1,4)}) ${phone.slice(4,7)}-${phone.slice(7)}`;
+    }
+    return phone;
+}
+
 function renderStationBoard(stationData) {
     currentStationData = stationData || {};
 
@@ -625,7 +635,7 @@ function openVolunteerPanel(volunteerJson) {
 
     document.getElementById("detailName").textContent = volunteer.name || "Volunteer";
     document.getElementById("detailEmail").textContent = volunteer.email || "None listed";
-    document.getElementById("detailPhone").textContent = volunteer.phone || "None listed";
+    document.getElementById("detailPhone").textContent = formatPhonePretty(volunteer.phone) || "None listed";
     document.getElementById("detailCaptain").textContent = volunteer.captain_status || "Volunteer";
     document.getElementById("detailShift").textContent = volunteer.typical_shift || "None listed";
     document.getElementById("detailUnavailability").textContent = volunteer.unavailability || "None listed";
