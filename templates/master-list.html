@@ -47,6 +47,11 @@ button {
     color: white;
 }
 
+.edit {
+    background: #2563eb;
+    color: white;
+}
+
 .danger {
     background: #dc2626;
     color: white;
@@ -130,8 +135,25 @@ tr:hover {
         <input type="text" name="last_name" placeholder="Last Name" required>
         <input type="email" name="email" placeholder="Email" required>
         <input type="tel" name="phone" placeholder="Phone Number" required>
+        <input type="checkbox" name="is_floater">
         <button class="primary" type="submit">Save</button>
     </form>
+</div>
+
+<div id="editForm">
+    <form method="POST" action="/admin/edit-volunteer">
+        <input type="text" name="name" id="editName" placeholder="Full Name" required style="display:none;">
+        <input type="email" name="email" id="editEmail" placeholder="Email" required style="display:none;">
+        <input type="tel" name="phone" id="editPhone" placeholder="Phone Number" required style="display:none;">
+        <select name="role" id="editRole" style="display:none;">
+            <option value="">Select Role</option>
+            <option value="volunteer">Volunteer</option>
+            <option value="captain">Captain</option>
+            <option value="admin">Admin</option>
+            <option value="tech">Tech</option>
+        </select>
+        <input type="checkbox" name="is_floater" id="editFloater" style="display:none;">
+        <button class="primary" type="button" id="saveBtn" onclick="saveVolunteer()" style="display:none;">Save</button>
 </div>
 
 <table>
@@ -153,6 +175,11 @@ tr:hover {
             <td>{{ v.phone }}</td>
             <td>{{ v.captain_status }}</td>
             <td class="actions-cell">
+                <form method="POST" action="admin/master-list/edit-volunteer/{{ v.id }}">
+                    <button class="edit" type="submit">Edit</button>
+                </form>
+            </td>
+            <td class="actions-cell">
                 <form method="POST" action="/admin/master-list/delete-volunteer/{{ v.id }}">
                     <button class="danger" type="submit"
                         onclick="return confirm('Delete this volunteer?')">
@@ -172,6 +199,130 @@ function toggleForm() {
     const form = document.getElementById("addForm");
     form.style.display = form.style.display === "none" ? "block" : "none";
 }
+
+function editVolunteer() {
+    if(!currentVolunteer) return;
+    document.getElementById("first_name").style.display = "none";
+    document.getElementById("detailEmail").style.display = "none";
+    document.getElementById("detailPhone").style.display = "none";
+    document.getElementById("detailCaptain").style.display = "none";
+
+    const nameInput = document.getElementById("editName");
+    const emailInput = document.getElementById("editEmail");
+    const phoneInput = document.getElementById("editPhone");
+    const captainInput = document.getElementById("editRole");
+
+    // added for station
+    const stationSelect = document.getElementById("editStation");
+    
+    nameInput.style.display = "block";
+    emailInput.style.display = "block";
+    phoneInput.style.display = "block";
+    shiftInput.style.display = "block";
+    unavailabilityInput.style.display = "block";
+    restrictionsInput.style.display = "block";
+    captainInput.style.display = "block";
+    stationSelect.style.display = "block";
+    
+    nameInput.value = currentVolunteer.name || "";
+    emailInput.value = currentVolunteer.email || "";
+    phoneInput.value = currentVolunteer.phone || "";
+    shiftInput.value = currentVolunteer.typical_shift || "";
+    unavailabilityInput.value = currentVolunteer.unavailability || "";
+    restrictionsInput.value = currentVolunteer.capability_restrictions || "";
+    captainInput.value = currentVolunteer.role || "";
+    
+    stationSelect.innerHTML = "";
+
+    const stations = [
+        // { id: 14, name: "Absent" },
+        { id: 12, name: "Baked Potato Bar" },
+        { id: 7, name: "Busboys/sanitation" },
+        { id: 6, name: "Desserts" },
+        { id: 8, name: "Dishwashers" },
+        { id: 5, name: "Drink Station" },
+        { id: 10, name: "General Manager" },
+        { id: 11, name: "Greeters" },
+        { id: 4, name: "Kitchen" },
+        { id: 3, name: "Line Servers" },
+        // { id: 15, name: "Other" },
+        { id: 9, name: "Reserve" },
+        { id: 13, name: "Salad Bar" },
+        { id: 1, name: "Setup Team" },
+        { id: 2, name: "Teardown Team" },
+        { id: 16, name: "Vegan Station" }
+    ];
+
+    stations.forEach(station => {
+        const option = document.createElement("option");
+        option.value = station.id;      // numeric ID
+        option.textContent = station.name;
+
+        if (station.id === currentVolunteer.station_id) { // use numeric comparison
+            option.selected = true;
+        }
+
+        stationSelect.appendChild(option);
+    });
+    stationSelect.value = currentVolunteer.station_id || "";
+    document.getElementById("editBtn").style.display = "none";
+    document.getElementById("saveBtn").style.display = "inline-block";
+    
+}
+
+function saveVolunteer() {
+    const fullName = document.getElementById("editName").value.trim();
+    const [firstName, ...rest] = fullName.split(" ");
+    const lastName = rest.join(" ");
+    // added for station
+    const stationSelect = document.getElementById("editStation");
+    const stationId = stationSelect.value;
+    const updatedData = {
+        id: currentVolunteer.id,
+        first_name: firstName,
+        last_name: lastName,
+        email: document.getElementById("editEmail").value,
+        phone: document.getElementById("editPhone").value, 
+        typical_shift: document.getElementById("editShift").value,
+        unavailability: document.getElementById("editUnavailability").value,
+        capability_restrictions: document.getElementById("editRestrictions").value,
+        role: document.getElementById("editRole").value,
+        // added for station
+        station_id: document.getElementById("editStation").value
+    };
+
+    fetch("/admin/edit-volunteer", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(updatedData)
+    })
+    .then(res => res.json())
+    .then(data => {
+        window.location.reload();
+    })
+    .catch(err => console.error(err));
+
+    // reload station board to show new update
+    loadStationBoard()
+}
+
+// Added for edit
+
+document.addEventListener("click", function (e) {
+    if (!isSelectionLocked) return;
+
+    const isVolunteer = e.target.closest(".volunteer-pill");
+    const isEditButton = e.target.closest("button[onclick='enableEdit()']");
+
+    if (isVolunteer || isEditButton) return;
+
+    // BLOCK everything else
+    e.stopPropagation();
+    e.preventDefault();
+}, true);
+
 </script>
 
 </body>
