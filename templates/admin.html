@@ -482,10 +482,10 @@ body {
         <div class="header-copy">
             <h1>Admin Dashboard</h1>
         </div>
-        <button onclick="logOut();">
+        <!-- <button onclick="logOut();">
             <span class="icon">🚪</span>
             <span class="label">Sign Out</span>
-        </button>
+        </button> -->
     </div>
 
     <div class="header-actions">
@@ -498,7 +498,7 @@ body {
             <span class="label">Hourly View</span>
         </button>
 
-        <button class="secondary-btn" onclick="window.location.href='/admin/need-coverage'">
+        <button onclick="window.location.href='/admin/need-coverage'">
             <span class="icon">🚨</span>
             <span class="label">Need Coverage?</span>
         </button>
@@ -508,9 +508,9 @@ body {
             <span class="label">Volunteer Master List</span>
         </button>
 
-        <button onclick="window.location.href='/captain'">
+        <!-- <button onclick="window.location.href='/captain'">
             <span class="label">Captain View</span>
-        </button>
+        </button> -->
     </div>
 </div>
 
@@ -631,6 +631,16 @@ function formatHourPretty(h) {
     if (h < 12) return `${h} AM`;
     if (h === 12) return "12 PM";
     return `${h - 12} PM`;
+}
+
+// Make the phone number more readable e.g. (123) 456-7890 or +1 (123) 456-7890
+function formatPhonePretty(phone) {
+    if (phone.length === 10) {
+        return `(${phone.slice(0,3)}) ${phone.slice(3,6)}-${phone.slice(6)}`;
+    } else if (phone.length === 11 && phone[0] === '1') {
+        return `+1 (${phone.slice(1,4)}) ${phone.slice(4,7)}-${phone.slice(7)}`;
+    }
+    return phone;
 }
 
 function openAbsentEditPicker() {
