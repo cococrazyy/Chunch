@@ -1121,10 +1121,8 @@ function openVolunteerPanel(volunteerJson) {
     document.getElementById("detailName").textContent = volunteer.name || "Volunteer";
     document.getElementById("detailEmail").textContent = volunteer.email || "None listed";
     document.getElementById("detailPhone").textContent = formatPhonePretty(volunteer.phone) || "None listed";
-    document.getElementById("detailCaptain").textContent = formatRolePretty(volunteer.role);
+    document.getElementById("detailRole").textContent = formatRolePretty(volunteer.role);
     const roleSelect = document.getElementById("editRole");
-    // roleSelect.value = formatRolePretty(volunteer.role) || "None listed";
-    // roleSelect.value = (volunteer.role || "volunteer");
     
     document.getElementById("detailShift").textContent = volunteer.display_time || volunteer.typical_shift || "None listed";
     document.getElementById("detailUnavailability").textContent = volunteer.unavailability || "None listed";
@@ -1175,7 +1173,6 @@ function openVolunteerPanel(volunteerJson) {
     document.getElementById("detailPanel").classList.add("open");
     document.getElementById("detailOverlay").classList.add("open");
     
-        
 }
 
 function closeVolunteerPanel() {
@@ -1199,8 +1196,7 @@ function closeVolunteerPanel() {
     document.getElementById("detailShift").style.display = "block";
     document.getElementById("detailUnavailability").style.display = "block";
     document.getElementById("detailRestrictions").style.display = "block";
-    // Remove or replace with "detailRole", change above as well if changed
-    document.getElementById("detailCaptain").style.display = "block";
+    document.getElementById("detailRole").style.display = "block";
     // added for station
     document.getElementById("detailStation").style.display = "block";
 
@@ -1229,8 +1225,7 @@ function editVolunteer() {
     document.getElementById("detailEmail").style.display = "none";
     document.getElementById("detailPhone").style.display = "none";
     document.getElementById("detailShift").style.display = "none";
-    // Remove or replace with "detailRole", change above as well if changed
-    document.getElementById("detailCaptain").style.display = "none";
+    document.getElementById("detailRole").style.display = "none";
     document.getElementById("detailUnavailability").style.display = "none";
     document.getElementById("detailRestrictions").style.display = "none";
     document.getElementById("detailStation").style.display = "none";
@@ -1451,8 +1446,7 @@ loadStationBoard();
 
         <div class="detail-card">
             <div class="detail-label">Role</div>
-            <!-- Is this being used? Change to "detailRole"? -->
-            <div class="detail-value" id="detailCaptain">—</div>
+            <div class="detail-value" id="detailRole">—</div>
         
             <select id="editRole" class="date-picker" style="display:none;">
                 <option value="admin">Admin</option>
