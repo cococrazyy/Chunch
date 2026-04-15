@@ -2936,21 +2936,56 @@ def need_coverage_page():
         if deny:
             return deny
 
+        sheet = get_sheet()
+        rows = sheet.get_all_records()
+
+        non_reserve_emails = set()
+
+        for row in rows:
+            email = str(row.get("Email", "")).strip().lower()
+            typical_station = str(row.get("Typical Station", "")).strip().lower()
+
+            if email and typical_station != "reserve":
+                non_reserve_emails.add(email)
+
         volunteers = Volunteer.query\
             .filter(Volunteer.deleted_at.is_(None))\
             .order_by(Volunteer.last_name, Volunteer.first_name)\
             .all()
 
+        filtered_volunteers = [
+            v for v in volunteers
+            if (v.email or "").strip().lower() in non_reserve_emails
+        ]
+
+        prefill_first = request.args.get("first_name", "").strip().lower()
+        prefill_last = request.args.get("last_name", "").strip().lower()
+
+        prefill_volunteer_id = None
+        for v in filtered_volunteers:
+            if (
+                (v.first_name or "").strip().lower() == prefill_first and
+                (v.last_name or "").strip().lower() == prefill_last
+            ):
+                prefill_volunteer_id = v.id
+                break
+
+        if prefill_volunteer_id is None:
+            prefill_volunteer_id = request.args.get("volunteer_id", type=int)
+
         prefill = {
-            "volunteer_id": request.args.get("volunteer_id", type=int),
-            "start_date": request.args.get("start_date", ""),
-            "end_date": request.args.get("end_date", ""),
-            "notes": request.args.get("notes", "")
+            "volunteer_id": prefill_volunteer_id,
+            "start_date": request.args.get("start_date", "").strip(),
+            "end_date": request.args.get("end_date", "").strip(),
+            "notes": request.args.get("notes", "").strip(),
+            "is_partial": request.args.get("is_partial", "false").strip().lower(),
+            "partial_start_hour": request.args.get("partial_start_hour", "").strip(),
+            "partial_end_hour": request.args.get("partial_end_hour", "").strip()
         }
 
         return render_template(
             "need-coverage.html",
-            volunteers=volunteers,
+            volunteers=filtered_volunteers,
             prefill=prefill
         )
 
