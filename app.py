@@ -2534,7 +2534,7 @@ import json
 import gspread
 from google.oauth2.service_account import Credentials
 
-def get_sheet():
+def get_sheet(tab_name=None):
     creds_dict = json.loads(os.environ["GOOGLE_SERVICE_JSON"])
 
     scopes = [
@@ -2547,9 +2547,10 @@ def get_sheet():
 
     spreadsheet = client.open("Chunch Volunteer Info")
 
-    sheet = spreadsheet.worksheet("Volunteer Information")
+    if tab_name:
+        return spreadsheet.worksheet(tab_name)
 
-    return sheet
+    return spreadsheet.worksheet("Volunteer Information")
 
 def get_applicant_sheet():
     creds_dict = json.loads(os.environ["GOOGLE_SERVICE_JSON"])
