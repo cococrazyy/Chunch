@@ -748,8 +748,9 @@ def coverage_details():
     if not latest_absence:
         return "<pre>No absence record found for this volunteer.</pre>", 404
 
-    sync_absences()
     run_sync_absences()
+
+    sheet = get_sheet()
     rows = sheet.get_all_records()
 
     row_by_email = {}
