@@ -719,57 +719,58 @@ def admin_page():
         if role == "captain":
             return redirect("/captain")
 
-        # get volunteers for page
         volunteers = Volunteer.query\
             .filter(Volunteer.deleted_at.is_(None))\
             .order_by(Volunteer.last_name)\
             .all()
 
-        from datetime import datetime
-
-        # get absence form rows
-        sheet = get_sheet("Absence")
-        rows = sheet.get_all_records()
-
-        # existing DB absences
-        existing_absences = Absence.query.all()
-        existing_keys = {
-            (a.volunteer_id, a.start_date, a.end_date)
-            for a in existing_absences
-        }
-
-        # build volunteer lookup
-        volunteers_all = Volunteer.query.all()
-        lookup = {
-            (
-                (v.first_name or "").strip().lower(),
-                (v.last_name or "").strip().lower()
-            ): v.id
-            for v in volunteers_all
-        }
-
         unassigned_count = 0
 
-        for row in rows:
-            first = str(row.get("First name", "")).strip().lower()
-            last = str(row.get("Last name", "")).strip().lower()
-            start = str(row.get("Absence start date", "")).strip()
-            end = str(row.get("Absence end date", "")).strip()
+        try:
+            from datetime import datetime
 
-            volunteer_id = lookup.get((first, last))
-            if not volunteer_id or not start or not end:
-                continue
+            sheet = get_sheet("Absence")
+            rows = sheet.get_all_records()
 
-            try:
-                start_date = datetime.strptime(start, "%m/%d/%Y").date()
-                end_date = datetime.strptime(end, "%m/%d/%Y").date()
-            except Exception:
-                continue
+            existing_absences = Absence.query.all()
+            existing_keys = {
+                (a.volunteer_id, a.start_date, a.end_date)
+                for a in existing_absences
+            }
 
-            key = (volunteer_id, start_date, end_date)
+            volunteers_all = Volunteer.query.all()
+            lookup = {
+                (
+                    (v.first_name or "").strip().lower(),
+                    (v.last_name or "").strip().lower()
+                ): v.id
+                for v in volunteers_all
+            }
 
-            if key not in existing_keys:
-                unassigned_count += 1
+            for row in rows:
+                first = str(row.get("First name", "")).strip().lower()
+                last = str(row.get("Last name", "")).strip().lower()
+                start = str(row.get("Absence start date", "")).strip()
+                end = str(row.get("Absence end date", "")).strip()
+
+                volunteer_id = lookup.get((first, last))
+                if not volunteer_id or not start or not end:
+                    continue
+
+                try:
+                    start_date = datetime.strptime(start, "%m/%d/%Y").date()
+                    end_date = datetime.strptime(end, "%m/%d/%Y").date()
+                except Exception:
+                    continue
+
+                key = (volunteer_id, start_date, end_date)
+
+                if key not in existing_keys:
+                    unassigned_count += 1
+
+        except Exception as badge_error:
+            print("ABSENCE BADGE ERROR:", badge_error)
+            unassigned_count = 0
 
         return render_template(
             "admin.html",
