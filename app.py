@@ -1299,6 +1299,9 @@ def absence_forms():
         if deny:
             return deny
 
+        from datetime import datetime
+        from urllib.parse import quote_plus
+
         sheet = get_sheet("Absence")
         rows = sheet.get_all_records()
 
@@ -1355,7 +1358,6 @@ def absence_forms():
 
                     if start_hour is None or end_hour is None:
                         continue
-
                     if start_hour > end_hour:
                         continue
 
@@ -1368,13 +1370,19 @@ def absence_forms():
 
             return sorted(hours)
 
+        def to_iso_date(date_str):
+            date_str = str(date_str).strip()
+            if not date_str:
+                return ""
+            return datetime.strptime(date_str, "%m/%d/%Y").strftime("%Y-%m-%d")
+
         parsed = []
 
         for row in rows:
             first = str(row.get("First name", "")).strip()
             last = str(row.get("Last name", "")).strip()
-            start_date = str(row.get("Absence start date", "")).strip()
-            end_date = str(row.get("Absence end date", "")).strip()
+            start_date_raw = str(row.get("Absence start date", "")).strip()
+            end_date_raw = str(row.get("Absence end date", "")).strip()
             comments = str(row.get("Additional comments", "")).strip()
             start_time = str(row.get("Absence start time", "")).strip()
             end_time = str(row.get("Absence end time", "")).strip()
@@ -1386,11 +1394,11 @@ def absence_forms():
             absence_start_hour = parse_time_to_hour(start_time)
             absence_end_hour = parse_time_to_hour(end_time)
 
-            is_single_day = bool(start_date and end_date and start_date == end_date)
+            is_single_day = bool(start_date_raw and end_date_raw and start_date_raw == end_date_raw)
 
             is_partial = False
-            partial_start_hour = None
-            partial_end_hour = None
+            partial_start_hour = ""
+            partial_end_hour = ""
 
             if (
                 is_single_day and
@@ -1413,10 +1421,13 @@ def absence_forms():
 
                 if within_shift and not_full_shift and absence_start_hour <= absence_end_hour:
                     is_partial = True
-                    partial_start_hour = absence_start_hour
-                    partial_end_hour = absence_end_hour
+                    partial_start_hour = str(absence_start_hour)
+                    partial_end_hour = str(absence_end_hour)
 
-            query = (
+            start_date = to_iso_date(start_date_raw)
+            end_date = to_iso_date(end_date_raw)
+
+            coverage_url = (
                 f"/admin/need-coverage"
                 f"?first_name={quote_plus(first)}"
                 f"&last_name={quote_plus(last)}"
@@ -1426,14 +1437,17 @@ def absence_forms():
                 f"&is_partial={'true' if is_partial else 'false'}"
             )
 
-            if is_partial and partial_start_hour is not None and partial_end_hour is not None:
-                query += f"&partial_start_hour={partial_start_hour}&partial_end_hour={partial_end_hour}"
+            if is_partial:
+                coverage_url += (
+                    f"&partial_start_hour={quote_plus(partial_start_hour)}"
+                    f"&partial_end_hour={quote_plus(partial_end_hour)}"
+                )
 
             parsed.append({
                 "first": first,
                 "last": last,
-                "start_date": start_date,
-                "end_date": end_date,
+                "start_date": start_date_raw,
+                "end_date": end_date_raw,
                 "comments": comments,
                 "start_time": start_time,
                 "end_time": end_time,
@@ -1441,7 +1455,7 @@ def absence_forms():
                 "is_partial": is_partial,
                 "partial_start_hour": partial_start_hour,
                 "partial_end_hour": partial_end_hour,
-                "coverage_url": query
+                "coverage_url": coverage_url
             })
 
         return render_template("absence-forms.html", absences=parsed)
@@ -2930,7 +2944,7 @@ def sync_volunteers():
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
     
 @app.route("/admin/need-coverage")
-def need_coverage_page():
+def need_coverage():
     try:
         role, deny = require_admin_or_captain()
         if deny:
