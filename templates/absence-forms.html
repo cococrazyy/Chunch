@@ -1,40 +1,257 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Absence Forms</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: #f3f6fb;
+            color: #1e293b;
+        }
+
+        .header {
+            background: #0f172a;
+            color: white;
+            padding: 24px 32px;
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.18);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 32px;
+            font-weight: 800;
+        }
+
+        .header p {
+            margin: 8px 0 0;
+            color: rgba(255,255,255,0.82);
+            font-size: 14px;
+        }
+
+        .page {
+            padding: 32px;
+        }
+
+        .top-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 22px;
+        }
+
+        .top-actions a {
+            text-decoration: none;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 12px;
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn.primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn.secondary {
+            background: #64748b;
+            color: white;
+        }
+
+        .table-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
+            overflow: hidden;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+
+        thead {
+            background: #f8fafc;
+        }
+
+        th, td {
+            padding: 16px 18px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: top;
+        }
+
+        th {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #64748b;
+            font-weight: 800;
+        }
+
+        td {
+            font-size: 14px;
+            color: #0f172a;
+        }
+
+        .name-cell {
+            font-weight: 700;
+        }
+
+        .subtle {
+            color: #64748b;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 999px;
+            padding: 6px 10px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .badge.partial {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .badge.full {
+            background: #e2e8f0;
+            color: #334155;
+        }
+
+        .action-link {
+            text-decoration: none;
+        }
+
+        .action-btn {
+            background: #dc2626;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .empty-state {
+            padding: 28px;
+            color: #64748b;
+        }
+
+        @media (max-width: 768px) {
+            .header,
+            .page {
+                padding: 20px 16px;
+            }
+
+            .header h1 {
+                font-size: 26px;
+            }
+        }
+    </style>
 </head>
 <body>
 
-<h1>Absence Requests</h1>
+<div class="header">
+    <h1>Absence Forms</h1>
+    <p>Submitted absence requests from the Google Form. Open any request directly in Need Coverage.</p>
+</div>
 
-<table border="1">
-    <tr>
-        <th>Name</th>
-        <th>Start Date</th>
-        <th>End Date</th>
-        <th>Comments</th>
-        <th>Action</th>
-    </tr>
+<div class="page">
+    <div class="top-actions">
+        <a href="/admin"><button class="btn secondary" type="button">← Back to Dashboard</button></a>
+        <a href="/admin/sync-absences"><button class="btn primary" type="button">Sync Absences</button></a>
+    </div>
 
-    {% for a in absences %}
-    <tr>
-        <td>{{ a.first }} {{ a.last }}</td>
-        <td>{{ a.start_date }}</td>
-        <td>{{ a.end_date }}</td>
-        <td>{{ a.comments }}</td>
-        <td>
-            {% if a.volunteer_id %}
-            <a href="/admin/coverage/details?volunteer_id={{ a.volunteer_id }}">
-                Find Coverage
-            </a>
-            {% else %}
-            No match
-            {% endif %}
-        </td>
-    </tr>
-    {% endfor %}
-
-</table>
+    <div class="table-card">
+        {% if absences %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Volunteer</th>
+                        <th>Dates</th>
+                        <th>Time Request</th>
+                        <th>Shift Type</th>
+                        <th>Comments</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in absences %}
+                    <tr>
+                        <td>
+                            <div class="name-cell">{{ a.first }} {{ a.last }}</div>
+                        </td>
+                        <td>
+                            <div>{{ a.start_date }}</div>
+                            <div class="subtle">
+                                {% if a.start_date == a.end_date %}
+                                    Single day
+                                {% else %}
+                                    Through {{ a.end_date }}
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>
+                            {% if a.start_time or a.end_time %}
+                                <div>{{ a.start_time or "—" }} to {{ a.end_time or "—" }}</div>
+                            {% else %}
+                                <div class="subtle">No specific time submitted</div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if a.is_partial %}
+                                <span class="badge partial">Partial Shift</span>
+                                <div class="subtle">{{ a.partial_start_hour }} to {{ a.partial_end_hour }}</div>
+                            {% else %}
+                                <span class="badge full">Full Shift</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ a.comments or "—" }}
+                        </td>
+                        <td>
+                            <a class="action-link" href="{{ a.coverage_url }}">
+                                <button class="action-btn" type="button">Find Coverage</button>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">No absence form submissions found.</div>
+        {% endif %}
+    </div>
+</div>
 
 </body>
 </html>
