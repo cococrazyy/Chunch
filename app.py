@@ -1,5 +1,6 @@
 from flask import Flask, send_from_directory, redirect
 from flask_sqlalchemy import SQLAlchemy
+from urllib.parse import quote_plus
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy import Column, Integer, String
 from sqlalchemy import Column, Integer, String, Enum, Date, Time, Boolean
@@ -1447,7 +1448,7 @@ def absence_forms():
 
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
-        
+
 @app.route("/admin/need-coverage/save", methods=["POST"])
 def save_need_coverage():
     try:
