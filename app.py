@@ -120,7 +120,7 @@ class Station(db.Model):
             "Teardown Team",
             "Line Servers",
             "Kitchen",
-            "Drink Station",
+            "Drinks",
             "Desserts",
             "Busboys/sanitation",
             "Dishwashers",
