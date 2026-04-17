@@ -49,8 +49,8 @@ export function renderStationBoard({
     stationClassMap,
     getVolunteerDisplayName,
     isCaptain,
-    isAdmin,
-    openVolunteerPanel
+    isAdmin
+    //openVolunteerPanel
 }) {
     const grid = document.getElementById("scheduleGrid");
     grid.innerHTML = "";
