@@ -415,6 +415,10 @@ import {
     isAdmin
 } from "/admin_captain_shared.js";
 
+import {
+    renderStationBoard
+} from "./admin_captain_shared.js";
+
 let currentVolunteer = null;
 const stationClassMap = {
     "Setup Team": "setup",
@@ -492,6 +496,7 @@ function formatPhonePretty(phone) {
     return phone;
 }
 
+/*
 function renderStationBoard(stationData) {
     currentStationData = stationData || {};
 
@@ -593,6 +598,7 @@ function renderStationBoard(stationData) {
         grid.appendChild(card);
     });
 }
+*/
 
 async function loadStationBoard() {
     try {
@@ -605,7 +611,15 @@ async function loadStationBoard() {
             throw new Error(stationData.error || "Failed to load station board response.");
         }
 
-        renderStationBoard(stationData);
+        //renderStationBoard(stationData);
+        renderStationBoard({
+            stationData,
+            stationClassMap,
+            getVolunteerDisplayName,
+            isCaptain,
+            isAdmin,
+            openVolunteerPanel
+        });
     } catch (error) {
         document.getElementById("scheduleGrid").innerHTML = `
         <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
