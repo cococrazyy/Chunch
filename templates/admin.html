@@ -535,12 +535,8 @@ body {
         <a href="/absence-forms">
             <button class="dashboard-btn">
                 Absence Forms
-                {% if unassigned_count is defined %}
-                    {% if unassigned_count > 0 %}
-                        <span class="badge">{{ unassigned_count }}</span>
-                    {% endif %}
-                {% else %}
-                    <span class="badge">-1</span>
+                {% if unassigned_count > 0 %}
+                    <span class="badge">{{ unassigned_count }}</span>
                 {% endif %}
             </button>
         </a>
