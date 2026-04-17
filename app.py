@@ -706,7 +706,14 @@ def admin_page():
             .order_by(Volunteer.last_name)\
             .all()
 
-        unassigned_count = Assignment.query.filter_by(is_absent=True).count()
+        unassigned_count = 0
+
+        try:
+            sheet = get_sheet("Absence")
+            rows = sheet.get_all_records()
+            unassigned_count = len(rows)
+        except Exception:
+            unassigned_count = 0
 
         return render_template(
             "admin.html",
