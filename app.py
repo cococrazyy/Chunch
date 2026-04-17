@@ -1208,7 +1208,6 @@ def assign_reserve_coverage():
         reserve_volunteer_id = request.form.get("reserve_volunteer_id", type=int)
         cover_start_hour = request.form.get("cover_start_hour", type=int)
         cover_end_hour = request.form.get("cover_end_hour", type=int)
-        send_email = (request.form.get("send_email", "no") == "yes")
 
         if not absence_id or not absent_volunteer_id or not reserve_volunteer_id:
             return "<pre>Missing required coverage fields.</pre>", 400
@@ -1225,43 +1224,7 @@ def assign_reserve_coverage():
         ).order_by(Assignment.assignment_id.desc()).first()
 
         if not absent_assignment:
-            absent_volunteer = Volunteer.query.get(absent_volunteer_id)
-            if not absent_volunteer:
-                return "<pre>Absent volunteer not found.</pre>", 404
-
-            sheet = get_sheet()
-            rows = sheet.get_all_records()
-
-            absent_row = None
-            absent_email = (absent_volunteer.email or "").strip().lower()
-
-            for row in rows:
-                row_email = str(row.get("Email", "")).strip().lower()
-                if row_email == absent_email:
-                    absent_row = row
-                    break
-
-            if not absent_row:
-                return "<pre>Absent volunteer assignment not found and volunteer is not in the sheet.</pre>", 404
-
-            typical_station_name = str(absent_row.get("Typical Station", "")).strip()
-
-            if not typical_station_name:
-                return "<pre>Absent volunteer has no typical station in the sheet.</pre>", 404
-
-            station = Station.query.filter_by(station_name=typical_station_name).first()
-            if not station:
-                return f"<pre>Station '{typical_station_name}' not found.</pre>", 404
-
-            absent_assignment = Assignment(
-                volunteer_id=absent_volunteer_id,
-                station_id=station.station_id,
-                schedule_id=None,
-                is_absent=False,
-                is_covering=False
-            )
-            db.session.add(absent_assignment)
-            db.session.flush()
+            return "<pre>Absent assignment not found.</pre>", 404
 
         reserve_assignment = Assignment(
             volunteer_id=reserve_volunteer_id,
@@ -1279,6 +1242,27 @@ def assign_reserve_coverage():
         absent_assignment.is_absent = True
 
         db.session.commit()
+
+        # ✅ REMOVE FROM GOOGLE SHEET (THIS FIXES THE BADGE)
+        try:
+            sheet = get_sheet("Absence")
+            rows = sheet.get_all_records()
+
+            absent_volunteer = Volunteer.query.get(absent_volunteer_id)
+
+            for i, row in enumerate(rows, start=2):  # start=2 because row 1 is header
+                first = str(row.get("First name", "")).strip().lower()
+                last = str(row.get("Last name", "")).strip().lower()
+
+                if (
+                    first == (absent_volunteer.first_name or "").strip().lower() and
+                    last == (absent_volunteer.last_name or "").strip().lower()
+                ):
+                    sheet.delete_rows(i)
+                    break
+
+        except Exception:
+            pass
 
         return redirect("/admin")
 
