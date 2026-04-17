@@ -7,6 +7,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://apis.google.com/js/platform.js" async defer></script>
 <script src="admin_captain_shared.js"></script>
+<script>
+window.addEventListener("DOMContentLoaded", () => {
+    loadStationBoard();
+});
+</script>
 <style>
 * {
     margin: 0;
@@ -407,19 +412,8 @@ button.logout-btn:hover { background: rgb(178, 59, 59); }
 </div>
 
 
-<script type="module">
+<script>
 
-import {
-    formatCountLabel,
-    getVolunteerDisplayName,
-    isCaptain,
-    isAdmin
-} from "/admin_captain_shared.js";
-
-import {
-    renderStationBoard,
-    openVolunteerPanel
-} from "./admin_captain_shared.js";
 
 let currentVolunteer = null;
 const stationClassMap = {
@@ -615,12 +609,8 @@ async function loadStationBoard() {
 
         //renderStationBoard(stationData);
         renderStationBoard({
-            stationData,
-            stationClassMap,
-            getVolunteerDisplayName,
-            isCaptain,
-            isAdmin,
-            openVolunteerPanel
+            stationData: stationData.data,
+            stationClassMap
         });
     } catch (error) {
         document.getElementById("scheduleGrid").innerHTML = `
@@ -698,7 +688,6 @@ function signOut() {
 window.addEventListener("DOMContentLoaded", loadStationBoard);
 
 // added for shared file
-window.openVolunteerPanel = openVolunteerPanel;
 window.closeVolunteerPanel = closeVolunteerPanel;
 </script>
 
