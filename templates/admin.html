@@ -520,15 +520,11 @@ body {
             <span class="label">Need Coverage?</span>
         </button>
 
-        <!-- Seems to be causing problem with signing in
-        <a href="/absence-forms" class="btn-link">
-            <button class="dashboard-btn">
-                Absence Forms
-                {% if unassigned_count > 0 %}
-                <span class="badge">{{ unassigned_count }}</span>
-                {% endif %}
-            </button>
-        </a> -->
+        
+        <button onclick="window.location.href='/absence-forms'">
+            <span class="icon">📄</span>
+            <span class="label">Absence Forms</span>
+        </button>
 
         <button onclick="window.location.href='/admin/master-list'">
             <span class="icon">👥</span>
