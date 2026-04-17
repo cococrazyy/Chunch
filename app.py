@@ -122,7 +122,7 @@ class Station(db.Model):
             "Kitchen",
             "Drinks",
             "Desserts",
-            "Busboys/sanitation",
+            "Busboys/ sanitation",
             "Dishwashers",
             "Reserve",
             "General Manager",
@@ -130,7 +130,7 @@ class Station(db.Model):
             "Baked Potato Bar",
             "Salad Bar",
             "Absent",
-            "Vegan Station",
+            "Vegan",
             "Other",
             name="station_enum"
         )
@@ -709,8 +709,9 @@ def admin_page():
         unassigned_count = 0
 
         try:
-            sheet = get_sheet("Absence")
-            rows = sheet.get_all_records()
+            from datetime import datetime
+
+            rows = get_sheet_records("Absence")
 
             unassigned_count = len(rows)
 
@@ -1291,7 +1292,7 @@ def assign_reserve_coverage():
 
 @app.route("/absence-forms")
 def absence_forms():
-    
+    run_sync_absences()
     try:
         role, deny = require_admin_or_captain()
         if deny:
@@ -2223,7 +2224,7 @@ def volunteer_hours():
             "Teardown Team",
             "Line Servers",
             "Kitchen",
-            "Drink Station",
+            "Drink",
             "Desserts",
             "Busboys/sanitation",
             "Dishwashers",
@@ -2231,7 +2232,7 @@ def volunteer_hours():
             "Greeters",
             "Baked Potato Bar",
             "Salad Bar",
-            "Vegan Station"
+            "Vegan"
         ]
 
         existing_station_names = {
