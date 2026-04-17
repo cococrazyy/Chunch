@@ -23,6 +23,27 @@ export function isAdmin(volunteer) {
     return (volunteer.role || "").toString().toLowerCase() === "admin";
 }
 
+export function openVolunteerPanel(volunteerJson) {
+    const volunteer = JSON.parse(volunteerJson);
+    
+    document.getElementById("detailName").style.display = "inline";
+    document.getElementById("detailEmail").style.display = "block";
+    document.getElementById("detailPhone").style.display = "block";
+
+    currentVolunteer = volunteer;
+
+    document.getElementById("detailName").textContent = volunteer.name || "Volunteer";
+    document.getElementById("detailEmail").textContent = volunteer.email || "None listed";
+    document.getElementById("detailPhone").textContent = formatPhonePretty(volunteer.phone) || "None listed";
+    document.getElementById("detailCaptain").textContent = volunteer.captain_status || "Volunteer";
+    document.getElementById("detailShift").textContent = volunteer.typical_shift || "None listed";
+    document.getElementById("detailUnavailability").textContent = volunteer.unavailability || "None listed";
+    document.getElementById("detailRestrictions").textContent = volunteer.capability_restrictions || "None listed";
+
+    document.getElementById("detailPanel").classList.add("open");
+    document.getElementById("detailOverlay").classList.add("open");
+}
+
 export function renderStationBoard({
     stationData,
     stationClassMap,
