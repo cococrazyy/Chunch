@@ -711,7 +711,6 @@ def admin_page():
         unassigned_count = 0
 
         try:
-            # ✅ USE YOUR EXISTING WORKING FUNCTION (not cached version)
             sheet = get_sheet("Absence")
             rows = sheet.get_all_records()
 
