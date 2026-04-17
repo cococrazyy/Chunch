@@ -122,7 +122,7 @@ class Station(db.Model):
             "Kitchen",
             "Drinks",
             "Desserts",
-            "Busboys/ sanitation",
+            "Busboys/sanitation",
             "Dishwashers",
             "Reserve",
             "General Manager",
@@ -130,7 +130,7 @@ class Station(db.Model):
             "Baked Potato Bar",
             "Salad Bar",
             "Absent",
-            "Vegan",
+            "Vegan Station",
             "Other",
             name="station_enum"
         )
@@ -706,57 +706,7 @@ def admin_page():
             .order_by(Volunteer.last_name)\
             .all()
 
-        unassigned_count = 0
-
-        try:
-            from datetime import datetime
-
-            rows = get_sheet_records("Absence")
-
-            existing_absences = Absence.query.all()
-            existing_keys = {
-                (a.volunteer_id, a.start_date, a.end_date)
-                for a in existing_absences
-            }
-
-            volunteers_all = Volunteer.query.all()
-            lookup = {
-                (
-                    (v.first_name or "").strip().lower(),
-                    (v.last_name or "").strip().lower()
-                ): v.id
-                for v in volunteers_all
-            }
-
-            for row in rows:
-                first = str(row.get("First name", "")).strip().lower()
-                last = str(row.get("Last name", "")).strip().lower()
-                start = str(row.get("Absence start date", "")).strip()
-                end = str(row.get("Absence end date", "")).strip()
-
-                volunteer_id = lookup.get((first, last))
-                if not volunteer_id or not start or not end:
-                    continue
-
-                try:
-                    start_date = datetime.strptime(start, "%m/%d/%Y").date()
-                    end_date = datetime.strptime(end, "%m/%d/%Y").date()
-                except Exception:
-                    continue
-
-                key = (volunteer_id, start_date, end_date)
-
-                if key not in existing_keys:
-                    unassigned_count += 1
-
-        except Exception as badge_error:
-            print("BADGE ERROR:", badge_error)
-
-        return render_template(
-            "admin.html",
-            volunteers=volunteers,
-            unassigned_count=unassigned_count
-        )
+        return render_template("admin.html", volunteers=volunteers)
 
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
@@ -1326,7 +1276,7 @@ def assign_reserve_coverage():
 
 @app.route("/absence-forms")
 def absence_forms():
-    run_sync_absences()
+    
     try:
         role, deny = require_admin_or_captain()
         if deny:
@@ -2258,7 +2208,7 @@ def volunteer_hours():
             "Teardown Team",
             "Line Servers",
             "Kitchen",
-            "Drink",
+            "Drink Station",
             "Desserts",
             "Busboys/sanitation",
             "Dishwashers",
@@ -2266,7 +2216,7 @@ def volunteer_hours():
             "Greeters",
             "Baked Potato Bar",
             "Salad Bar",
-            "Vegan"
+            "Vegan Station"
         ]
 
         existing_station_names = {
