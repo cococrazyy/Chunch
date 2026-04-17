@@ -286,10 +286,10 @@ def google_login():
     session["email"] = email
 
     if user.role == "admin" or user.role == "tech":
-        render_template("admin.html")
+        return jsonify({"success": True, "role": user.role, "redirect": "/admin"})
     elif user.role == "captain":
-        render_template("captain.html")
-    
+        return jsonify({"success": True, "role": user.role, "redirect": "/captain"})
+
     return jsonify({"success": True, "role": user.role})
 
 # def get_account():
