@@ -535,9 +535,10 @@ body {
         <a href="/absence-forms">
             <button class="dashboard-btn">
                 Absence Forms
-                {% if unassigned_count > 0 %}
-                    <span class="badge">{{ unassigned_count }}</span>
-                {% endif %}
+                <!-- {% if unassigned_count > 0 %} -->
+                    <!-- <span class="badge">{{ unassigned_count }}</span> -->
+                    <span class="badge"></span>
+                <!-- {% endif %} -->
             </button>
         </a>
 
@@ -610,16 +611,16 @@ const stationClassMap = {
     "Teardown Team": "teardown",
     "Line Servers": "servers",
     "Kitchen": "kitchen",
-    "Drink Station": "drinks",
+    "Drinks": "drinks",
     "Desserts": "desserts",
-    "Busboys/sanitation": "busboys",
+    "Busboys/ sanitation": "busboys",
     "Dishwashers": "dishes",
     "Reserve": "reserve",
     "General Manager": "manager",
     "Greeters": "greeters",
     "Baked Potato Bar": "potato",
     "Salad Bar": "salad",
-    "Vegan Station": "vegan",
+    "Vegan": "vegan",
     "Absent": "absent",
     "Other": "other"
 };
@@ -1299,10 +1300,10 @@ function editVolunteer() {
     const stations = [
         // { id: 14, name: "Absent" },
         { id: 12, name: "Baked Potato Bar" },
-        { id: 7, name: "Busboys/sanitation" },
+        { id: 7, name: "Busboys/ sanitation" },
         { id: 6, name: "Desserts" },
         { id: 8, name: "Dishwashers" },
-        { id: 5, name: "Drink" },
+        { id: 5, name: "Drinks" },
         { id: 10, name: "General Manager" },
         { id: 11, name: "Greeters" },
         { id: 4, name: "Kitchen" },
