@@ -122,7 +122,7 @@ class Station(db.Model):
             "Kitchen",
             "Drinks",
             "Desserts",
-            "Busboys/sanitation",
+            "Busboys/ sanitation",
             "Dishwashers",
             "Reserve",
             "General Manager",
@@ -130,7 +130,7 @@ class Station(db.Model):
             "Baked Potato Bar",
             "Salad Bar",
             "Absent",
-            "Vegan Station",
+            "Vegan",
             "Other",
             name="station_enum"
         )
@@ -286,10 +286,10 @@ def google_login():
     session["email"] = email
 
     if user.role == "admin" or user.role == "tech":
-        return jsonify({"success": True, "role": user.role, "redirect": "/admin"})
+        render_template("admin.html")
     elif user.role == "captain":
-        return jsonify({"success": True, "role": user.role, "redirect": "/captain"})
-
+        render_template("captain.html")
+    
     return jsonify({"success": True, "role": user.role})
 
 # def get_account():
@@ -706,13 +706,12 @@ def admin_page():
             .order_by(Volunteer.last_name)\
             .all()
 
-        from datetime import datetime
-
         unassigned_count = 0
 
         try:
-            sheet = get_sheet("Absence")
-            rows = sheet.get_all_records()
+            from datetime import datetime
+
+            rows = get_sheet_records("Absence")
 
             existing_absences = Absence.query.all()
             existing_keys = {
@@ -1327,7 +1326,7 @@ def assign_reserve_coverage():
 
 @app.route("/absence-forms")
 def absence_forms():
-    
+    run_sync_absences()
     try:
         role, deny = require_admin_or_captain()
         if deny:
@@ -2259,7 +2258,7 @@ def volunteer_hours():
             "Teardown Team",
             "Line Servers",
             "Kitchen",
-            "Drink Station",
+            "Drink",
             "Desserts",
             "Busboys/sanitation",
             "Dishwashers",
@@ -2267,7 +2266,7 @@ def volunteer_hours():
             "Greeters",
             "Baked Potato Bar",
             "Salad Bar",
-            "Vegan Station"
+            "Vegan"
         ]
 
         existing_station_names = {
