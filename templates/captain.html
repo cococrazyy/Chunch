@@ -405,7 +405,8 @@ button.logout-btn:hover { background: rgb(178, 59, 59); }
     <div class="grid" id="scheduleGrid"></div>
 </div>
 
-<script>
+<script type="module">
+
 
 import {
     formatCountLabel,
@@ -463,6 +464,7 @@ function isAdmin(volunteer) {
     return (volunteer.role || "").toString().toLowerCase() === "admin";
 }
 */
+
 function formatDatePretty(dateStr) {
     if (!dateStr) return "";
     const d = new Date(dateStr);
