@@ -706,50 +706,13 @@ def admin_page():
             .order_by(Volunteer.last_name)\
             .all()
 
-        from datetime import datetime
-
         unassigned_count = 0
 
         try:
             sheet = get_sheet("Absence")
             rows = sheet.get_all_records()
 
-            existing_absences = Absence.query.all()
-
-            volunteers_all = Volunteer.query.all()
-
-            lookup = {
-                (
-                    (v.first_name or "").strip().lower(),
-                    (v.last_name or "").strip().lower()
-                ): v.id
-                for v in volunteers_all
-            }
-
-            for row in rows:
-                first = str(row.get("First name", "")).strip().lower()
-                last = str(row.get("Last name", "")).strip().lower()
-                start = str(row.get("Absence start date", "")).strip()
-                end = str(row.get("Absence end date", "")).strip()
-
-                volunteer_id = lookup.get((first, last))
-                if not volunteer_id or not start or not end:
-                    continue
-
-                try:
-                    start_date = datetime.strptime(start, "%m/%d/%Y").date()
-                    end_date = datetime.strptime(end, "%m/%d/%Y").date()
-                except Exception:
-                    continue
-
-                existing = Absence.query.filter_by(
-                    volunteer_id=volunteer_id,
-                    start_date=start_date,
-                    end_date=end_date
-                ).first()
-
-                if not existing:
-                    unassigned_count += 1
+            unassigned_count = len(rows)
 
         except Exception:
             unassigned_count = 0
