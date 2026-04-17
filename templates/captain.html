@@ -416,6 +416,7 @@ button.logout-btn:hover { background: rgb(178, 59, 59); }
 
 
 let currentVolunteer = null;
+/*
 const stationClassMap = {
     "Setup Team": "setup",
     "Teardown Team": "teardown",
@@ -434,6 +435,7 @@ const stationClassMap = {
     "Absent": "absent",
     "Other": "other"
 };
+*/
 
 // Initialize station data empty
 let currentStationData = {};
@@ -608,10 +610,9 @@ async function loadStationBoard() {
         }
 
         //renderStationBoard(stationData);
-        renderStationBoard(
-            stationData,
-            stationClassMap
-        );
+        renderStationBoard({
+            stationData
+        });
     } catch (error) {
         document.getElementById("scheduleGrid").innerHTML = `
         <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">

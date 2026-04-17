@@ -34,6 +34,25 @@ function openVolunteerPanel(volunteerJson) {
     document.getElementById("detailOverlay").classList.add("open");
 }
 
+const stationClassMap = {
+    "Setup Team": "setup",
+    "Teardown Team": "teardown",
+    "Line Servers": "servers",
+    "Kitchen": "kitchen",
+    "Drink Station": "drinks",
+    "Desserts": "desserts",
+    "Busboys/sanitation": "busboys",
+    "Dishwashers": "dishes",
+    "Reserve": "reserve",
+    "General Manager": "manager",
+    "Greeters": "greeters",
+    "Baked Potato Bar": "potato",
+    "Salad Bar": "salad",
+    "Vegan Station": "vegan",
+    "Absent": "absent",
+    "Other": "other"
+};
+
 function renderStationBoard(
     stationData,
     stationClassMap
