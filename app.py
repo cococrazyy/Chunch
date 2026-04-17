@@ -715,12 +715,9 @@ def admin_page():
             rows = sheet.get_all_records()
 
             existing_absences = Absence.query.all()
-            existing_keys = {
-                (a.volunteer_id, a.start_date, a.end_date)
-                for a in existing_absences
-            }
 
             volunteers_all = Volunteer.query.all()
+
             lookup = {
                 (
                     (v.first_name or "").strip().lower(),
@@ -745,13 +742,17 @@ def admin_page():
                 except Exception:
                     continue
 
-                key = (volunteer_id, start_date, end_date)
+                existing = Absence.query.filter_by(
+                    volunteer_id=volunteer_id,
+                    start_date=start_date,
+                    end_date=end_date
+                ).first()
 
-                if key not in existing_keys:
+                if not existing:
                     unassigned_count += 1
 
-        except Exception as badge_error:
-            print("BADGE ERROR:", badge_error)
+        except Exception:
+            unassigned_count = 0
 
         return render_template(
             "admin.html",
