@@ -711,7 +711,31 @@ def admin_page():
         try:
             sheet = get_sheet("Absence")
             rows = sheet.get_all_records()
-            unassigned_count = len(rows)
+
+            for row in rows:
+                first = str(row.get("First name", "")).strip().lower()
+                last = str(row.get("Last name", "")).strip().lower()
+                start = str(row.get("Absence start date", "")).strip()
+                end = str(row.get("Absence end date", "")).strip()
+
+                if not first or not last or not start or not end:
+                    continue
+
+                volunteer = Volunteer.query.filter(
+                    Volunteer.first_name.ilike(first),
+                    Volunteer.last_name.ilike(last)
+                ).first()
+
+                if not volunteer:
+                    continue
+
+                existing = Absence.query.filter_by(
+                    volunteer_id=volunteer.id
+                ).first()
+
+                if not existing:
+                    unassigned_count += 1
+
         except Exception:
             unassigned_count = 0
 
