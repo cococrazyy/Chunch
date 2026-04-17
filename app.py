@@ -1276,6 +1276,7 @@ def assign_reserve_coverage():
 
 @app.route("/absence-forms")
 def absence_forms():
+    run_sync_absences()
     try:
         role, deny = require_admin_or_captain()
         if deny:
