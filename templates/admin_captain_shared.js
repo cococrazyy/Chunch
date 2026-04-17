@@ -12,7 +12,7 @@ function getVolunteerDisplayName(volunteer) {
 function isCaptain(volunteer) {
     if (!volunteer || typeof volunteer === "string") return false;
 
-    const captainStatus = (volunteer.captain_status || volunteer.captainStatus || "").toLowerCase();
+    const captainStatus = (volunteer.captain_status || volunteer.captainStatus || "").toString().toLowerCase();
     const role = (volunteer.role || "").toLowerCase();
 
     return captainStatus === "captain" || role === "captain";
@@ -34,10 +34,10 @@ function openVolunteerPanel(volunteerJson) {
     document.getElementById("detailOverlay").classList.add("open");
 }
 
-function renderStationBoard({
+function renderStationBoard(
     stationData,
     stationClassMap
-}) {
+) {
     const grid = document.getElementById("scheduleGrid");
     grid.innerHTML = "";
 

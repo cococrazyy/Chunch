@@ -6,7 +6,7 @@
 <title>Captain Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://apis.google.com/js/platform.js" async defer></script>
-<script src="admin_captain_shared.js"></script>
+<script src="./admin_captain_shared.js"></script>
 <script>
 window.addEventListener("DOMContentLoaded", () => {
     loadStationBoard();
@@ -608,10 +608,10 @@ async function loadStationBoard() {
         }
 
         //renderStationBoard(stationData);
-        renderStationBoard({
+        renderStationBoard(
             stationData,
             stationClassMap
-        });
+        );
     } catch (error) {
         document.getElementById("scheduleGrid").innerHTML = `
         <div style="background:white;border-radius:16px;padding:20px;border:1px solid #e2e8f0;">
