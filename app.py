@@ -2065,7 +2065,7 @@ def add_volunteer():
         last_name=last_name,
         email=email,
         phone=phone,
-        station_id = station_id
+        station_id = station_id,
         is_floater=is_floater
     )
 
