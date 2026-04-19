@@ -2052,6 +2052,8 @@ def add_volunteer():
     email = request.form.get("email", "").strip().lower()
     phone = request.form.get("phone", "").strip()
     station_id = request.form.get("station_id", "")
+    start_hour = request.form.get("start_hour", type=int)
+    end_hour = request.form.get("end_hour", type=int)
     # default is false if get has no return, if true then becomes true
     is_floater = (request.form.get("is_floater", "no") == "yes") 
 
@@ -2068,7 +2070,22 @@ def add_volunteer():
         station_id = station_id,
         is_floater=is_floater
     )
-
+    
+    if end_hour <= start_hour:
+        return "Invalid time range", 400
+        
+    for hour in range(start_hour, end_hour+1):
+        availability = Availability(
+            volunteer_id=volunteer.id,
+            hour=hour
+        )
+        db.session.add(availability)
+    
+    assignment = Assignment(
+        volunteer_id=volunteer.id,
+        station_id=station_id,
+    )
+    db.session.add(assignment)
     db.session.add(new_volunteer)
     db.session.commit()
     grant_drive_access(new_volunteer.email)
