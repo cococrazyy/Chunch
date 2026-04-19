@@ -2070,23 +2070,22 @@ def add_volunteer():
         station_id = station_id,
         is_floater=is_floater
     )
-    
+    db.session.add(new_volunteer)
     if end_hour <= start_hour:
         return "Invalid time range", 400
         
     for hour in range(start_hour, end_hour+1):
         availability = Availability(
-            volunteer_id=volunteer.id,
+            volunteer_id=new_volunteer.id,
             hour=hour
         )
         db.session.add(availability)
     
     assignment = Assignment(
-        volunteer_id=volunteer.id,
+        volunteer_id=new_volunteer.id,
         station_id=station_id,
     )
     db.session.add(assignment)
-    db.session.add(new_volunteer)
     db.session.commit()
     grant_drive_access(new_volunteer.email)
     return redirect("/admin/master-list")
