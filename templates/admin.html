@@ -1160,7 +1160,7 @@ function openVolunteerPanel(volunteerJson) {
     document.getElementById("editBtn").style.display = "inline-block";
     document.getElementById("saveBtn").style.display = "none";
 
-    
+    // Volunteer selected
     currentVolunteer = volunteer;
 
     document.getElementById("detailName").textContent = volunteer.name || "Volunteer";
@@ -1173,9 +1173,10 @@ function openVolunteerPanel(volunteerJson) {
     document.getElementById("detailRestrictions").textContent = volunteer.capability_restrictions || "None listed";
 
     // added for station
+    // TODO: Change to be the current station, not volunteer's station
+    // TODO: Change sections involving volunteer.station to work with this
     document.getElementById("detailStation").textContent = volunteer.station || "Unassigned";
-    // document.getElementById("editStation").value = volunteer.station_id || "";
-    // const floater = volunteer.is_floater;
+
     const container = document.getElementById('status-container');
     // document.getElementById("detailFloater").innerHTML = floater ? '&#10003;' : '&#88;'; x
     const absenceCard = document.getElementById("detailAbsenceCard");
@@ -1226,6 +1227,10 @@ function closeVolunteerPanel() {
     document.getElementById("detailPanel").classList.remove("open");
     document.getElementById("detailOverlay").classList.remove("open");
 
+    // QUESTION: do the following 2 sections need to be here when the panel is hidden?
+    //          after all, they are already defined when the panel is open.
+
+    // Hide edit fields when not in edit mode
     document.getElementById("editName").style.display = "none";
     document.getElementById("editEmail").style.display = "none";
     document.getElementById("editPhone").style.display = "none";
@@ -1235,8 +1240,9 @@ function closeVolunteerPanel() {
     document.getElementById("editRole").style.display = "none";
     // added for station
     document.getElementById("editStation").style.display = "none";
+    document.getElementById("editFloater").style.display = "none";
 
-
+    // Sets the style of the information
     document.getElementById("detailName").style.display = "inline";
     document.getElementById("detailEmail").style.display = "block";
     document.getElementById("detailPhone").style.display = "block";
@@ -1246,11 +1252,12 @@ function closeVolunteerPanel() {
     document.getElementById("detailRole").style.display = "block";
     // added for station
     document.getElementById("detailStation").style.display = "block";
-
+    document.getElementById("detailFloater").style.display = "block";
 
     document.getElementById("editBtn").style.display = "inline-block";
     document.getElementById("saveBtn").style.display = "none";
 
+    // What is this for? Is it necessary or was it temporary?
     document.getElementById("editName").value = "";
     document.getElementById("editEmail").value = "";
     document.getElementById("editPhone").value = "";
@@ -1259,6 +1266,7 @@ function closeVolunteerPanel() {
     document.getElementById("editRestrictions").value = "";
     document.getElementById("editRole").value = "";
     document.getElementById("editStation").value = "";
+    document.getElementById("editFloater").value = "";
 
     currentVolunteer = null;
     
