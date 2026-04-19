@@ -1308,6 +1308,19 @@ def absence_forms():
         volunteer_sheet = get_sheet()
         volunteer_rows = volunteer_sheet.get_all_records()
 
+        # volunteer lookup
+        volunteers = Volunteer.query\
+            .filter(Volunteer.deleted_at.is_(None))\
+            .all()
+
+        volunteer_lookup = {
+            (
+                (v.first_name or "").strip().lower(),
+                (v.last_name or "").strip().lower()
+            ): v.id
+            for v in volunteers
+        }
+
         volunteer_row_by_name = {}
         for row in volunteer_rows:
             first = str(row.get("First Name", "")).strip().lower()
@@ -1387,6 +1400,35 @@ def absence_forms():
             comments = str(row.get("Additional comments", "")).strip()
             start_time = str(row.get("Absence start time", "")).strip()
             end_time = str(row.get("Absence end time", "")).strip()
+
+            #map to volunteer_id
+            volunteer_id = volunteer_lookup.get((first.lower(), last.lower()))
+            if not volunteer_id:
+                continue
+
+            #convert to date objects
+            try:
+                start_date_obj = datetime.strptime(start_date_raw, "%m/%d/%Y").date()
+                end_date_obj = datetime.strptime(end_date_raw, "%m/%d/%Y").date()
+            except Exception:
+                continue
+
+            #find matching absence 
+            absence = Absence.query.filter_by(
+                volunteer_id=volunteer_id,
+                start_date=start_date_obj,
+                end_date=end_date_obj
+            ).first()
+
+            #skip if already covered
+            if absence:
+                has_coverage = Assignment.query.filter_by(
+                    absence_id=absence.absence_id,
+                    is_covering=True
+                ).first()
+
+                if has_coverage:
+                    continue
 
             volunteer_row = volunteer_row_by_name.get((first.lower(), last.lower()), {})
             typical_shift = str(volunteer_row.get("Typical Shift", "")).strip()
