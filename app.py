@@ -1419,6 +1419,42 @@ def absence_forms():
                 start_date=start_date_obj,
                 end_date=end_date_obj
             ).first()
+            
+                        print("\n--- ABSENCE DEBUG ---")
+            print("Name:", first, last)
+            print("Raw dates:", start_date_raw, end_date_raw)
+            print("Volunteer ID:", volunteer_id)
+
+            if absence:
+                print("Matched Absence ID:", absence.absence_id)
+            else:
+                print("No matching Absence found")
+
+            coverage = None
+            if absence:
+                coverage = Assignment.query.filter_by(
+                    absence_id=absence.absence_id
+                ).all()
+
+                print("Assignments for this absence:", len(coverage))
+
+                for c in coverage:
+                    print({
+                        "assignment_id": c.assignment_id,
+                        "is_covering": c.is_covering,
+                        "absence_id": c.absence_id,
+                        "covering_for": c.covering_for_volunteer_id
+                    })
+
+            has_coverage = any(c.is_covering for c in coverage) if coverage else False
+            print("Has covering assignment:", has_coverage)
+
+            if has_coverage:
+                print(">>> SKIPPING THIS ROW <<<")
+
+            print("--- END DEBUG ---\n")
+
+            
 
             #skip if already covered
             if absence:
