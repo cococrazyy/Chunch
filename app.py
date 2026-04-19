@@ -2055,7 +2055,7 @@ def add_volunteer():
     start_hour = request.form.get("start_hour", type=int)
     end_hour = request.form.get("end_hour", type=int)
     # default is false if get has no return, if true then becomes true
-    is_floater = (request.form.get("is_floater", "no") == "yes") 
+    is_floater = request.form.get("is_floater") == "on"
 
     existing = Volunteer.query.filter_by(first_name = first_name, email=email).first()
     if existing:
@@ -2071,6 +2071,7 @@ def add_volunteer():
         is_floater=is_floater
     )
     db.session.add(new_volunteer)
+    db.session.flush()
     if end_hour <= start_hour:
         return "Invalid time range", 400
         
