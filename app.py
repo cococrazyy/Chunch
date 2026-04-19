@@ -1235,14 +1235,20 @@ def assign_reserve_coverage():
         reserve_volunteer_id = request.form.get("reserve_volunteer_id", type=int)
         cover_start_hour = request.form.get("cover_start_hour", type=int)
         cover_end_hour = request.form.get("cover_end_hour", type=int)
-
-        print("\n=== ASSIGN DEBUG ===")
-        print("absence_id:", absence_id)
-        print("absent_volunteer_id:", absent_volunteer_id)
-        print("reserve_volunteer_id:", reserve_volunteer_id)
-        print("====================\n")
-
         timestamp = request.form.get("timestamp")
+
+        # ✅ SHOW DEBUG IN BROWSER INSTEAD OF LOGS
+        return f"""
+<pre>
+ASSIGN DEBUG
+
+absence_id: {absence_id}
+absent_volunteer_id: {absent_volunteer_id}
+reserve_volunteer_id: {reserve_volunteer_id}
+</pre>
+"""
+
+        # 🔴 EVERYTHING BELOW TEMPORARILY DISABLED FOR DEBUGGING
 
         if not absence_id or not absent_volunteer_id or not reserve_volunteer_id:
             return "<pre>Missing required coverage fields.</pre>", 400
