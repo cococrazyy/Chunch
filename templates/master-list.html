@@ -14,7 +14,7 @@ body {
 }
 
 .container {
-    max-width: 1000px;
+    max-width: 1250px;
     margin: 0 auto;
 }
 
@@ -135,48 +135,63 @@ tr:hover {
         <input type="text" name="last_name" placeholder="Last Name" required>
         <input type="email" name="email" placeholder="Email" required>
         <input type="tel" name="phone" placeholder="Phone Number">
-        <select name = station_id id="addStation">
-                <option value="1">Setup Team</option>
-                <option value="2">Teardown Team</option>
-                <option value="3">Line Servers</option>
-                <option value="4">Kitchen</option>
-                <option value="5">Drinks</option>
-                <option value="6">Desserts</option>
-                <option value="7">Busboys/sanitation</option>
-                <option value="8">Dishwashers</option>
-                <option value="9">Reserve</option>
-                <option value="10">General Manager</option>
-                <option value="11">Greeters</option>
-                <option value="12">Baked Potato Bar</option>
-                <option value="13">Salad Bar</option>
-                <option value="14">Absent</option>
-                <option value="15">Other</option>
-                <option value="16">Vegan</option>
-            </select>
-         <label>Start Hour:</label>
-            <select name="start_hour" required>
-                {% for h in range(0, 24) %}
-                    <option value="{{ h }}">{{ h }}:00</option>
-                {% endfor %}
-            </select>
+        <select name="station_id">
+            <option value="">Select Station</option>
+            <option value="1">Setup Team</option>
+            <option value="2">Teardown Team</option>
+            <option value="3">Line Servers</option>
+            <option value="4">Kitchen</option>
+            <option value="5">Drinks</option>
+            <option value="6">Desserts</option>
+            <option value="7">Busboys/sanitation</option>
+            <option value="8">Dishwashers</option>
+            <option value="9">Reserve</option>
+            <option value="10">General Manager</option>
+            <option value="11">Greeters</option>
+            <option value="12">Baked Potato Bar</option>
+            <option value="13">Salad Bar</option>
+            <!-- <option value="14">Absent</option> -->
+            <!-- <option value="15">Other</option> -->
+            <option value="16">Vegan</option>
+        </select>
+        <!-- Add an if statement somewhere that sets the station to 9 if none are selected -->
+        
+        <select name="role">
+            <option value="">Select Role</option>
+            <option value="1">Volunteer</option>
+            <option value="2">Admin</option>
+            <option value="3">Captain</option>
+            <option value="4">Tech</option>
+        </select>
+
+        <label>Start Hour:</label>
+        <select name="start_hour" required>
+            {% for h in range(0, 24) %}
+                <option value="{{ h }}">{{ h }}:00</option>
+            {% endfor %}
+        </select>
         <label>End Hour:</label>
-            <select name="end_hour" required>
-                {% for h in range(1, 25) %}
-                    <option value="{{ h }}">{{ h }}:00</option>
-                {% endfor %}
-            </select>
+        <select name="end_hour" required>
+            {% for h in range(1, 25) %}
+                <option value="{{ h }}">{{ h }}:00</option>
+            {% endfor %}
+        </select>
+        
+        <!-- Floater input -->
         <label for="floater">Floater: </label>
         <input type="checkbox" name="is_floater" id="floater">
+
         <button class="primary" type="submit">Save</button>
     </form>
 </div>
 
 <div id="editForm">
     <form method="POST" action="/admin/master-list/edit-volunteer">
-        <input type="text" name="name" id="editName" placeholder="Full Name" required style="display:none;">
-        <input type="email" name="email" id="editEmail" placeholder="Email" required style="display:none;">
-        <input type="tel" name="phone" id="editPhone" placeholder="Phone Number" required style="display:none;">
-        <select name="role" id="editRole" style="display:none;">
+        <input type="text" name="first_name" id="editFirstName">
+        <input type="text" name="last_name" id="editLastName">
+        <input type="email" name="email" id="editEmail">
+        <input type="tel" name="phone" id="editPhone">
+        <select name="editRole" id="editRole" style="display:none;">
             <option value="">Select Role</option>
             <option value="volunteer">Volunteer</option>
             <option value="captain">Captain</option>
@@ -194,7 +209,7 @@ tr:hover {
             <th>Email</th>
             <th>Phone Number</th>
             <th>Role</th>
-            <th></th>
+            <th>Station</th>
         </tr>
     </thead>
 
@@ -205,6 +220,7 @@ tr:hover {
             <td>{{ v.email }}</td>
             <td>{{ v.phone }}</td>
             <td>{{ v.role }}</td>
+            <td>{{ v.station}}</td>
             <td class="actions-cell">
                 <form method="POST" action="/admin/master-list/edit-volunteer/{{ v.id }}">
                     <button class="edit" type="submit">Edit</button>
@@ -235,9 +251,11 @@ function toggleForm() {
 function editVolunteer() {
     if(!currentVolunteer) return;
     document.getElementById("first_name").style.display = "none";
-    document.getElementById("detailEmail").style.display = "none";
-    document.getElementById("detailPhone").style.display = "none";
-    document.getElementById("detailCaptain").style.display = "none";
+    document.getElementById("last_name").style.display = "none";
+    document.getElementById("email").style.display = "none";
+    document.getElementById("phone").style.display = "none";
+    document.getElementById("station").style.display = "none";
+    document.getElementById("role").style.display = "none";
 
     const nameInput = document.getElementById("editName");
     const emailInput = document.getElementById("editEmail");
@@ -246,15 +264,17 @@ function editVolunteer() {
 
     // added for station
     const stationSelect = document.getElementById("editStation");
+    const roleSelect = document.getElementById("editRole");
     
-    nameInput.style.display = "block";
-    emailInput.style.display = "block";
-    phoneInput.style.display = "block";
-    shiftInput.style.display = "block";
-    unavailabilityInput.style.display = "block";
-    restrictionsInput.style.display = "block";
-    captainInput.style.display = "block";
-    stationSelect.style.display = "block";
+    nameInput.style.display = "inline";
+    emailInput.style.display = "inline";
+    phoneInput.style.display = "inline";
+    
+    // shiftInput.style.display = "inline";
+    // unavailabilityInput.style.display = "inline";
+    // restrictionsInput.style.display = "inline";
+    // captainInput.style.display = "inline";
+    // stationSelect.style.display = "inline";
     
     nameInput.value = currentVolunteer.name || "";
     emailInput.value = currentVolunteer.email || "";
@@ -282,7 +302,7 @@ function editVolunteer() {
         { id: 13, name: "Salad Bar" },
         { id: 1, name: "Setup Team" },
         { id: 2, name: "Teardown Team" },
-        { id: 16, name: "Vegan Station" }
+        { id: 16, name: "Vegan" }
     ];
 
     stations.forEach(station => {
