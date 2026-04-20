@@ -187,10 +187,10 @@ tr:hover {
 
 <div id="editForm">
     <form method="POST" action="/admin/master-list/edit-volunteer">
-        <input type="text" name="first_name" id="editFirstName">
-        <input type="text" name="last_name" id="editLastName">
-        <input type="email" name="email" id="editEmail">
-        <input type="tel" name="phone" id="editPhone">
+        <input type="text" name="first_name" id="editFirstName" style="display:none;">
+        <input type="text" name="last_name" id="editLastName" style="display:none;">
+        <input type="email" name="email" id="editEmail" style="display:none;">
+        <input type="tel" name="phone" id="editPhone" style="display:none;">
         <select name="editRole" id="editRole" style="display:none;">
             <option value="">Select Role</option>
             <option value="volunteer">Volunteer</option>
@@ -220,7 +220,7 @@ tr:hover {
             <td>{{ v.email }}</td>
             <td>{{ v.phone }}</td>
             <td>{{ v.role }}</td>
-            <td>{{ v.station}}</td>
+            <td>{{ v.station }}</td>
             <td class="actions-cell">
                 <button class="edit" type="button" onclick="enableEdit({{ v.id }})">Edit</button>
             </td>
@@ -237,29 +237,21 @@ tr:hover {
             <td colspan="6">
                 <form method="POST" action="/admin/master-list/edit-volunteer/{{ v.id }}" class="inline-edit-form">
                     <div class="form-row">
-                        <input type="text" name="first_name" placeholder="First Name"
-                               value="{{ v.first_name }}" required>
+                        <input type="text" name="first_name" value="{{ v.first_name }}">
 
-                        <input type="text" name="last_name" placeholder="Last Name"
-                               value="{{ v.last_name }}" required>
+                        <input type="text" name="last_name" value="{{ v.last_name }}">
 
-                        <input type="email" name="email" placeholder="Email"
-                               value="{{ v.email }}" required>
+                        <input type="email" name="email" value="{{ v.email }}">
 
-                        <input type="tel" name="phone" placeholder="Phone Number"
-                               value="{{ v.phone or '' }}">
-                    </div>
-
-                    <div class="form-row">
-                        <input type="text" name="unavailability" placeholder="Unavailability"
-                               value="{{ v.unavailability or '' }}">
+                        <input type="tel" name="phone" placeholder="Phone Number" value="{{ v.phone }}"> 
+                        <br>
+                        <input type="text" name="unavailability" placeholder="Unavailability" value="{{ v.unavailability }}">
 
                         <input type="text" name="capability_restrictions" placeholder="Capability Restrictions"
-                               value="{{ v.capability_restrictions or '' }}">
-                    </div>
-
-                    <div class="form-row">
-                        <select name="station_id" required>
+                            value="{{ v.capability_restrictions }}">
+                        <br>
+                        <select name="station_id">
+                            <option value="">Select Station</option>
                             <option value="1" {% if v.station_id == 1 %}selected{% endif %}>Setup Team</option>
                             <option value="2" {% if v.station_id == 2 %}selected{% endif %}>Teardown Team</option>
                             <option value="3" {% if v.station_id == 3 %}selected{% endif %}>Line Servers</option>
@@ -280,17 +272,17 @@ tr:hover {
 
                         <label for="start_hour_{{ v.id }}">Start Hour:</label>
                         <input type="number" name="start_hour" id="start_hour_{{ v.id }}" min="0" max="23"
-                            value="{{ v.start_hour if v.start_hour is not none else '' }}" required>
+                            value="{{ v.start_hour if v.start_hour is not none else '' }}">
 
                         <label for="end_hour_{{ v.id }}">End Hour:</label>
                         <input type="number" name="end_hour" id="end_hour_{{ v.id }}" min="1" max="24"
-                            value="{{ v.end_hour if v.end_hour is not none else '' }}" required>
+                            value="{{ v.end_hour if v.end_hour is not none else '' }}">
 
                         <!-- Check again, what is this for? Doesn't match the floater in other locations? -->
                         <span class="checkbox-wrap">
-                            <label for="floater_{{ v.id }}">Floater:</label>
-                            <input type="checkbox" name="is_floater" id="floater_{{ v.id }}"
-                                {% if v.is_floater %}checked{% endif %}>
+                            <label for="editFloater">Floater:</label>
+                            <input type="checkbox" name="floater" id="editFloater" 
+                                {% if v.is_floater %} checked {% endif %}>
                         </span>
                     </div>
 
