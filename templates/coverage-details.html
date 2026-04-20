@@ -417,33 +417,22 @@
     }
 
     function submitCoverageDirect() {
-        document.getElementById("moreCoveragePopup").style.display = "none";
-    }
-
-    function goToEmailPopup() {
         if (!activeAssignForm) return;
-
         let startHour = modalDefaultStart;
         let endHour = modalDefaultEnd;
-
         const fullShift = document.getElementById("coverFullShiftCheckbox").checked;
-
         if (!fullShift) {
             startHour = parseInt(document.getElementById("coverStartHour").value, 10);
             endHour = parseInt(document.getElementById("coverEndHour").value, 10);
-
             if (startHour > endHour) {
                 alert("Start hour cannot be after end hour.");
                 return;
             }
         }
-
         selectedCoverageStart = startHour;
         selectedCoverageEnd = endHour;
-
         activeAssignForm.querySelector(".cover-start-hour").value = startHour;
         activeAssignForm.querySelector(".cover-end-hour").value = endHour;
-
         closeCoverageHourModal();
         openMoreCoveragePopup();
     }
