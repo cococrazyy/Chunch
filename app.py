@@ -2457,7 +2457,7 @@ def edit_master_volunteer(volunteer_id):
     last_name = request.form.get("last_name", "").strip()
     email = request.form.get("email", "").strip().lower()
     phone = request.form.get("phone", "").strip()
-    is_floater = request.form.get("is_floater", "no") == "yes"
+    is_floater = request.form.get("is_floater", False) == True
 
     if not first_name or not last_name or not email:
         flash("All fields are required.")

@@ -1195,12 +1195,11 @@ function openVolunteerPanel(volunteerJson) {
     // TODO: Change to be the current station, not volunteer's station
     // TODO: Change sections involving volunteer.station to work with this
     document.getElementById("detailStation").textContent = volunteer.station || "Unassigned";
-    // document.getElementById("detailFloater").value = volunteer.is_floater.value;
-    document.getElementById("detailFloater").checked = !!volunteer.is_floater;
+    document.getElementById("detailFloater").value = volunteer.is_floater.value;
+    
+    // document.getElementById("detailFloater").checked = !!volunteer.is_floater;
     document.getElementById("detailFloater").disabled = true;
 
-    const container = document.getElementById('status-container');
-    // document.getElementById("detailFloater").innerHTML = floater ? '&#10003;' : '&#88;'; x
     const absenceCard = document.getElementById("detailAbsenceCard");
     const absenceText = document.getElementById("detailAbsence");
     const absenceMessageCard = document.getElementById("detailAbsenceMessageCard");
@@ -1351,7 +1350,7 @@ function editVolunteer() {
         { id: 11, name: "Greeters" },
         { id: 4, name: "Kitchen" },
         { id: 3, name: "Line Servers" },
-        // { id: 15, name: "Other" },
+        { id: 15, name: "Other" },
         { id: 9, name: "Reserve" },
         { id: 13, name: "Salad Bar" },
         { id: 1, name: "Setup Team" },
