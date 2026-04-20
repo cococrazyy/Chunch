@@ -425,15 +425,15 @@ def volunteer_hours_captain():
             "Teardown Team",
             "Line Servers",
             "Kitchen",
-            "Drink Station",
+            "Drink",
             "Desserts",
-            "Busboys/sanitation",
+            "Busboys/ sanitation",
             "Dishwashers",
             "General Manager",
             "Greeters",
             "Baked Potato Bar",
             "Salad Bar",
-            "Vegan Station"
+            "Vegan"
         ]
 
         existing_station_names = {
@@ -2374,7 +2374,7 @@ def volunteer_hours():
             "Kitchen",
             "Drink",
             "Desserts",
-            "Busboys/sanitation",
+            "Busboys/ sanitation",
             "Dishwashers",
             "General Manager",
             "Greeters",
