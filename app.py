@@ -610,7 +610,7 @@ def volunteer_hours_captain():
         #         assignment.station_id, set()
         #     ).add(volunteer_id)
 
-        station_to_volunteer_ids = build_station_state(volunteers, stations)
+        station_to_volunteer_ids, debug = build_station_state(volunteers, stations)
 
         station_data = {}
         for station in stations:
@@ -629,7 +629,8 @@ def volunteer_hours_captain():
 
         return render_template(
             "volunteer-hours-cap.html",
-            station_data=station_data
+            station_data=station_data,
+            debug=debug
         )
 
     except Exception as e:
@@ -640,6 +641,8 @@ from datetime import date
 
 def build_station_state(volunteers, stations):
     today = date.today()
+
+    debug_lines = []
 
     station_to_volunteer_ids = {
         station.station_id: set()
@@ -665,24 +668,34 @@ def build_station_state(volunteers, stations):
 
     for volunteer_id, assignment in latest_assignment_by_volunteer.items():
 
-        # covering
+        debug_lines.append(f"\n--- VOLUNTEER {volunteer_id} ---")
+        debug_lines.append(f"TODAY: {today}")
+        debug_lines.append(f"is_covering: {assignment.is_covering}")
+        debug_lines.append(f"assignment.station_id: {assignment.station_id}")
+        debug_lines.append(f"absence_id: {assignment.absence_id}")
+
+        # coverage
         if assignment.is_covering and assignment.absence_id:
             absence = Absence.query.get(assignment.absence_id)
 
             if absence:
+                debug_lines.append(f"absence.start: {absence.start_date}")
+                debug_lines.append(f"absence.end: {absence.end_date}")
+                debug_lines.append(f"today < start: {today < absence.start_date}")
+
                 if today < absence.start_date:
-                    #  reserve to stay in Reserve before absence
+                    debug_lines.append("→ FORCE RESERVE (before start)")
                     if reserve_id:
                         station_to_volunteer_ids[reserve_id].add(volunteer_id)
                     continue
 
                 if today > absence.end_date:
-                    # after absence back to Reserve
+                    debug_lines.append("→ AFTER absence → reserve")
                     if reserve_id:
                         station_to_volunteer_ids[reserve_id].add(volunteer_id)
                     continue
 
-                # DURING absence reserve takes over station
+                debug_lines.append("→ DURING absence → takes station")
                 if assignment.station_id:
                     station_to_volunteer_ids[assignment.station_id].add(volunteer_id)
                 continue
@@ -694,16 +707,21 @@ def build_station_state(volunteers, stations):
             Absence.end_date >= today
         ).first()
 
+        debug_lines.append(f"active_absence: {bool(active_absence)}")
+
         if active_absence:
+            debug_lines.append("→ MARKED ABSENT")
             if absent_id:
                 station_to_volunteer_ids[absent_id].add(volunteer_id)
             continue
 
         # normal
+        debug_lines.append("→ NORMAL STATION")
+
         if assignment.station_id:
             station_to_volunteer_ids[assignment.station_id].add(volunteer_id)
 
-    return station_to_volunteer_ids
+    return station_to_volunteer_ids, "\n".join(debug_lines)
 
 def run_sync_absences():
     sheet = get_sheet("Absence")
@@ -2559,7 +2577,7 @@ def volunteer_hours():
         #         assignment.station_id, set()
         #     ).add(volunteer_id)
 
-        station_to_volunteer_ids = build_station_state(volunteers, stations)
+        station_to_volunteer_ids, debug = build_station_state(volunteers, stations)
 
         station_data = {}
         for station in stations:
@@ -2576,11 +2594,11 @@ def volunteer_hours():
 
             station_data[station_name] = volunteers_for_station
 
-        return render_template(
-            "volunteer-hours.html",
-            station_data=station_data
-        )
-
+            return render_template(
+                "volunteer-hours.html",
+                station_data=station_data,
+                debug=debug
+            )
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
