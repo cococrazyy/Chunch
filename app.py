@@ -665,24 +665,24 @@ def build_station_state(volunteers, stations):
 
     for volunteer_id, assignment in latest_assignment_by_volunteer.items():
 
-        # coverage
+        # covering
         if assignment.is_covering and assignment.absence_id:
             absence = Absence.query.get(assignment.absence_id)
 
             if absence:
                 if today < absence.start_date:
-                    # before absence reserve stays reserve
+                    #  reserve to stay in Reserve before absence
                     if reserve_id:
                         station_to_volunteer_ids[reserve_id].add(volunteer_id)
                     continue
 
                 if today > absence.end_date:
-                    # after absence go back to reserve
+                    # after absence back to Reserve
                     if reserve_id:
                         station_to_volunteer_ids[reserve_id].add(volunteer_id)
                     continue
 
-                # during absence take over station
+                # DURING absence reserve takes over station
                 if assignment.station_id:
                     station_to_volunteer_ids[assignment.station_id].add(volunteer_id)
                 continue
@@ -1308,7 +1308,6 @@ def assign_reserve_coverage():
         cover_end_hour = request.form.get("cover_end_hour", type=int)
         timestamp = request.form.get("timestamp")
 
-        # validation
         if not absence_id or not absent_volunteer_id or not reserve_volunteer_id:
             return "<pre>Missing required coverage fields.</pre>", 400
 
@@ -1323,10 +1322,19 @@ def assign_reserve_coverage():
         if not absent_assignment:
             return "<pre>Absent assignment not found.</pre>", 404
 
-        # create coverage assignment
+        from datetime import date
+        today = date.today()
+
+        # dont assign reserve to station early
+        if absence.start_date <= today:
+            reserve_station_id = absent_assignment.station_id
+        else:
+            reserve_station = Station.query.filter_by(station_name="Reserve").first()
+            reserve_station_id = reserve_station.station_id if reserve_station else None
+
         reserve_assignment = Assignment(
             volunteer_id=reserve_volunteer_id,
-            station_id=absent_assignment.station_id,
+            station_id=reserve_station_id,
             schedule_id=None,
             is_absent=False,
             is_covering=True,
@@ -1339,26 +1347,20 @@ def assign_reserve_coverage():
         db.session.add(reserve_assignment)
 
         # only mark absent if absence has started
-        from datetime import date
-        today = date.today()
-
         if absence.start_date <= today:
             absent_assignment.is_absent = True
 
         db.session.commit()
 
-        # remove from Google Sheet
+        # remove from sheet
         try:
             sheet = get_sheet("Absence")
             rows = sheet.get_all_records()
 
             for i, row in enumerate(rows, start=2):
-                row_timestamp = str(row.get("Timestamp", "")).strip()
-
-                if row_timestamp == str(timestamp).strip():
+                if str(row.get("Timestamp", "")).strip() == str(timestamp).strip():
                     sheet.delete_rows(i)
                     break
-
         except Exception:
             pass
 
