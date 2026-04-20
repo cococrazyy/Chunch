@@ -2071,6 +2071,15 @@ def debug_hourly_data():
 
 @app.route("/admin/inbox")
 def inbox():
+    if "user_id" not in session:
+        return redirect("/")
+
+    try:
+        sync_applicants()
+    except Exception as e:
+        db.session.rollback()
+        print(f"Applicant sync failed: {e}")
+    
     applicants = Applicant.query.filter(Applicant.status == 'pending').all()
     rejected = Applicant.query.filter(Applicant.status == 'rejected').all()
 
@@ -2881,7 +2890,7 @@ def applicant_detail(applicant_id):
     return render_template("applicant-detail.html", applicant=applicant)
 
 # Need to make this into a button in the inbox
-@app.route("/admin/sync-applicants", methods=["GET", "POST"])
+#@app.route("/admin/sync-applicants", methods=["GET", "POST"])
 def sync_applicants():
     if "user_id" not in session:
         return redirect("/")
