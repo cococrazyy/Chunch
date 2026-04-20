@@ -50,11 +50,6 @@
             margin-bottom: 20px;
         }
 
-        .card h2 {
-            margin-top: 0;
-            margin-bottom: 12px;
-        }
-
         .two-column {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -110,433 +105,103 @@
         <p><strong>Name:</strong> {{ absent_volunteer.name }}</p>
         <p><strong>Email:</strong> {{ absent_volunteer.email }}</p>
         <p><strong>Station:</strong> {{ absent_volunteer.station_name or "None listed" }}</p>
-        <p><strong>Shift Being Covered:</strong> {{ absent_volunteer.typical_shift or "None listed" }}</p>
-        <p><strong>Coverage Start Date:</strong> {{ absent_volunteer.start_date }}</p>
-        <p><strong>Coverage End Date:</strong> {{ absent_volunteer.end_date }}</p>
-        <p><strong>Absence Type:</strong>
-            {% if absent_volunteer.is_partial %}
-                Partial Shift
-            {% else %}
-                Full Shift
-            {% endif %}
-        </p>
-        <p><strong>Notes:</strong> {{ absent_volunteer.notes or "None listed" }}</p>
+        <p><strong>Shift:</strong> {{ absent_volunteer.typical_shift or "None listed" }}</p>
     </div>
 
     <div class="two-column">
-        <div class="card">
-            <h2>Fully Available Reserves</h2>
 
-            {% if fully_available_reserves %}
-                {% for r in fully_available_reserves %}
-                    <div class="reserve-card">
-                        <div class="reserve-name">{{ r.name }}</div>
-                        <div><strong>Email:</strong> {{ r.email or "None listed" }}</div>
-                        <div><strong>Phone:</strong> {{ r.phone or "None listed" }}</div>
-                        <div><strong>Unavailability:</strong> {{ r.unavailability or "None listed" }}</div>
+        {% for r in fully_available_reserves %}
+        <div class="reserve-card">
+            <div class="reserve-name">{{ r.name }}</div>
 
-                        {% if r.special_notes %}
-                            <div class="warning">⚠ {{ r.special_notes }}</div>
-                        {% endif %}
+            <form method="POST" action="/admin/coverage/assign" class="assign-form">
+                <input type="hidden" name="absence_id" value="{{ absent_volunteer.absence_id }}">
+                <input type="hidden" name="absent_volunteer_id" value="{{ absent_volunteer.id }}">
+                <input type="hidden" name="reserve_volunteer_id" value="{{ r.id }}">
+                <input type="hidden" name="cover_start_hour" class="cover-start-hour">
+                <input type="hidden" name="cover_end_hour" class="cover-end-hour">
 
-                        <form method="POST" action="/admin/coverage/assign" class="assign-form" style="margin-top: 10px;">
-                            <input type="hidden" name="absence_id" value="{{ absent_volunteer.absence_id }}">
-                            <input type="hidden" name="absent_volunteer_id" value="{{ absent_volunteer.id }}">
-                            <input type="hidden" name="reserve_volunteer_id" value="{{ r.id }}">
-                            <input type="hidden" name="send_email" value="no">
-                            <input type="hidden" name="timestamp" value="{{ timestamp }}">
-                            <input type="hidden" name="cover_start_hour" class="cover-start-hour">
-                            <input type="hidden" name="cover_end_hour" class="cover-end-hour">
-                            <input type="hidden" class="reserve-email" value="{{ r.email or '' }}">
-
-                            <button
-                                type="button"
-                                onclick="openCoverageHourModal(
-                                    this.form,
-                                    '{{ r.name|escape }}',
-                                    '{{ absent_volunteer.station_name|default('Assigned Station', true)|escape }}',
-                                    '{{ absent_volunteer.typical_shift|default('', true)|escape }}'
-                                )">
-                                Assign This Reserve
-                            </button>
-                        </form>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p class="empty-state">No fully available reserves.</p>
-            {% endif %}
+                <button type="button"
+                    onclick="openCoverageHourModal(this.form, '{{ r.name }}', '{{ absent_volunteer.station_name }}', '{{ absent_volunteer.typical_shift }}')">
+                    Assign
+                </button>
+            </form>
         </div>
+        {% endfor %}
 
-        <div class="card">
-            <h2>Partially Available Reserves</h2>
-
-            {% if partial_overlap_reserves %}
-                {% for r in partial_overlap_reserves %}
-                    <div class="reserve-card">
-                        <div class="reserve-name">{{ r.name }}</div>
-                        <div><strong>Email:</strong> {{ r.email or "None listed" }}</div>
-                        <div><strong>Phone:</strong> {{ r.phone or "None listed" }}</div>
-                        <div><strong>Overlapping Time:</strong> {{ r.overlapping_label or "None listed" }}</div>
-
-                        {% if r.special_notes %}
-                            <div class="warning">⚠ {{ r.special_notes }}</div>
-                        {% endif %}
-
-                        <form method="POST" action="/admin/coverage/assign" class="assign-form" style="margin-top: 10px;">
-                            <input type="hidden" name="absence_id" value="{{ absent_volunteer.absence_id }}">
-                            <input type="hidden" name="absent_volunteer_id" value="{{ absent_volunteer.id }}">
-                            <input type="hidden" name="reserve_volunteer_id" value="{{ r.id }}">
-                            <input type="hidden" name="send_email" value="no">
-                            <input type="hidden" name="timestamp" value="{{ timestamp }}">
-                            <input type="hidden" name="cover_start_hour" class="cover-start-hour">
-                            <input type="hidden" name="cover_end_hour" class="cover-end-hour">
-                            <input type="hidden" class="reserve-email" value="{{ r.email or '' }}">
-
-                            <button
-                                type="button"
-                                onclick="openCoverageHourModal(
-                                    this.form,
-                                    '{{ r.name|escape }}',
-                                    '{{ absent_volunteer.station_name|default('Assigned Station', true)|escape }}',
-                                    '{{ absent_volunteer.typical_shift|default('', true)|escape }}'
-                                )">
-                                Assign This Reserve
-                            </button>
-                        </form>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p class="empty-state">No partial options.</p>
-            {% endif %}
-        </div>
     </div>
-
 </div>
 
 <div id="coverageHourOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:999;"></div>
 
-<div id="coverageHourModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width:min(92vw, 460px); background:white; border-radius:18px; padding:24px; z-index:1000; box-shadow:0 20px 40px rgba(0,0,0,0.2);">
-    <h3 style="margin-bottom:10px; color:#0f172a;">Set Coverage Hours</h3>
-    <p id="coverageHourSummary" style="margin-bottom:8px; color:#475569;"></p>
-    <p id="coverageHourFullShiftLabel" style="margin-bottom:16px; font-weight:600; color:#0f172a;"></p>
-    <label style="display:flex; align-items:center; gap:8px; margin-bottom:14px;">
-        <input type="checkbox" id="coverFullShiftCheckbox" checked>
-        <span id="coverFullShiftText">Cover full shift</span>
+<div id="coverageHourModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width:420px; background:white; border-radius:12px; padding:20px; z-index:1000;">
+    <h3>Set Coverage Hours</h3>
+
+    <label>
+        <input type="checkbox" id="coverFullShiftCheckbox" checked onchange="toggleCustomHours()"> Full Shift
     </label>
-    <div id="customHourFields" style="display:none;">
-        <div style="margin-bottom:12px;">
-            <label for="coverStartHour" style="display:block; margin-bottom:6px; font-weight:600; color:#0f172a;">Start hour</label>
-            <select id="coverStartHour" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:10px;"></select>
-        </div>
 
-        <div style="margin-bottom:16px;">
-            <label for="coverEndHour" style="display:block; margin-bottom:6px; font-weight:600; color:#0f172a;">End hour</label>
-            <select id="coverEndHour" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:10px;"></select>
-        </div>
+    <div id="customHours" style="display:none;">
+        <label>Start</label>
+        <select id="coverStartHour"></select>
+
+        <label>End</label>
+        <select id="coverEndHour"></select>
     </div>
 
-    <div style="display:flex; justify-content:flex-end; gap:10px;">
-        <button type="button" onclick="closeCoverageHourModal()" style="padding:10px 14px; border:none; border-radius:10px; background:#e2e8f0; color:#0f172a; font-weight:700; cursor:pointer;">
-            Cancel
-        </button>
-        <button type="button" onclick="goToEmailPopup()" style="padding:10px 14px; border:none; border-radius:10px; background:#2563eb; color:white; font-weight:700; cursor:pointer;">
-            Continue
-        </button>
-    </div>
-</div>
-
-<div id="assignPopup" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:1001;">
-    <div style="background:white; width:90%; max-width:650px; margin:60px auto; padding:24px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.2);">
-        <h3 style="margin-top:0;">Email Preview</h3>
-
-        <div style="margin-bottom:14px;">
-            <strong>Subject:</strong>
-            <div id="assignEmailSubject" style="margin-top:6px; padding:10px; border:1px solid #ccc; border-radius:8px; background:#f8f8f8;"></div>
-        </div>
-
-        <div style="margin-bottom:20px;">
-            <strong>Message:</strong>
-            <div id="assignEmailBody" style="margin-top:6px; padding:12px; border:1px solid #ccc; border-radius:8px; background:#f8f8f8; white-space:pre-wrap;"></div>
-        </div>
-
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <button type="button" onclick="submitAssignWithEmail('yes')">Assign and Send Email</button>
-            <button type="button" onclick="submitAssignWithEmail('no')">Assign Without Email</button>
-            <button type="button" onclick="closeAssignPopup()">Cancel</button>
-        </div>
-    </div>
-</div>
-
-<div id="moreCoveragePopup" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:1002;">
-    <div style="background:white; width:90%; max-width:560px; margin:80px auto; padding:24px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.2);">
-        <h3 style="margin-top:0; margin-bottom:12px;">Coverage Decision</h3>
-        <div id="moreCoverageMessage" style="margin-bottom:20px; color:#334155; line-height:1.5;"></div>
-
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <button type="button" onclick="chooseMoreCoverage('add')">Add Another Reserve</button>
-            <button type="button" onclick="chooseMoreCoverage('keep')">Keep This Coverage</button>
-            <button type="button" onclick="closeMoreCoveragePopup()">Cancel</button>
-        </div>
+    <div style="margin-top:16px;">
+        <button onclick="submitCoverage()">Assign</button>
+        <button onclick="closeCoverageHourModal()">Cancel</button>
     </div>
 </div>
 
 <script>
-    let activeAssignForm = null;
-    let activeReserveName = "";
-    let activeStationName = "";
-    let parsedShiftHours = [];
-    let selectedCoverageStart = null;
-    let selectedCoverageEnd = null;
-    let pendingAddMoreChoice = false;
-    let modalDefaultStart = null;
-    let modalDefaultEnd = null;
+let activeForm = null;
 
-    function formatHour(hour) {
-        if (hour === 0) return "12AM";
-        if (hour < 12) return `${hour}AM`;
-        if (hour === 12) return "12PM";
-        return `${hour - 12}PM`;
+function openCoverageHourModal(form) {
+    activeForm = form;
+
+    const start = document.getElementById("coverStartHour");
+    const end = document.getElementById("coverEndHour");
+
+    start.innerHTML = "";
+    end.innerHTML = "";
+
+    for (let i = 5; i <= 16; i++) {
+        start.innerHTML += `<option value="${i}">${i}</option>`;
+        end.innerHTML += `<option value="${i}">${i}</option>`;
     }
 
-    function formatRange(start, end) {
-        return `${formatHour(start)} - ${formatHour(end)}`;
+    document.getElementById("coverageHourOverlay").style.display = "block";
+    document.getElementById("coverageHourModal").style.display = "block";
+}
+
+function closeCoverageHourModal() {
+    document.getElementById("coverageHourOverlay").style.display = "none";
+    document.getElementById("coverageHourModal").style.display = "none";
+}
+
+function toggleCustomHours() {
+    const full = document.getElementById("coverFullShiftCheckbox").checked;
+    document.getElementById("customHours").style.display = full ? "none" : "block";
+}
+
+function submitCoverage() {
+    if (!activeForm) return;
+
+    let start = 5;
+    let end = 16;
+
+    if (!document.getElementById("coverFullShiftCheckbox").checked) {
+        start = document.getElementById("coverStartHour").value;
+        end = document.getElementById("coverEndHour").value;
     }
 
-    function parseTimeToHour(timeStr) {
-        timeStr = String(timeStr).trim().toUpperCase().replace(/\s+/g, "");
+    activeForm.querySelector(".cover-start-hour").value = start;
+    activeForm.querySelector(".cover-end-hour").value = end;
 
-        if (!timeStr) return null;
-
-        if (timeStr.endsWith("AM")) {
-            let raw = timeStr.slice(0, -2);
-            if (raw.includes(":")) raw = raw.split(":")[0];
-            if (!/^\d+$/.test(raw)) return null;
-            const hour = parseInt(raw, 10);
-            return hour === 12 ? 0 : hour;
-        }
-
-        if (timeStr.endsWith("PM")) {
-            let raw = timeStr.slice(0, -2);
-            if (raw.includes(":")) raw = raw.split(":")[0];
-            if (!/^\d+$/.test(raw)) return null;
-            const hour = parseInt(raw, 10);
-            return hour === 12 ? 12 : hour + 12;
-        }
-
-        return null;
-    }
-
-    function parseHourList(text) {
-        text = String(text || "").trim();
-        if (!text) return [];
-
-        const normalized = text.replace(/–|—/g, "-");
-        const parts = normalized.split(",").map(p => p.trim()).filter(Boolean);
-
-        const hours = new Set();
-
-        for (const part of parts) {
-            if (part.includes("-")) {
-                const [startStr, endStr] = part.split("-", 2);
-                const startHour = parseTimeToHour(startStr);
-                const endHour = parseTimeToHour(endStr);
-
-                if (startHour === null || endHour === null) continue;
-                if (startHour > endHour) continue;
-
-                for (let h = startHour; h <= endHour; h++) {
-                    hours.add(h);
-                }
-            } else {
-                const single = parseTimeToHour(part);
-                if (single !== null) hours.add(single);
-            }
-        }
-
-        return Array.from(hours).sort((a, b) => a - b);
-    }
-
-    function fillHourSelect(select, start, end) {
-        select.innerHTML = "";
-        for (let h = start; h <= end; h++) {
-            const option = document.createElement("option");
-            option.value = h;
-            option.textContent = formatHour(h);
-            select.appendChild(option);
-        }
-    }
-
-    function openCoverageHourModal(form, reserveName, stationName, shiftText) {
-        activeAssignForm = form;
-        activeReserveName = reserveName;
-        activeStationName = stationName;
-        pendingAddMoreChoice = false;
-
-        parsedShiftHours = parseHourList(shiftText);
-
-        if (!parsedShiftHours.length) {
-            alert("Could not determine shift hours.");
-            return;
-        }
-
-        const shiftStart = Math.min(...parsedShiftHours);
-        const shiftEnd = Math.max(...parsedShiftHours);
-
-        const coveredStart = {{ absent_volunteer.covered_start|tojson }};
-        const coveredEnd = {{ absent_volunteer.covered_end|tojson }};
-
-        let defaultStart = shiftStart;
-        let defaultEnd = shiftEnd;
-
-        if (coveredStart !== null && coveredEnd !== null) {
-            if (coveredStart <= shiftStart && coveredEnd < shiftEnd) {
-                defaultStart = coveredEnd;
-                defaultEnd = shiftEnd;
-            } else if (coveredStart > shiftStart && coveredEnd >= shiftEnd) {
-                defaultStart = shiftStart;
-                defaultEnd = coveredStart;
-            }
-        }
-
-        modalDefaultStart = defaultStart;
-        modalDefaultEnd = defaultEnd;
-
-        document.getElementById("coverageHourSummary").textContent =
-            `Set the coverage hours for ${reserveName} at ${stationName}.`;
-
-        document.getElementById("coverageHourFullShiftLabel").textContent =
-            `Usual shift: ${formatRange(shiftStart, shiftEnd)}`;
-
-        document.getElementById("coverFullShiftText").textContent =
-            `Cover full remaining shift (${formatRange(defaultStart, defaultEnd)})`;
-
-        const startSelect = document.getElementById("coverStartHour");
-        const endSelect = document.getElementById("coverEndHour");
-
-        fillHourSelect(startSelect, 5, 16);
-        fillHourSelect(endSelect, 5, 16);
-
-        startSelect.value = defaultStart;
-        endSelect.value = defaultEnd;
-
-        document.getElementById("coverFullShiftCheckbox").checked = true;
-        document.getElementById("customHourFields").style.display = "none";
-
-        document.getElementById("coverageHourOverlay").style.display = "block";
-        document.getElementById("coverageHourModal").style.display = "block";
-    }
-
-    function closeCoverageHourModal() {
-        document.getElementById("coverageHourOverlay").style.display = "none";
-        document.getElementById("coverageHourModal").style.display = "none";
-    }
-
-    function openAssignPopup() {
-        const subject = `Coverage Assignment for ${activeStationName}`;
-        const body =
-`Hi ${activeReserveName},
-
-You have been assigned to help cover ${activeStationName} at Chunch.
-
-Please review the training materials and station-specific videos before your shift.
-
-These can be found at this link: https://drive.google.com/drive/folders/1IwmKyFWKEvAB86WKg9I7C9N1BBvrSzD-
-
-Thank you.
-
-- Bryan & Cheryl`;
-
-        document.getElementById("assignEmailSubject").innerText = subject;
-        document.getElementById("assignEmailBody").innerText = body;
-        document.getElementById("assignPopup").style.display = "block";
-    }
-
-    function closeAssignPopup() {
-        document.getElementById("assignPopup").style.display = "none";
-    }
-
-    function openMoreCoveragePopup() {
-        const message = `Selected coverage: ${formatRange(selectedCoverageStart, selectedCoverageEnd)}. Would you like to add another reserve or keep this coverage?`;
-        document.getElementById("moreCoverageMessage").innerText = message;
-        document.getElementById("moreCoveragePopup").style.display = "block";
-    }
-
-    function closeMoreCoveragePopup() {
-        document.getElementById("moreCoveragePopup").style.display = "none";
-    }
-
-    function goToEmailPopup() {
-        if (!activeAssignForm) return;
-
-        let startHour = modalDefaultStart;
-        let endHour = modalDefaultEnd;
-
-        const fullShift = document.getElementById("coverFullShiftCheckbox").checked;
-
-        if (!fullShift) {
-            startHour = parseInt(document.getElementById("coverStartHour").value, 10);
-            endHour = parseInt(document.getElementById("coverEndHour").value, 10);
-
-            if (startHour > endHour) {
-                alert("Start hour cannot be after end hour.");
-                return;
-            }
-        }
-
-        selectedCoverageStart = startHour;
-        selectedCoverageEnd = endHour;
-
-        activeAssignForm.querySelector(".cover-start-hour").value = startHour;
-        activeAssignForm.querySelector(".cover-end-hour").value = endHour;
-
-        closeCoverageHourModal();
-        openMoreCoveragePopup();
-    }
-
-    function chooseMoreCoverage(choice) {
-        pendingAddMoreChoice = (choice === "add");
-        closeMoreCoveragePopup();
-        openAssignPopup();
-    }
-
-    function submitAssignWithEmail(sendEmail) {
-        if (!activeAssignForm) {
-            alert("No reserve assignment selected.");
-            return;
-        }
-
-        activeAssignForm.querySelector('input[name="send_email"]').value = sendEmail;
-
-        const absentVolunteerId = {{ absent_volunteer.id|tojson }};
-
-        if (pendingAddMoreChoice) {
-            activeAssignForm.action =
-                `/admin/coverage/assign?add_more=1&volunteer_id=${encodeURIComponent(absentVolunteerId)}`;
-        } else {
-            activeAssignForm.action = "/admin/coverage/assign";
-        }
-
-        if (sendEmail === "yes") {
-            const reserveEmail =
-                activeAssignForm.querySelector(".reserve-email")?.value || "";
-
-            const subject = document.getElementById("assignEmailSubject").innerText;
-            const body = document.getElementById("assignEmailBody").innerText;
-
-            if (reserveEmail) {
-                const mailtoLink =
-                    `mailto:${reserveEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-                window.open(mailtoLink, "_blank");
-            }
-        }
-
-        closeAssignPopup();
-        activeAssignForm.submit();
-    }
-
-    document.getElementById("coverFullShiftCheckbox").addEventListener("change", function() {
-        document.getElementById("customHourFields").style.display = this.checked ? "none" : "block";
-    });
+    activeForm.submit();
+}
 </script>
 
 </body>

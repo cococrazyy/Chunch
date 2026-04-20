@@ -1054,12 +1054,33 @@ function renderStationBoard(stationData) {
                         const captainBadge = isCaptain(volunteer) ? " (C)" : "";
                         const adminBadge = isAdmin(volunteer) ? " (A)" : "";
                         return `
-                            <button class="volunteer-pill" type="button" onclick='openVolunteerPanel(${JSON.stringify(JSON.stringify({...volunteer, 
-                                // added for station
-                                station: stationName,
-                                }))})'>
-                                ${displayName}${captainBadge}${adminBadge}${displayTime}
-                            </button>
+                            <div class="volunteer-pill">
+                                <div
+                                    onclick='openVolunteerPanel(${JSON.stringify(JSON.stringify({
+                                        ...volunteer,
+                                        // added for station
+                                        station: stationName,
+                                    }))})'
+                                    style="cursor:pointer;"
+                                >
+                                    ${displayName}${captainBadge}${adminBadge}${displayTime}
+                                </div>
+
+                                ${stationName === "Reserve" ? `
+                                    <button
+                                        onclick="event.stopPropagation(); restoreReserve(${volunteer.id})"
+                                        style="
+                                            margin-top:6px;
+                                            background:#ef4444;
+                                            font-size:11px;
+                                            padding:4px 8px;
+                                            border-radius:6px;
+                                        "
+                                    >
+                                        Move Back
+                                    </button>
+                                ` : ""}
+                            </div>
                         `;
                     }).join("")}
                 </div>
@@ -1428,6 +1449,19 @@ document.addEventListener("click", function (e) {
 // function handleSignoutClick(event) {
 //     gapi.auth2.getAuthInstance().signOut();
 // }
+
+async function restoreReserve(volunteerId) {
+    if (!confirm("Move this volunteer back to Reserve?")) return;
+
+    const res = await fetch(`/debug/restore-reserve/${volunteerId}`);
+    const data = await res.json();
+
+    if (data.success) {
+        location.reload(); // refresh board
+    } else {
+        alert(data.error || "Failed to move volunteer");
+    }
+}
 
 async function logOut() {
     const res = await fetch("/api/google-logout", {

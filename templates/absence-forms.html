@@ -73,6 +73,7 @@
             color: white;
         }
 
+
         .table-card {
             background: white;
             border: 1px solid #e2e8f0;
@@ -188,6 +189,18 @@
         <a href="/admin"><button class="btn secondary" type="button">← Back to Dashboard</button></a>
     </div>
 
+    {% if debug %}
+    <pre style="
+        background: #111;
+        color: #0f0;
+        padding: 16px;
+        font-size: 12px;
+        overflow-x: auto;
+        max-height: 300px;
+    ">
+    {{ debug }}
+    </pre>
+    {% endif %}
     <div class="table-card">
         {% if absences %}
         <div class="table-wrap">
