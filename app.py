@@ -2156,6 +2156,15 @@ def undo_rejection(applicants_id):
 
 @app.route("/admin/master-list")
 def master_list():
+    if "user_id" not in session:
+        return redirect("/")
+
+    try:
+        sync_volunteers()
+    except Exception as e:
+        db.session.rollback()
+        print(f"Volunteer sync failed: {e}")
+        
     volunteers = Volunteer.query\
         .filter(Volunteer.deleted_at.is_(None))\
         .order_by(Volunteer.last_name, Volunteer.first_name)\
@@ -2982,7 +2991,7 @@ def grant_drive_access(email):
         print(f"Drive permission error for {email}: {e}")
 
     
-@app.route("/admin/sync-volunteers", methods=["GET", "POST"])
+#@app.route("/admin/sync-volunteers", methods=["GET", "POST"])
 def sync_volunteers():
     try:
         if "user_id" not in session:
