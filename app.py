@@ -1,26 +1,27 @@
-#attempting to write a flask cli command to add admins
-import click # Delete?
-from datetime import date
-from email.message import EmailMessage
-from flask import Flask, send_from_directory, redirect, request, jsonify, session, url_for, flash, render_template
-#attempting to write a flask cli command to add admins
-from flask.cli import with_appcontext # Delete?
-from flask_migrate import Migrate
-from flask_softdelete import SoftDeleteMixin
+from flask import Flask, send_from_directory, redirect
 from flask_sqlalchemy import SQLAlchemy
-from googleapiclient.discovery import build
-from google.auth.transport import requests as grequests
-from google.oauth2 import id_token
-from google.oauth2.service_account import Credentials
-import gspread
-import json
-import os
+from urllib.parse import quote_plus
+from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Enum, Date, Time, Boolean
+from sqlalchemy.orm import DeclarativeBase, relationship
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import relationship, backref
 import random
+import os
 import smtplib
-from sqlalchemy import Column, Integer, String, Enum, Date, Time, Boolean, ForeignKey, text
-from sqlalchemy.orm import DeclarativeBase, relationship, backref
-from urllib.parse import quote_plus # Delete?
+from email.message import EmailMessage
+from flask import request, jsonify, session, redirect, flash
+from google.oauth2 import id_token
+from google.auth.transport import requests as grequests
 from werkzeug.middleware.proxy_fix import ProxyFix
+from flask import render_template
+from googleapiclient.discovery import build
+from flask_softdelete import SoftDeleteMixin
+from flask_migrate import Migrate
+from datetime import date
+from sqlalchemy import text
+from flask import render_template
 
 
 app = Flask(__name__, static_folder='.', static_url_path='')
@@ -1396,7 +1397,7 @@ def absence_forms():
         role, deny = require_admin_or_captain()
         if deny:
             return deny
-
+        
         from datetime import datetime
         from urllib.parse import quote_plus
 
@@ -2862,6 +2863,9 @@ def seed_admin():
 
     return "Admin user created."
 
+import json
+import gspread
+from google.oauth2.service_account import Credentials
 
 def get_sheet(tab_name=None):
     creds_dict = json.loads(os.environ["GOOGLE_SERVICE_JSON"])
@@ -3208,6 +3212,9 @@ def need_coverage():
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
+#attempting to write a flask cli command to add admins
+import click
+from flask.cli import with_appcontext
 
 @app.cli.command("create-admin")
 @click.argument("email")
