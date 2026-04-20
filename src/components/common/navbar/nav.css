@@ -1,0 +1,21 @@
+/* DOCUMENT HEADER */
+.navbar {
+    background: #0F172A;
+    padding: 18px 40px;
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+}
+
+.navbar a {
+    text-decoration: none;
+    color: white;
+    font-weight: 600;
+    padding: 10px 18px;
+    border-radius: 8px;
+    transition: 0.3s ease;
+}
+
+.navbar a:hover {
+    background: #2563EB;
+}

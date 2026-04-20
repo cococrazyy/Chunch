@@ -22,14 +22,22 @@
     </head>
     <body>
         <!-- Navigation placeholder-->
-        <!-- <div id="navbar-placeholder"></div> -->
-        <nav class="navbar">
+        <div id="navbar-placeholder"></div>
+        <!-- <nav class="navbar">
             <a href="../../../../public/index.html">HOME</a>
             <a href="../MeetTheTeamPage/index.html">MEET THE TEAM</a>
             <a href="../DonatePage/index.html">CONTRIBUTE</a>
             <a href="../VolunteerPage/index.html">VOLUNTEER</a>
             <a href="../QuotesPage/index.html">STUDENTS</a>
-        </nav>
+        </nav> -->
+        
+        <script>
+            fetch('../common/navbar/nav.html')
+                .then(response => response.text())
+                .then(data => {
+                document.getElementById('navbar-placeholder').innerHTML = data;
+                });
+        </script>
         
         <!-- Page-specific content -->
         <section class="header">

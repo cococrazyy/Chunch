@@ -220,7 +220,7 @@ tr:hover {
             <td>{{ v.email }}</td>
             <td>{{ v.phone }}</td>
             <td>{{ v.role }}</td>
-            <td>{{ v.station_id }}</td>
+            <td>{{ v.station_id }}</td> <!-- get name of station?? -->
             <td class="actions-cell">
                 <button class="edit" type="button" onclick="enableEdit({{ v.id }})">Edit</button>
             </td>
@@ -241,9 +241,9 @@ tr:hover {
 
                         <input type="text" name="last_name" value="{{ v.last_name }}">
 
-                        <input type="email" name="email" value="{{ v.email }}">
+                        <input type="email" name="email" value="{{ v.email or '' }}">
 
-                        <input type="tel" name="phone" placeholder="Phone Number" value="{{ v.phone }}"> 
+                        <input type="tel" name="phone" placeholder="Phone Number" value="{{ v.phone or '' }}"> 
                         <!-- <br> -->
                         <select name="editRole" id="editRole">
                             <option value="">Select Role</option>
@@ -252,11 +252,11 @@ tr:hover {
                             <option value="admin">Admin</option>
                             <option value="tech">Tech</option>
                         </select>
-                        
-                        <input type="text" name="unavailability" placeholder="Unavailability" value="{{ v.unavailability }}">
+
+                        <input type="text" name="unavailability" placeholder="Unavailability" value="{{ v.unavailability or '' }}">
 
                         <input type="text" name="capability_restrictions" placeholder="Capability Restrictions"
-                            value="{{ v.capability_restrictions }}">
+                            value="{{ v.capability_restrictions or '' }}">
                         <!-- <br> -->
                         <select name="station_id">
                             <option value="">Select Station</option>
@@ -278,13 +278,13 @@ tr:hover {
                             <option value="16" {% if v.station_id == 16 %}selected{% endif %}>Vegan</option>
                         </select>
 
-                        <label for="start_hour_{{ v.id }}">Start Hour:</label>
+                        <!-- <label for="start_hour_{{ v.id }}">Start Hour:</label>
                         <input type="number" name="start_hour" id="start_hour_{{ v.id }}" min="0" max="23"
-                            value="{{ v.start_hour if v.start_hour is not none else '' }}">
+                            value="{{ v.start_hour if v.start_hour is not none else '' }}"> -->
 
-                        <label for="end_hour_{{ v.id }}">End Hour:</label>
+                        <!-- <label for="end_hour_{{ v.id }}">End Hour:</label>
                         <input type="number" name="end_hour" id="end_hour_{{ v.id }}" min="1" max="24"
-                            value="{{ v.end_hour if v.end_hour is not none else '' }}">
+                            value="{{ v.end_hour if v.end_hour is not none else '' }}"> -->
 
                         <!-- Check again, what is this for? Doesn't match the floater in other locations? -->
                         <span class="checkbox-wrap">
