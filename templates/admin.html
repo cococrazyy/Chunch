@@ -1196,7 +1196,8 @@ function openVolunteerPanel(volunteerJson) {
     // TODO: Change sections involving volunteer.station to work with this
     document.getElementById("detailStation").textContent = volunteer.station || "Unassigned";
     // document.getElementById("detailFloater").value = volunteer.is_floater.value;
-    document.getElementById("detailFloater").ariaReadOnly = true;
+    document.getElementById("detailFloater").checked = !!volunteer.is_floater;
+    document.getElementById("detailFloater").disabled = true;
 
     const container = document.getElementById('status-container');
     // document.getElementById("detailFloater").innerHTML = floater ? '&#10003;' : '&#88;'; x
@@ -1304,7 +1305,7 @@ function editVolunteer() {
     document.getElementById("detailUnavailability").style.display = "none";
     document.getElementById("detailRestrictions").style.display = "none";
     document.getElementById("detailStation").style.display = "none";
-    document.getElementById("detailFloater").style.display = "block";
+    document.getElementById("detailFloater").style.display = "none";
 
     const nameInput = document.getElementById("editName");
     const emailInput = document.getElementById("editEmail");
@@ -1375,8 +1376,8 @@ function editVolunteer() {
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.name = "is_floater";
-    checkbox.id = "floater";
-    checkbox.checked = currentVolunteer.is_floater;
+    checkbox.id = `floater-${currentVolunteer.id}`;
+    checkbox.checked = !!currentVolunteer.is_floater;
     
     floaterCheck.append(checkbox);
     
@@ -1392,6 +1393,7 @@ function saveVolunteer() {
     // added for station
     const stationSelect = document.getElementById("editStation");
     const stationId = stationSelect.value;
+    const checkbox = document.querySelector("#editFloater input");
     const updatedData = {
         id: currentVolunteer.id,
         first_name: firstName,
@@ -1404,7 +1406,7 @@ function saveVolunteer() {
         role: document.getElementById("editRole").value,
         // added for station
         station_id: document.getElementById("editStation").value,
-        is_floater: document.getElementById("editFloater").value
+        is_floater: checkbox ? checkbox.checked : false
     };
 
     fetch("/admin/edit-volunteer", {
@@ -1587,8 +1589,8 @@ loadStationBoard();
         <div class="detail-card">
             <div class="detail-label">Floater Status</div>
             <div class="detail-value">
-                <input type="checkbox" id="detailFloater" readonly>
-                <input id="editFloater" style="display:none;">
+                <input type="checkbox" id="detailFloater" disabled>
+                <div id="editFloater" style="display:none;"></div>
             </div>
         </div>
         
