@@ -434,7 +434,7 @@ def volunteer_hours_captain():
             "Greeters",
             "Baked Potato Bar",
             "Salad Bar",
-            "Vegan"
+            "Vegan Station"
         ]
 
         existing_station_names = {
