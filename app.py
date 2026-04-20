@@ -2154,13 +2154,30 @@ def undo_rejection(applicants_id):
         db.session.commit()
     return redirect("/admin/inbox")
 
+from datetime import datetime, timedelta
+
+LAST_VOLUNTEER_SYNC = None
+
+def should_sync_volunteers():
+    global LAST_VOLUNTEER_SYNC
+
+    if LAST_VOLUNTEER_SYNC is None:
+        return True
+
+    return datetime.utcnow() - LAST_VOLUNTEER_SYNC > timedelta(minutes=10)
+
 @app.route("/admin/master-list")
 def master_list():
+    global LAST_VOLUNTEER_SYNC
+    
     if "user_id" not in session:
         return redirect("/")
 
     try:
-        sync_volunteers()
+        if should_sync_volunteers():
+            sync_volunteers()
+            LAST_VOLUNTEER_SYNC = datetime.utcnow()
+    
     except Exception as e:
         db.session.rollback()
         print(f"Volunteer sync failed: {e}")
@@ -2991,7 +3008,7 @@ def grant_drive_access(email):
         print(f"Drive permission error for {email}: {e}")
 
     
-#@app.route("/admin/sync-volunteers", methods=["GET", "POST"])
+@app.route("/admin/sync-volunteers", methods=["GET", "POST"])
 def sync_volunteers():
     try:
         if "user_id" not in session:
