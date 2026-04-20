@@ -83,7 +83,7 @@ class Applicant(db.Model, SoftDeleteMixin):
     phone = Column(String(50))
     status = Column(
         Enum(
-            "accepted
+            "accepted",
             "rejected",
             "pending",
             name="status_enum"
