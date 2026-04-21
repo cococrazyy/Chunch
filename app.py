@@ -2068,9 +2068,8 @@ def volunteer_hours():
         db.session.commit()
 
         stations = Station.query\
-            #.filter(Station.station_name.notin_(["Reserve", "Absent", "Other"]))\
-            .order_by(Station.station_name)\
-            .all()
+        .order_by(Station.station_name)\
+        .all()
 
         sheet = get_sheet()
         rows = sheet.get_all_records()
