@@ -1404,7 +1404,7 @@ def assign_reserve_coverage():
         cover_start_hour = request.form.get("cover_start_hour", type=int)
         cover_end_hour = request.form.get("cover_end_hour", type=int)
         timestamp = request.form.get("timestamp")
-
+        stay_on_page = request.form.get("stay_on_page") == "true"
         if not absence_id or not absent_volunteer_id or not reserve_volunteer_id:
             return "<pre>Missing required coverage fields.</pre>", 400
 
@@ -1461,7 +1461,10 @@ def assign_reserve_coverage():
         except Exception:
             pass
 
-        return redirect("/admin")
+        if stay_on_page:
+            return redirect(request.referrer or "/admin")
+        else:
+            return redirect("/admin")
 
     except Exception as e:
         db.session.rollback()
