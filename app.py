@@ -1482,7 +1482,9 @@ def save_need_coverage():
         partial_end_hour = request.form.get("partial_end_hour", type=int)
         notes = request.form.get("notes", "").strip()
 
-        if not volunteer_id or not start_date_str or not end_date_str:
+        is_extra = request.form.get("is_extra_coverage") == "true"
+
+        if not start_date_str or not end_date_str:
             return "<pre>Missing required fields.</pre>", 400
 
         start_date = date.fromisoformat(start_date_str)
@@ -1501,6 +1503,22 @@ def save_need_coverage():
         else:
             partial_start_hour = None
             partial_end_hour = None
+
+        # extra coverage with no absence
+        if is_extra:
+            return redirect(
+                f"/admin/coverage/details?"
+                f"extra=true"
+                f"&start_date={start_date_str}"
+                f"&end_date={end_date_str}"
+                f"&is_partial={is_partial_str}"
+                f"&partial_start_hour={partial_start_hour or ''}"
+                f"&partial_end_hour={partial_end_hour or ''}"
+            )
+
+        # normaL absence
+        if not volunteer_id:
+            return "<pre>Missing volunteer.</pre>", 400
 
         absence = Absence(
             volunteer_id=volunteer_id,
@@ -1521,8 +1539,7 @@ def save_need_coverage():
         db.session.rollback()
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
-
-# ABSENCES
+# absences
 @app.route("/admin/absence/update", methods=["POST"])
 def update_absence():
     data = request.get_json()
