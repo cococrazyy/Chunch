@@ -397,9 +397,9 @@ function editVolunteer() {
         stationSelect.appendChild(option);
     });
     stationSelect.value = currentVolunteer.station_id || "";
+
     document.getElementById("editBtn").style.display = "none";
     document.getElementById("saveBtn").style.display = "inline-block";
-    
 }
 
 function saveVolunteer() {

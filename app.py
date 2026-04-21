@@ -1939,6 +1939,7 @@ def master_list_edit(volunteer_id):
         last_name = request.form.get("last_name", "").strip()
         email = request.form.get("email", "").strip().lower()
         phone = request.form.get("phone", "").strip()
+        role = request.form.get("editRole", "").strip().lower()
         unavailability = request.form.get("unavailability", "").strip()
         capability_restrictions = request.form.get("capability_restrictions", "").strip()
         station_id = request.form.get("station_id", type=int)
@@ -1969,6 +1970,7 @@ def master_list_edit(volunteer_id):
         volunteer.last_name = last_name
         volunteer.email = email
         volunteer.phone = phone
+        volunteer.role = role
         volunteer.typical_shift = typical_shift
         volunteer.unavailability = unavailability
         volunteer.capability_restrictions = capability_restrictions
