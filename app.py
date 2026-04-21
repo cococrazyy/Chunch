@@ -2247,11 +2247,11 @@ def volunteer_hours():
 
             station_data[station_name] = volunteers_for_station
 
-            return render_template(
-                "volunteer-hours.html",
-                station_data=station_data,
-                debug=debug
-            )
+        return render_template(
+            "volunteer-hours.html",
+            station_data=station_data,
+            debug=debug
+        )
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
