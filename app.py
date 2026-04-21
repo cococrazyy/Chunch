@@ -1462,7 +1462,7 @@ def assign_reserve_coverage():
             pass
 
         if stay_on_page:
-            return redirect(request.referrer or "/admin")
+            return redirect(f"/admin/coverage/details?volunteer_id={absent_volunteer_id}")
         else:
             return redirect("/admin")
 
