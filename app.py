@@ -720,11 +720,13 @@ def volunteer_hours_captain():
 
         db.session.commit()
 
+        #stations = Station.query\
+            #.filter(Station.station_name.notin_(["Reserve", "Absent", "Other"]))\
+            #.order_by(Station.station_name)\
+            #.all()
         stations = Station.query\
-            .filter(Station.station_name.notin_(["Reserve", "Absent", "Other"]))\
-            .order_by(Station.station_name)\
-            .all()
-
+        .order_by(Station.station_name)\
+        .all()
         sheet = get_sheet()
         rows = sheet.get_all_records()
 
@@ -919,7 +921,7 @@ def build_station_state(volunteers, stations):
         station.station_id: set()
         for station in stations
     }
-
+    
     latest_assignment_by_volunteer = {}
     assignments = Assignment.query.all()
 
@@ -993,7 +995,7 @@ def build_station_state(volunteers, stations):
             station_to_volunteer_ids[assignment.station_id].add(volunteer_id)
 
     return station_to_volunteer_ids, "\n".join(debug_lines)
-
+    
 def run_sync_absences():
     sheet = get_sheet("Absence")
     rows = sheet.get_all_records()
