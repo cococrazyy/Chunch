@@ -142,7 +142,11 @@
 
 <script>
     const stationData = {{ station_data | tojson | safe }};
-    const stationNames = Object.keys(stationData);
+    const blockedStations = ["Reserve", "Absent", "Other"];
+    const stationNames = Object.keys(stationData).filter(
+    stationName => !blockedStations.includes(stationName)
+    );
+    
     const stationSelect = document.getElementById('stationSelect');
     const stationHeading = document.getElementById('stationHeading');
     const ctx = document.getElementById('hoursChart').getContext('2d');
