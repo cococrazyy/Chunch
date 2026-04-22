@@ -1101,6 +1101,34 @@ def run_sync_absences():
     db.session.commit()
 
 
+@app.route("/admin/station-data")
+def admin_station_data():
+    volunteers = Volunteer.query.filter(Volunteer.deleted_at.is_(None)).all()
+    stations = Station.query.all()
+
+    station_to_volunteer_ids, _ = build_station_state(volunteers, stations)
+
+    result = {}
+
+    for station in stations:
+        assigned_ids = station_to_volunteer_ids.get(station.station_id, set())
+
+        result[station.station_name] = {
+            "volunteers": [
+                {
+                    "id": v.id,
+                    "name": f"{v.first_name} {v.last_name}",
+                    "role": v.role,
+                    "email": v.email,
+                    "phone": v.phone,
+                    "station_id": station.station_id
+                }
+                for v in volunteers if v.id in assigned_ids
+            ]
+        }
+
+    return jsonify(result)
+
 # DASHBOARD
 @app.route("/admin")
 def admin_page():
