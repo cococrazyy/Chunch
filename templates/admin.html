@@ -1122,7 +1122,7 @@ function renderStationBoard(stationData) {
 
 async function loadStationBoard() {
     try {
-        const response = await fetch("/admin/debug-hourly-final");
+        const response = await fetch("/admin/volunteer-hours");
         const stationData = await response.json();
 
         if (!response.ok || stationData.error) {
