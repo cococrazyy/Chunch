@@ -660,6 +660,73 @@ def edit_volunteer():
     
     # The assignment of the new station, list of volunteers for that station
     # check for volunteer in this assignment    
+    
+    def parse_time_to_hour(time_str):
+            time_str = str(time_str).strip().upper()
+            time_str = time_str.replace(" ", "")
+
+            if not time_str:
+                return None
+
+            if time_str.endswith("AM"):
+                raw = time_str[:-2]
+                if ":" in raw:
+                    raw = raw.split(":")[0]
+                if not raw.isdigit():
+                    return None
+                hour = int(raw)
+                return 0 if hour == 12 else hour
+
+            if time_str.endswith("PM"):
+                raw = time_str[:-2]
+                if ":" in raw:
+                    raw = raw.split(":")[0]
+                if not raw.isdigit():
+                    return None
+                hour = int(raw)
+                return hour if hour == 12 else hour + 12
+
+            return None
+
+    Availability.query.filter_by(volunteer_id=volunteer.id).delete()
+
+    availability_text = str(row.get("Typical Shift", "")).strip()
+    if not availability_text:
+        continue
+
+    normalized_text = availability_text.replace("–", "-").replace("—", "-")
+    entries = normalized_text.split(",")
+
+    for entry in entries:
+        part = entry.strip()
+        if not part:
+            continue
+
+        if "-" in part:
+            start_str, end_str = part.split("-", 1)
+            start_hour = parse_time_to_hour(start_str)
+            end_hour = parse_time_to_hour(end_str)
+
+            if start_hour is None or end_hour is None:
+                continue
+
+            if start_hour <= end_hour:
+                hours_to_add = range(start_hour, end_hour + 1)
+            else:
+                continue
+        else:
+            single_hour = parse_time_to_hour(part)
+            if single_hour is None:
+                continue
+            hours_to_add = [single_hour]
+
+        for hour in hours_to_add:
+            db.session.add(
+                Availability(
+                    volunteer_id=volunteer.id,
+                    hour=hour
+                )
+            )
 
     if "role" in data:
         new_role = data["role"]
