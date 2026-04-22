@@ -1470,7 +1470,7 @@ def assign_reserve_coverage():
                 f"/admin/coverage/details?"
                 f"volunteer_id={absent_volunteer_id}"
                 f"&timestamp={timestamp or ''}"
-                "&covered_start={cover_start_hour or ''}"
+                f"&covered_start={cover_start_hour or ''}"
                 f"&covered_end={cover_end_hour or ''}"
             )
         else:
