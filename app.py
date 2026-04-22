@@ -1744,13 +1744,13 @@ from datetime import datetime, timedelta
 
 LAST_VOLUNTEER_SYNC = None
 
-def should_sync_volunteers():
-    global LAST_VOLUNTEER_SYNC
+#def should_sync_volunteers():
+    #global LAST_VOLUNTEER_SYNC
 
-    if LAST_VOLUNTEER_SYNC is None:
-        return True
+    #if LAST_VOLUNTEER_SYNC is None:
+        #return True
 
-    return datetime.utcnow() - LAST_VOLUNTEER_SYNC > timedelta(minutes=10)
+    #return datetime.utcnow() - LAST_VOLUNTEER_SYNC > timedelta(minutes=10)
 
 # MASTERLIST
 @app.route("/admin/master-list")
@@ -1760,14 +1760,14 @@ def master_list():
     if "user_id" not in session:
         return redirect("/")
 
-    try:
-        if should_sync_volunteers():
-            sync_volunteers()
-            LAST_VOLUNTEER_SYNC = datetime.utcnow()
+    #try:
+        #if should_sync_volunteers():
+           # sync_volunteers()
+            #LAST_VOLUNTEER_SYNC = datetime.utcnow()
     
-    except Exception as e:
-        db.session.rollback()
-        print(f"Volunteer sync failed: {e}")
+    #except Exception as e:
+        #db.session.rollback()
+        #print(f"Volunteer sync failed: {e}")
         
     volunteers = Volunteer.query\
         .filter(Volunteer.deleted_at.is_(None))\
