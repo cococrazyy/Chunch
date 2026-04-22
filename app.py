@@ -1466,7 +1466,13 @@ def assign_reserve_coverage():
             pass
 
         if stay_on_page:
-            return redirect(f"/admin/coverage/details?volunteer_id={absent_volunteer_id}")
+            return redirect(
+                f"/admin/coverage/details?"
+                f"volunteer_id={absent_volunteer_id}"
+                f"&timestamp={timestamp or ''}"
+                "&covered_start={cover_start_hour or ''}"
+                f"&covered_end={cover_end_hour or ''}"
+            )
         else:
             return redirect("/admin")
 
