@@ -3044,17 +3044,7 @@ def debug_hourly_data():
 
     assignments = Assignment.query.all()
 
-    station_to_volunteer_ids = {}
-    for station in stations:
-        station_to_volunteer_ids[station.station_id] = set()
-
-    for assignment in assignments:
-        if assignment.station_id is None or assignment.volunteer_id is None:
-            continue
-
-        station_to_volunteer_ids.setdefault(
-            assignment.station_id, set()
-        ).add(assignment.volunteer_id)
+    station_to_volunteer_ids, debug = build_station_state(volunteers, stations)
 
     station_data = {}
     for station in stations:
