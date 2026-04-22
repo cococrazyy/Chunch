@@ -148,18 +148,16 @@ tr:hover {
             <option value="11">Greeters</option>
             <option value="12">Baked Potato Bar</option>
             <option value="13">Salad Bar</option>
-            <!-- <option value="14">Absent</option> -->
-            <!-- <option value="15">Other</option> -->
-            <option value="16">Vegan</option>
+            <option value="14">Vegan</option>
         </select>
         <!-- Add an if statement somewhere that sets the station to 9 if none are selected -->
         
         <select name="role">
             <option value="">Select Role</option>
-            <option value="1">Volunteer</option>
-            <option value="2">Admin</option>
-            <option value="3">Captain</option>
-            <option value="4">Tech</option>
+            <option value="volunteer">Volunteer</option>
+            <option value="admin">Admin</option>
+            <option value="captain">Captain</option>
+            <option value="tech">Tech</option>
         </select>
 
         <!-- <label>Start Hour:</label>
@@ -207,7 +205,7 @@ tr:hover {
             <th>Email</th>
             <th>Phone Number</th>
             <th>Role</th>
-            <th>Station</th>
+            <!-- <th>Station</th> -->
             <th></th>
             <th></th>
         </tr>
@@ -220,7 +218,7 @@ tr:hover {
             <td>{{ v.email }}</td>
             <td>{{ v.phone }}</td>
             <td>{{ v.role }}</td>
-            <td>{{ v.station_id }}</td> <!-- get name of station?? -->
+            <!-- <td>{{ v.station_id }}</td> --> <!-- get name of station?? -->
             <td class="actions-cell">
                 <button class="edit" type="button" onclick="enableEdit({{ v.id }})">Edit</button>
             </td>
@@ -273,9 +271,7 @@ tr:hover {
                             <option value="11" {% if v.station_id == 11 %}selected{% endif %}>Greeters</option>
                             <option value="12" {% if v.station_id == 12 %}selected{% endif %}>Baked Potato Bar</option>
                             <option value="13" {% if v.station_id == 13 %}selected{% endif %}>Salad Bar</option>
-                            <!-- <option value="14" {% if v.station_id == 14 %}selected{% endif %}>Absent</option> -->
-                            <!-- <option value="15" {% if v.station_id == 15 %}selected{% endif %}>Other</option> -->
-                            <option value="16" {% if v.station_id == 16 %}selected{% endif %}>Vegan</option>
+                            <option value="14" {% if v.station_id == 16 %}selected{% endif %}>Vegan</option>
                         </select>
 
                         <!-- <label for="start_hour_{{ v.id }}">Start Hour:</label>
@@ -326,118 +322,6 @@ function cancelEdit(id) {
     if (editRow) {
         editRow.hidden=true;
     }
-}
-
-function editVolunteer() {
-    if(!currentVolunteer) return;
-    document.getElementById("first_name").style.display = "none";
-    document.getElementById("last_name").style.display = "none";
-    document.getElementById("email").style.display = "none";
-    document.getElementById("phone").style.display = "none";
-    document.getElementById("station").style.display = "none";
-    document.getElementById("role").style.display = "none";
-
-    const nameInput = document.getElementById("editName");
-    const emailInput = document.getElementById("editEmail");
-    const phoneInput = document.getElementById("editPhone");
-    const captainInput = document.getElementById("editRole");
-
-    // added for station
-    const stationSelect = document.getElementById("editStation");
-    const roleSelect = document.getElementById("editRole");
-    
-    nameInput.style.display = "inline";
-    emailInput.style.display = "inline";
-    phoneInput.style.display = "inline";
-    
-    // shiftInput.style.display = "inline";
-    // unavailabilityInput.style.display = "inline";
-    // restrictionsInput.style.display = "inline";
-    // captainInput.style.display = "inline";
-    // stationSelect.style.display = "inline";
-    
-    nameInput.value = currentVolunteer.name || "";
-    emailInput.value = currentVolunteer.email || "";
-    phoneInput.value = currentVolunteer.phone || "";
-    shiftInput.value = currentVolunteer.typical_shift || "";
-    unavailabilityInput.value = currentVolunteer.unavailability || "";
-    restrictionsInput.value = currentVolunteer.capability_restrictions || "";
-    captainInput.value = currentVolunteer.role || "";
-    
-    stationSelect.innerHTML = "";
-
-    const stations = [
-        // { id: 14, name: "Absent" },
-        { id: 12, name: "Baked Potato Bar" },
-        { id: 7, name: "Busboys/sanitation" },
-        { id: 6, name: "Desserts" },
-        { id: 8, name: "Dishwashers" },
-        { id: 5, name: "Drink Station" },
-        { id: 10, name: "General Manager" },
-        { id: 11, name: "Greeters" },
-        { id: 4, name: "Kitchen" },
-        { id: 3, name: "Line Servers" },
-        // { id: 15, name: "Other" },
-        { id: 9, name: "Reserve" },
-        { id: 13, name: "Salad Bar" },
-        { id: 1, name: "Setup Team" },
-        { id: 2, name: "Teardown Team" },
-        { id: 16, name: "Vegan" }
-    ];
-
-    stations.forEach(station => {
-        const option = document.createElement("option");
-        option.value = station.id;      // numeric ID
-        option.textContent = station.name;
-
-        if (station.id === currentVolunteer.station_id) { // use numeric comparison
-            option.selected = true;
-        }
-
-        stationSelect.appendChild(option);
-    });
-    stationSelect.value = currentVolunteer.station_id || "";
-
-    document.getElementById("editBtn").style.display = "none";
-    document.getElementById("saveBtn").style.display = "inline-block";
-}
-
-function saveVolunteer() {
-    const fullName = document.getElementById("editName").value.trim();
-    const [firstName, ...rest] = fullName.split(" ");
-    const lastName = rest.join(" ");
-    // added for station
-    const stationSelect = document.getElementById("editStation");
-    const stationId = stationSelect.value;
-    const updatedData = {
-        id: currentVolunteer.id,
-        first_name: firstName,
-        last_name: lastName,
-        email: document.getElementById("editEmail").value,
-        phone: document.getElementById("editPhone").value, 
-        typical_shift: document.getElementById("editShift").value,
-        unavailability: document.getElementById("editUnavailability").value,
-        capability_restrictions: document.getElementById("editRestrictions").value,
-        role: document.getElementById("editRole").value,
-        // added for station
-        station_id: document.getElementById("editStation").value
-    };
-
-    fetch("/admin/edit-volunteer", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(updatedData)
-    })
-    .then(res => res.json())
-    .then(data => {
-        window.location.reload();
-    })
-    .catch(err => console.error(err));
-
-    // reload station board to show new update
-    //loadStationBoard()
 }
 
 // Added for edit
