@@ -414,7 +414,20 @@
         document.getElementById("coverageHourModal").style.display = "none";
     }
 
-    
+    function applyCoverageHours() {
+        let startHour = modalDefaultStart;
+        let endHour = modalDefaultEnd;
+
+        const fullShift = document.getElementById("coverFullShiftCheckbox").checked;
+
+        if (!fullShift) {
+            startHour = parseInt(document.getElementById("coverStartHour").value, 10);
+            endHour = parseInt(document.getElementById("coverEndHour").value, 10);
+        }
+
+        activeAssignForm.querySelector(".cover-start-hour").value = startHour;
+        activeAssignForm.querySelector(".cover-end-hour").value = endHour;
+    }
 
     function submitCoverageForm() {
         if (!activeAssignForm) return;
@@ -434,14 +447,35 @@
     function submitAndExit() {
         if (!activeAssignForm) return;
 
-        activeAssignForm.querySelector(".stay-flag").value = "false";
-        submitCoverageForm();
+        const stayInput = activeAssignForm.querySelector('input[name="stay_on_page"]');
+
+        if (stayInput) {
+            stayInput.value = "false";
+        }
+
+        applyCoverageHours();
+
+        activeAssignForm.submit();
     }
         
     function submitAndStay() {
-        if (!activeAssignForm) return;
-        activeAssignForm.querySelector(".stay-flag").value = "true";
-        submitCoverageForm();
+        if (!activeAssignForm) {
+            console.error("No active form");
+            return;
+        }
+
+        const stayInput = activeAssignForm.querySelector('input[name="stay_on_page"]');
+
+        if (!stayInput) {
+            console.error("stay_on_page input not found");
+            return;
+        }
+
+        stayInput.value = "true";
+
+        applyCoverageHours();
+
+        activeAssignForm.submit();
     }
 
     document.getElementById("coverFullShiftCheckbox").addEventListener("change", function() {
