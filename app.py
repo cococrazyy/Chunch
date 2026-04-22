@@ -199,10 +199,6 @@ class Availability(db.Model, SoftDeleteMixin):
 
     volunteer = relationship("Volunteer", backref=backref("availability", cascade = "all, delete-orphan"))
 
-db.session.execute(text("""
-    ALTER TABLE assignments
-    ADD COLUMN IF NOT EXISTS is_extra_coverage BOOLEAN DEFAULT FALSE
-"""))
 
 with app.app_context():
     db.create_all()
