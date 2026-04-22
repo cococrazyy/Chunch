@@ -1818,7 +1818,7 @@ def master_list():
             return None, None
     volunteer_rows = []
     for v in volunteers:
-        #role = role_by_volunteer_id.get(v.id, "volunteer")
+        role = role_by_volunteer_id.get(v.id, "volunteer")
         user = UserAccount.query.filter(UserAccount.volunteer_id == v.id).first() 
         start_hour, end_hour = parse_shift(v.typical_shift)
 
@@ -1828,7 +1828,7 @@ def master_list():
             "last_name": v.last_name,
             "email": v.email,
             "phone": v.phone,
-            "role": user.role if user is not None else "Volunteer",
+            "role": role.capitalize() if role is not None else "Volunteer",
             "station_id": v.station_id,
             "unavailability": v.unavailability,
             "capability_restrictions": v.capability_restrictions,
@@ -1848,7 +1848,7 @@ def add_volunteer():
     last_name = request.form.get("last_name", "").strip()
     email = request.form.get("email", "").strip().lower()
     phone = request.form.get("phone", "").strip()
-    # role = request.form.get("role", "").strip().lower()
+    role = request.form.get("role", "").strip()
     station_id = request.form.get("station_id", "")
     start_hour = request.form.get("start_hour", type=int)
     end_hour = request.form.get("end_hour", type=int)
@@ -1880,7 +1880,7 @@ def add_volunteer():
         last_name=last_name,
         email=email,
         phone=phone,
-        # role=role,
+        role=role,
         station_id = station_id,
         is_floater=is_floater,
         typical_shift=typical_shift
@@ -1953,7 +1953,7 @@ def master_list_edit(volunteer_id):
         last_name = request.form.get("last_name", "").strip()
         email = request.form.get("email", "").strip().lower()
         phone = request.form.get("phone", "").strip()
-        # role = request.form.get("role", "").strip().lower()
+        role = request.form.get("role", "").strip().lower()
         unavailability = request.form.get("unavailability", "").strip()
         capability_restrictions = request.form.get("capability_restrictions", "").strip()
         station_id = request.form.get("station_id", type=int)
@@ -1984,7 +1984,7 @@ def master_list_edit(volunteer_id):
         volunteer.last_name = last_name
         volunteer.email = email
         volunteer.phone = phone
-        # volunteer.role = role
+        volunteer.role = role
         volunteer.typical_shift = typical_shift
         volunteer.unavailability = unavailability
         volunteer.capability_restrictions = capability_restrictions
@@ -2056,7 +2056,7 @@ def edit_master_volunteer(volunteer_id):
     last_name = request.form.get("last_name", "").strip()
     email = request.form.get("email", "").strip().lower()
     phone = request.form.get("phone", "").strip()
-    # role = request.form.get("role", "").strip().lower()
+    role = request.form.get("role", "").strip().lower()
     is_floater = request.form.get("is_floater", False) == True
 
     if not first_name or not last_name or not email:
@@ -2072,7 +2072,7 @@ def edit_master_volunteer(volunteer_id):
     volunteer.last_name = last_name
     volunteer.email = email
     volunteer.phone = phone
-    # volunteer.role = role
+    volunteer.role = role
     volunteer.is_floater = is_floater
 
     db.session.commit()
