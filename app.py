@@ -696,7 +696,6 @@ def edit_volunteer():
 
     normalized_text = availability_text.replace("–", "-").replace("—", "-")
     entries = normalized_text.split(",")
-
     for entry in entries:
         part = entry.strip()
         if not part:
@@ -719,7 +718,7 @@ def edit_volunteer():
             if single_hour is None:
                 continue
             hours_to_add = [single_hour]
-
+            
         for hour in hours_to_add:
             db.session.add(
                 Availability(
