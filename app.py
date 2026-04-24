@@ -1265,9 +1265,14 @@ def admin_page():
         for station in stations:
             station_name = str(station.station_name)
             assigned_ids = station_to_volunteer_ids.get(station.station_id, set())
-
             station_data[station_name] = [
-                v for v in volunteers if v.id in assigned_ids
+                {
+                    "id": v.id,
+                    "name": f"{v.first_name} {v.last_name}",
+                    "email": v.email,
+                    "phone": v.phone
+                }
+                for v in volunteers if v.id in assigned_ids
             ]
 
         return render_template(
