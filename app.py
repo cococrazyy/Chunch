@@ -1969,6 +1969,33 @@ def master_list():
 
     return render_template("master-list.html", volunteers=volunteer_rows)
     
+
+from datetime import date
+
+@app.route("/admin/fix-stuck-absent")
+def fix_stuck_absent():
+    today = date.today()
+
+    assignments = Assignment.query.all()
+
+    fixed = 0
+
+    for a in assignments:
+        active_absence = Absence.query.filter(
+            Absence.volunteer_id == a.volunteer_id,
+            Absence.start_date <= today,
+            Absence.end_date >= today
+        ).first()
+
+        if not active_absence and a.is_absent:
+            a.is_absent = False
+            fixed += 1
+
+    db.session.commit()
+
+    return f"Fixed {fixed} stuck absent assignments"
+
+
 @app.route("/admin/master-list/add-volunteer", methods=["POST"])
 def add_volunteer():
     if "user_id" not in session:
