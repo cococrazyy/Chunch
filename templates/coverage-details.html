@@ -144,11 +144,9 @@
                             <input type="hidden" name="absent_volunteer_id" value="{{ absent_volunteer.id }}">
                             <input type="hidden" name="reserve_volunteer_id" value="{{ r.id }}">
                             <input type="hidden" name="send_email" value="no">
-                            <input type="hidden" name="timestamp" value="{{ timestamp }}">
                             <input type="hidden" name="cover_start_hour" class="cover-start-hour">
                             <input type="hidden" name="cover_end_hour" class="cover-end-hour">
                             <input type="hidden" class="reserve-email" value="{{ r.email or '' }}">
-                            <input type="hidden" name="stay_on_page" value="false" class="stay-flag">
 
                             <button
                                 type="button"
@@ -188,11 +186,10 @@
                             <input type="hidden" name="absent_volunteer_id" value="{{ absent_volunteer.id }}">
                             <input type="hidden" name="reserve_volunteer_id" value="{{ r.id }}">
                             <input type="hidden" name="send_email" value="no">
-                            <input type="hidden" name="timestamp" value="{{ timestamp }}">
                             <input type="hidden" name="cover_start_hour" class="cover-start-hour">
                             <input type="hidden" name="cover_end_hour" class="cover-end-hour">
                             <input type="hidden" class="reserve-email" value="{{ r.email or '' }}">
-                            <input type="hidden" name="stay_on_page" value="false" class="stay-flag">
+
                             <button
                                 type="button"
                                 onclick="openCoverageHourModal(
@@ -240,21 +237,48 @@
         <button type="button" onclick="closeCoverageHourModal()" style="padding:10px 14px; border:none; border-radius:10px; background:#e2e8f0; color:#0f172a; font-weight:700; cursor:pointer;">
             Cancel
         </button>
-        <button type="button" onclick="submitAndExit()" style="padding:10px 14px; border:none; border-radius:10px; background:#64748b; color:white; font-weight:700; cursor:pointer;">
-            Assign & Return to Dashboard
+        <button type="button" onclick="goToEmailPopup()" style="padding:10px 14px; border:none; border-radius:10px; background:#2563eb; color:white; font-weight:700; cursor:pointer;">
+            Continue
         </button>
     </div>
 </div>
 
-<script id="coverage-data" type="application/json">
-{
-    "covered_start": {{ absent_volunteer.covered_start|tojson }},
-    "covered_end": {{ absent_volunteer.covered_end|tojson }}
-}
-</script>
+<div id="assignPopup" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:1001;">
+    <div style="background:white; width:90%; max-width:650px; margin:60px auto; padding:24px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.2);">
+        <h3 style="margin-top:0;">Email Preview</h3>
+
+        <div style="margin-bottom:14px;">
+            <strong>Subject:</strong>
+            <div id="assignEmailSubject" style="margin-top:6px; padding:10px; border:1px solid #ccc; border-radius:8px; background:#f8f8f8;"></div>
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <strong>Message:</strong>
+            <div id="assignEmailBody" style="margin-top:6px; padding:12px; border:1px solid #ccc; border-radius:8px; background:#f8f8f8; white-space:pre-wrap;"></div>
+        </div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button type="button" onclick="submitAssignWithEmail('yes')">Assign and Send Email</button>
+            <button type="button" onclick="submitAssignWithEmail('no')">Assign Without Email</button>
+            <button type="button" onclick="closeAssignPopup()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div id="moreCoveragePopup" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:1002;">
+    <div style="background:white; width:90%; max-width:560px; margin:80px auto; padding:24px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.2);">
+        <h3 style="margin-top:0; margin-bottom:12px;">Coverage Decision</h3>
+        <div id="moreCoverageMessage" style="margin-bottom:20px; color:#334155; line-height:1.5;"></div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button type="button" onclick="chooseMoreCoverage('add')">Add Another Reserve</button>
+            <button type="button" onclick="chooseMoreCoverage('keep')">Keep This Coverage</button>
+            <button type="button" onclick="closeMoreCoveragePopup()">Cancel</button>
+        </div>
+    </div>
+</div>
 
 <script>
-
     let activeAssignForm = null;
     let activeReserveName = "";
     let activeStationName = "";
@@ -264,7 +288,6 @@
     let pendingAddMoreChoice = false;
     let modalDefaultStart = null;
     let modalDefaultEnd = null;
-    let activeStationId = null;
 
     function formatHour(hour) {
         if (hour === 0) return "12AM";
@@ -272,7 +295,6 @@
         if (hour === 12) return "12PM";
         return `${hour - 12}PM`;
     }
-
 
     function formatRange(start, end) {
         return `${formatHour(start)} - ${formatHour(end)}`;
@@ -301,8 +323,6 @@
 
         return null;
     }
-
-
 
     function parseHourList(text) {
         text = String(text || "").trim();
@@ -348,7 +368,6 @@
         activeAssignForm = form;
         activeReserveName = reserveName;
         activeStationName = stationName;
-        activeStationId = 
         pendingAddMoreChoice = false;
 
         parsedShiftHours = parseHourList(shiftText);
@@ -361,12 +380,9 @@
         const shiftStart = Math.min(...parsedShiftHours);
         const shiftEnd = Math.max(...parsedShiftHours);
 
-        const COVERAGE_DATA = JSON.parse(
-            document.getElementById("coverage-data").textContent
-        );
+        const coveredStart = {{ absent_volunteer.covered_start|tojson }};
+        const coveredEnd = {{ absent_volunteer.covered_end|tojson }};
 
-        const coveredStart = COVERAGE_DATA.covered_start;
-        const coveredEnd = COVERAGE_DATA.covered_end;
         let defaultStart = shiftStart;
         let defaultEnd = shiftEnd;
 
@@ -413,7 +429,43 @@
         document.getElementById("coverageHourModal").style.display = "none";
     }
 
-    function applyCoverageHours() {
+    function openAssignPopup() {
+        const subject = `Coverage Assignment for ${activeStationName}`;
+        const body =
+`Hi ${activeReserveName},
+
+You have been assigned to help cover ${activeStationName} at Chunch.
+
+Please review the training materials and station-specific videos before your shift.
+
+These can be found at this link: https://drive.google.com/drive/folders/1IwmKyFWKEvAB86WKg9I7C9N1BBvrSzD-
+
+Thank you.
+
+- Bryan & Cheryl`;
+
+        document.getElementById("assignEmailSubject").innerText = subject;
+        document.getElementById("assignEmailBody").innerText = body;
+        document.getElementById("assignPopup").style.display = "block";
+    }
+
+    function closeAssignPopup() {
+        document.getElementById("assignPopup").style.display = "none";
+    }
+
+    function openMoreCoveragePopup() {
+        const message = `Selected coverage: ${formatRange(selectedCoverageStart, selectedCoverageEnd)}. Would you like to add another reserve or keep this coverage?`;
+        document.getElementById("moreCoverageMessage").innerText = message;
+        document.getElementById("moreCoveragePopup").style.display = "block";
+    }
+
+    function closeMoreCoveragePopup() {
+        document.getElementById("moreCoveragePopup").style.display = "none";
+    }
+
+    function goToEmailPopup() {
+        if (!activeAssignForm) return;
+
         let startHour = modalDefaultStart;
         let endHour = modalDefaultEnd;
 
@@ -422,41 +474,63 @@
         if (!fullShift) {
             startHour = parseInt(document.getElementById("coverStartHour").value, 10);
             endHour = parseInt(document.getElementById("coverEndHour").value, 10);
+
+            if (startHour > endHour) {
+                alert("Start hour cannot be after end hour.");
+                return;
+            }
         }
+
+        selectedCoverageStart = startHour;
+        selectedCoverageEnd = endHour;
 
         activeAssignForm.querySelector(".cover-start-hour").value = startHour;
         activeAssignForm.querySelector(".cover-end-hour").value = endHour;
+
+        closeCoverageHourModal();
+        openMoreCoveragePopup();
     }
 
-    function submitCoverageForm() {
-        if (!activeAssignForm) return;
-        const fullShift = document.getElementById("coverFullShiftCheckbox").checked;
-        if (fullShift) {
-            activeAssignForm.querySelector(".cover-start-hour").value = modalDefaultStart;
-            activeAssignForm.querySelector(".cover-end-hour").value = modalDefaultEnd;
+    function chooseMoreCoverage(choice) {
+        pendingAddMoreChoice = (choice === "add");
+        closeMoreCoveragePopup();
+        openAssignPopup();
+    }
+
+    function submitAssignWithEmail(sendEmail) {
+        if (!activeAssignForm) {
+            alert("No reserve assignment selected.");
+            return;
+        }
+
+        activeAssignForm.querySelector('input[name="send_email"]').value = sendEmail;
+
+        const absentVolunteerId = {{ absent_volunteer.id|tojson }};
+
+        if (pendingAddMoreChoice) {
+            activeAssignForm.action =
+                `/admin/coverage/assign?add_more=1&volunteer_id=${encodeURIComponent(absentVolunteerId)}`;
         } else {
-            activeAssignForm.querySelector(".cover-start-hour").value =
-                document.getElementById("coverStartHour").value;
-            activeAssignForm.querySelector(".cover-end-hour").value =
-                document.getElementById("coverEndHour").value;
-        }
-        activeAssignForm.submit();
-    }
-
-    function submitAndExit() {
-        if (!activeAssignForm) return;
-
-        const stayInput = activeAssignForm.querySelector('input[name="stay_on_page"]');
-
-        if (stayInput) {
-            stayInput.value = "false";
+            activeAssignForm.action = "/admin/coverage/assign";
         }
 
-        applyCoverageHours();
+        if (sendEmail === "yes") {
+            const reserveEmail =
+                activeAssignForm.querySelector(".reserve-email")?.value || "";
 
+            const subject = document.getElementById("assignEmailSubject").innerText;
+            const body = document.getElementById("assignEmailBody").innerText;
+
+            if (reserveEmail) {
+                const mailtoLink =
+                    `mailto:${reserveEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                window.open(mailtoLink, "_blank");
+            }
+        }
+
+        closeAssignPopup();
         activeAssignForm.submit();
     }
-        
 
     document.getElementById("coverFullShiftCheckbox").addEventListener("change", function() {
         document.getElementById("customHourFields").style.display = this.checked ? "none" : "block";
