@@ -1666,17 +1666,31 @@ def save_need_coverage():
             return "<pre>Missing volunteer.</pre>", 400
         
 
-        absence = Absence(
-            volunteer_id=volunteer_id,
-            start_date=start_date,
-            end_date=end_date,
-            is_partial=is_partial,
-            partial_start_hour=partial_start_hour,
-            partial_end_hour=partial_end_hour,
-            notes=notes or None
-        )
+        existing = Absence.query.filter(
+            Absence.volunteer_id == volunteer_id,
+            Absence.start_date <= end_date,
+            Absence.end_date >= start_date
+        ).first()
 
-        db.session.add(absence)
+        if existing:
+            existing.start_date = start_date
+            existing.end_date = end_date
+            existing.is_partial = is_partial
+            existing.partial_start_hour = partial_start_hour
+            existing.partial_end_hour = partial_end_hour
+            existing.notes = notes or None
+        else:
+            absence = Absence(
+                volunteer_id=volunteer_id,
+                start_date=start_date,
+                end_date=end_date,
+                is_partial=is_partial,
+                partial_start_hour=partial_start_hour,
+                partial_end_hour=partial_end_hour,
+                notes=notes or None
+            )
+            db.session.add(absence)
+
         db.session.commit()
 
         return redirect(f"/admin/coverage/details?volunteer_id={volunteer_id}")
