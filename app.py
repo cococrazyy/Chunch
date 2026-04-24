@@ -2088,13 +2088,13 @@ def master_list_edit(volunteer_id):
         end_hour = request.form.get("end_hour", type=int)
         is_floater = request.form.get("is_floater") == "on"
 
-        if not first_name or not last_name or not email:
-            flash("First name, last name, and email are required.")
-            return redirect(f"/admin/master-list/edit-volunteer/{volunteer_id}")
+        #if not first_name or not last_name or not email:
+            #flash("First name, last name, and email are required.")
+            #return redirect(f"/admin/master-list/edit-volunteer/{volunteer_id}")
 
-        existing = Volunteer.query.filter_by(email=email).first()
+        existing = Volunteer.query.filter_by(first_name = first_name, last_name = last_name).first()
         if existing and existing.id != volunteer.id:
-            flash("Volunteer with that email already exists.")
+            flash("Volunteer already exists.")
             return redirect(f"/admin/master-list/edit-volunteer/{volunteer_id}")
 
         if start_hour is None or end_hour is None:
