@@ -1989,6 +1989,22 @@ def debug_absences():
 
     return {"absences": results}
 
+@app.route("/admin/fix-bad-absences")
+def fix_bad_absences():
+    from datetime import date, timedelta
+    today = date.today()
+
+    fixed = 0
+
+    for a in Absence.query.all():
+        if a.start_date <= today <= a.end_date:
+            a.end_date = today - timedelta(days=1)
+            fixed += 1
+
+    db.session.commit()
+
+    return f"Fixed {fixed} active absences"
+
 @app.route("/admin/fix-stuck-absent")
 def fix_stuck_absent():
     today = date.today()
