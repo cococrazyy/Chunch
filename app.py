@@ -1161,11 +1161,7 @@ def run_sync_absences():
             .order_by(Assignment.assignment_id.desc())\
             .first()
 
-        if assignment:
-            if assignment.original_station_id is None:
-                assignment.original_station_id = assignment.station_id
-            assignment.station_id = absent_station_id
-            assignment.is_absent = True
+        if existing:
             continue
 
         absence = Absence(
@@ -1177,9 +1173,6 @@ def run_sync_absences():
         )
 
         db.session.add(absence)
-        if assignment:
-            assignment.station_id = absent_station_id
-            assignment.is_absent = True
 
     db.session.commit()
 
