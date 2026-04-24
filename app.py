@@ -1084,7 +1084,7 @@ def build_station_state(volunteers, stations):
                     continue
 
                 debug_lines.append("→ DURING absence → takes station")
-                target_station_id = assignment.original_station_id
+                target_station_id = assignment.original_station_id or assignment.station_id
                 if target_station_id:
                     station_to_volunteer_ids[target_station_id].add(volunteer_id)
                 else:
