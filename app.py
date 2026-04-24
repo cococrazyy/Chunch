@@ -3264,12 +3264,6 @@ def debug_hourly_final():
                 .order_by(Assignment.assignment_id.desc())\
                 .first()
 
-            if latest_absence:
-                if assignment:
-                    assignment.is_absent = True
-                    assignment.station_id = absent_station_id
-                    assignment.absence_id = latest_absence.absence_id
-
             if assignment.is_absent:
                 if absent_station_id is not None:
                     station_to_volunteer_ids[absent_station_id].add(volunteer_id)
