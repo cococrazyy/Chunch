@@ -1091,12 +1091,15 @@ def build_station_state(volunteers, stations):
                     debug_lines.append("missing original_station_id")
                 continue
 
-        # absent
-        active_absence = Absence.query.filter(
-            Absence.volunteer_id == volunteer_id,
-            Absence.start_date <= today,
-            Absence.end_date >= today
-        ).first()
+        active_absence = None
+
+        #  do not mark covering volunteers as absent
+        if not (assignment and assignment.is_covering):
+            active_absence = Absence.query.filter(
+                Absence.volunteer_id == volunteer_id,
+                Absence.start_date <= today,
+                Absence.end_date >= today
+            ).first()
 
         debug_lines.append(f"active_absence: {bool(active_absence)}")
 
