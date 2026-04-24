@@ -1972,6 +1972,23 @@ def master_list():
 
 from datetime import date
 
+@app.route("/admin/debug-absences")
+def debug_absences():
+    from datetime import date
+    today = date.today()
+
+    results = []
+
+    for a in Absence.query.all():
+        results.append({
+            "volunteer_id": a.volunteer_id,
+            "start": str(a.start_date),
+            "end": str(a.end_date),
+            "active": a.start_date <= today <= a.end_date
+        })
+
+    return {"absences": results}
+
 @app.route("/admin/fix-stuck-absent")
 def fix_stuck_absent():
     today = date.today()
