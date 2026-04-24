@@ -991,7 +991,6 @@ def volunteer_hours_captain():
         #         assignment.station_id, set()
         #     ).add(volunteer_id)
 
-        station_to_volunteer_ids, debug = build_station_state(volunteers, stations)
 
         station_data = {}
         for station in stations:
