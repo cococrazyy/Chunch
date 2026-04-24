@@ -3129,35 +3129,33 @@ def debug_hourly_final():
             else:
                 return f"{h-12}PM"
 
-        # station_to_volunteer_ids = {
-        #     station.station_id: set()
-        #     for station in stations
-        # }
+        station_to_volunteer_ids = {
+            station.station_id: set()
+            for station in stations
+        }
 
-        # station_name_to_id = {
-        #     str(station.station_name).strip().lower(): station.station_id
-        #     for station in stations
-        # }
+        station_name_to_id = {
+            str(station.station_name).strip().lower(): station.station_id
+            for station in stations
+        }
 
-        # for row in rows:
-        #     first_name = str(row.get("First Name", "")).strip().lower()
-        #     last_name = str(row.get("Last Name", "")).strip().lower()
-        #     email = str(row.get("Email", "")).strip().lower()
-        #     typical_station = str(row.get("Typical Station", "")).strip().lower()
-        #     key = (first_name, last_name)
-        #     volunteer_id = volunteer_lookup.get(key)
+        for row in rows:
+            first_name = str(row.get("First Name", "")).strip().lower()
+            last_name = str(row.get("Last Name", "")).strip().lower()
+            email = str(row.get("Email", "")).strip().lower()
+            typical_station = str(row.get("Typical Station", "")).strip().lower()
+            key = (first_name, last_name)
+            volunteer_id = volunteer_lookup.get(key)
 
-        #     if not email or not typical_station or typical_station == "other":
-        #         continue
+            if not email or not typical_station or typical_station == "other":
+                continue
 
-        #     station_id = station_name_to_id.get(typical_station)
+            station_id = station_name_to_id.get(typical_station)
 
-        #     if volunteer_id is None or station_id is None:
-        #         continue
+            if volunteer_id is None or station_id is None:
+                continue
 
-        #     station_to_volunteer_ids[station_id].add(volunteer_id)
-
-        station_to_volunteer_ids, debug = build_station_state(volunteers, stations)
+            station_to_volunteer_ids[station_id].add(volunteer_id)
 
         absent_station = Station.query.filter_by(station_name="Absent").first()
         absent_station_id = absent_station.station_id if absent_station else None
