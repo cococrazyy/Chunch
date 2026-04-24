@@ -2045,6 +2045,45 @@ def debug_absences():
 
     return {"absences": results}
 
+
+@app.route("/admin/debug-absent-decision")
+def debug_absent_decision():
+    from datetime import date
+    today = date.today()
+
+    output = []
+
+    stations = Station.query.all()
+    volunteers = Volunteer.query.all()
+
+    station_to_volunteer_ids, debug = build_station_state(volunteers, stations)
+
+    absent_station = Station.query.filter_by(station_name="Absent").first()
+    absent_id = absent_station.station_id if absent_station else None
+
+    for v in volunteers:
+        assignment = Assignment.query.filter_by(
+            volunteer_id=v.id
+        ).order_by(Assignment.assignment_id.desc()).first()
+
+        in_absent = v.id in station_to_volunteer_ids.get(absent_id, set())
+
+        output.append({
+            "name": f"{v.first_name} {v.last_name}",
+            "id": v.id,
+            "in_absent_column": in_absent,
+            "assignment": {
+                "station_id": assignment.station_id if assignment else None,
+                "is_absent": assignment.is_absent if assignment else None,
+                "is_covering": assignment.is_covering if assignment else None,
+                "original_station_id": assignment.original_station_id if assignment else None,
+                "covering_for": assignment.covering_for_volunteer_id if assignment else None,
+                "absence_id": assignment.absence_id if assignment else None,
+            } if assignment else None
+        })
+
+    return {"debug": output}
+
 @app.route("/admin/fix-bad-absences")
 def fix_bad_absences():
     from datetime import date, timedelta
