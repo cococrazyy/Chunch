@@ -392,12 +392,22 @@ def admin_absences():
 
         absences = []
 
+        from datetime import datetime
+
+        def fix_date(d):
+            if not d:
+                return ""
+            try:
+                return datetime.strptime(str(d), "%m/%d/%Y").strftime("%Y-%m-%d")
+            except:
+                return str(d)
+
         for row in rows:
             first = row.get("First name", "")
             last = row.get("Last name", "")
 
-            start_date = row.get("Absence start date")
-            end_date = row.get("Absence end date")
+            start_date = fix_date(row.get("Absence start date"))
+            end_date = fix_date(row.get("Absence end date"))
 
             start_time = row.get("Absence start time")
             end_time = row.get("Absence end time")
