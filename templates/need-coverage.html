@@ -170,6 +170,34 @@ function togglePartialFields() {
     document.getElementById("partialFields").style.display = isPartial ? "block" : "none";
 }
 
+function getParam(name) {
+    return new URLSearchParams(window.location.search).get(name);
+}
+
+window.onload = function() {
+    const volunteerId = getParam("volunteer_id");
+    const startDate = getParam("start_date");
+    const endDate = getParam("end_date");
+    const notes = getParam("notes");
+
+    if (volunteerId) {
+        document.getElementById("volunteer_id").value = volunteerId;
+        $('#volunteer_id').trigger('change'); // for select2
+    }
+
+    if (startDate) {
+        document.getElementById("start_date").value = startDate;
+    }
+
+    if (endDate) {
+        document.getElementById("end_date").value = endDate;
+    }
+
+    if (notes) {
+        document.getElementById("notes").value = notes;
+    }
+};
+
 $(document).ready(function() {
     $('#volunteer_id').select2({
         placeholder: "Type to search a volunteer",
