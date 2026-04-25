@@ -508,6 +508,11 @@ body {
             <span class="label">Need Coverage?</span>
         </button>
 
+        <button onclick="loadAbsencesFromSheet()">
+            <span class="icon">📄</span>
+            <span class="label">Load Absences</span>
+        </button>
+
         <button onclick="window.location.href='/admin/master-list'">
             <span class="icon">👥</span>
             <span class="label">Volunteer Master List</span>
@@ -1067,6 +1072,28 @@ function renderStationBoard(stationData) {
     document.getElementById("assignedVolunteersCount").textContent = assignedVolunteers;
     document.getElementById("captainsCount").textContent = captainsCount;
     document.getElementById("reserveCount").textContent = reserveCount;
+}
+
+async function loadAbsencesFromSheet() {
+    try {
+        const res = await fetch("/admin/load-absences", {
+            method: "POST"
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            throw new Error(data.error || "Failed");
+        }
+
+        alert(`Loaded ${data.created} absences`);
+
+        // refresh board immediately
+        loadStationBoard();
+
+    } catch (err) {
+        alert(err.message);
+    }
 }
 
 async function loadStationBoard() {
