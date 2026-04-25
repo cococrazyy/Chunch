@@ -392,22 +392,12 @@ def admin_absences():
 
         absences = []
 
-        from datetime import datetime
-
-        def fix_date(d):
-            if not d:
-                return ""
-            try:
-                return datetime.strptime(str(d), "%m/%d/%Y").strftime("%Y-%m-%d")
-            except:
-                return str(d)
-
         for row in rows:
             first = row.get("First name", "")
             last = row.get("Last name", "")
 
-            start_date = fix_date(row.get("Absence start date"))
-            end_date = fix_date(row.get("Absence end date"))
+            start_date = row.get("Absence start date")
+            end_date = row.get("Absence end date")
 
             start_time = row.get("Absence start time")
             end_time = row.get("Absence end time")
@@ -2963,7 +2953,7 @@ def sync_volunteers():
         db.session.rollback()
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
     
-@app.route("/admin/need-coverage", methods=["GET", "POST"])
+@app.route("/admin/need-coverage")
 def need_coverage():
     if "user_id" not in session:
         return redirect("/")
@@ -2990,21 +2980,7 @@ def need_coverage():
         if (v.email or "").strip().lower() in non_reserve_emails
     ]
 
-    prefill = {}
-
-    if request.method == "POST":
-        prefill = {
-            "volunteer_id": request.form.get("volunteer_id", type=int),
-            "start_date": request.form.get("start_date"),
-            "end_date": request.form.get("end_date"),
-            "notes": request.form.get("notes")
-        }
-
-    return render_template(
-        "need-coverage.html",
-        volunteers=filtered_volunteers,
-        prefill=prefill
-    )
+    return render_template("need-coverage.html", volunteers=filtered_volunteers)
 
 #attempting to write a flask cli command to add admins
 import click
