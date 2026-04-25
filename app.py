@@ -784,11 +784,12 @@ def admin_page():
     try:
         debug_admin = request.args.get("debug_admin") == "1"
 
-        if "user_id" not in session and not debug_admin: 
+        if "user_id" not in session and not debug_admin:
             return redirect("/")
-        elif "captain" in "role":
+
+        elif session.get("role") == "captain":
             return redirect("/captain")
-            # return render_template("captain.html", volunteers=volunteers)
+
         volunteers = Volunteer.query\
             .filter(Volunteer.deleted_at.is_(None))\
             .order_by(Volunteer.last_name)\
