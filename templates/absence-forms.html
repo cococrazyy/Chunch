@@ -261,7 +261,7 @@
                         <td>
                             <a class="action-link" href="{{ a.coverage_url }}">
                                 <form method="POST" action="/admin/need-coverage">
-                                    <input type="hidden" name="volunteer_id" value="{{ a.volunteer_id }}">
+                                    <input type="hidden" name="volunteer_name" value="{{ a.first }} {{ a.last }}">
                                     <input type="hidden" name="start_date" value="{{ a.start_date }}">
                                     <input type="hidden" name="end_date" value="{{ a.end_date }}">
                                     <input type="hidden" name="notes" value="{{ a.comments or '' }}">
