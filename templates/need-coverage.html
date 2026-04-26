@@ -170,6 +170,41 @@ function togglePartialFields() {
     document.getElementById("partialFields").style.display = isPartial ? "block" : "none";
 }
 
+
+function autofillFromURL() {
+    const params = new URLSearchParams(window.location.search);
+
+    const volunteerId = params.get("volunteer_id");
+    const startDate = params.get("start_date");
+    const endDate = params.get("end_date");
+
+    // Convert MM/DD/YYYY to YYYY-MM-DD (required for input[type=date])
+    function formatDate(dateStr) {
+        if (!dateStr) return "";
+        const parts = dateStr.split("/");
+        if (parts.length !== 3) return dateStr;
+
+        const [month, day, year] = parts;
+        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    }
+
+    if (startDate) {
+        document.getElementById("start_date").value = formatDate(startDate);
+    }
+
+    if (endDate) {
+        document.getElementById("end_date").value = formatDate(endDate);
+    }
+
+    if (volunteerId) {
+        const select = document.getElementById("volunteer_id");
+        select.value = volunteerId;
+
+        // REQUIRED for Select2 to visually update
+        $('#volunteer_id').trigger('change');
+    }
+}
+
 $(document).ready(function() {
     $('#volunteer_id').select2({
         placeholder: "Type to search a volunteer",
