@@ -1202,15 +1202,6 @@ function openVolunteerPanel(volunteerJson) {
     document.getElementById("detailPanel").classList.add("open");
     document.getElementById("detailOverlay").classList.add("open");
     
-
-    const resetForm = document.getElementById("resetCoveringForm");
-
-    if (volunteer.is_covering) {
-        resetForm.style.display = "block";
-        resetForm.action = `/admin/reset-covering/${volunteer.id}`;
-    } else {
-        resetForm.style.display = "none";
-    }
         
 }
 
@@ -1465,11 +1456,6 @@ loadStationBoard();
             <button class="detail-btn back" type="button" onclick="closeVolunteerPanel()">Back</button>
             <button class="detail-btn edit" type="button" id = "editBtn" onclick="editVolunteer()">Edit</button>
             <button class="detail-btn save" type="button" id="saveBtn" onclick="saveVolunteer()" style="display:none;">Save changes</button>
-            <form id="resetCoveringForm" method="POST" style="display:none;">
-                <button class="detail-btn" type="submit" style="background:#6b7280; color:white;">
-                    Reset to Reserve
-                </button>
-            </form>
         </div>
     </div>
 
