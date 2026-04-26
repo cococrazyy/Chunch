@@ -1016,6 +1016,8 @@ def coverage_details():
     if absent_assignment and absent_assignment.station:
         station_name = str(absent_assignment.station.station_name)
 
+    absence_key = request.args.get("absence_key")
+
     return render_template(
         "coverage-details.html",
         absent_volunteer={
@@ -1034,7 +1036,8 @@ def coverage_details():
             "covered_end": covered_end
         },
         fully_available_reserves=fully_available_reserves,
-        partial_overlap_reserves=partial_overlap_reserves
+        partial_overlap_reserves=partial_overlap_reserves,
+        absence_key=absence_key
     )
 
 @app.route("/debug/restore-reserve/<int:volunteer_id>")
@@ -1458,6 +1461,30 @@ def assign_reserve_coverage():
 
         db.session.commit()
 
+        absence_key = request.form.get("absence_key")
+
+        if absence_key:
+            parts = absence_key.split("_")
+
+            if len(parts) >= 4:
+                first = parts[0].strip().lower()
+                last = parts[1].strip().lower()
+                start_date = parts[2]
+                end_date = parts[3]
+
+                sheet = get_sheet()
+                worksheet = sheet.spreadsheet.worksheet("Absence")
+                rows = worksheet.get_all_records()
+
+                for i, row in enumerate(rows, start=2):
+                    if (
+                        str(row.get("First name", "")).strip().lower() == first and
+                        str(row.get("Last name", "")).strip().lower() == last and
+                        str(row.get("Absence start date", "")) == start_date and
+                        str(row.get("Absence end date", "")) == end_date
+                    ):
+                        worksheet.delete_rows(i)
+                        break
         if send_email:
             print("Email draft opened in client mail app for:", reserve_volunteer.email)
 
