@@ -1461,6 +1461,7 @@ def assign_reserve_coverage():
 
         db.session.commit()
 
+        print("FORM DATA:", request.form)
         absence_key = request.form.get("absence_key")
 
         if absence_key:
