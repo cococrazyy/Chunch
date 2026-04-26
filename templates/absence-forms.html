@@ -258,10 +258,21 @@
                         <td>
                             {{ a.comments or "—" }}
                         </td>
-                        <td>
+                        <td style="display:flex; gap:8px;">
                             <a class="action-link" href="{{ a.coverage_url }}">
                                 <button class="action-btn" type="button">Find Coverage</button>
                             </a>
+
+                            <form method="POST" action="/admin/absences/delete" style="margin:0;">
+                                <input type="hidden" name="first" value="{{ a.first }}">
+                                <input type="hidden" name="last" value="{{ a.last }}">
+                                <input type="hidden" name="start_date" value="{{ a.start_date }}">
+                                <input type="hidden" name="end_date" value="{{ a.end_date }}">
+
+                                <button type="submit" class="action-btn" style="background:#6b7280;">
+                                    Delete
+                                </button>
+                            </form>
                         </td>
                     </tr>
                     {% endfor %}
