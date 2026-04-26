@@ -37,6 +37,31 @@ body {
     flex-wrap: wrap;
 }
 
+.absent-edit-btn {
+    border: 1px solid rgba(255,255,255,0.35);
+    background: rgba(255,255,255,0.14);
+    color: white;
+    border-radius: 999px;
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+.absent-edit-btn:hover {
+    background: rgba(255,255,255,0.28);
+    box-shadow: 0 0 14px rgba(255,255,255,0.45);
+    transform: translateY(-1px) scale(1.04);
+}
+
+.absent-edit-btn:focus {
+    outline: 2px solid rgba(255,255,255,0.7);
+    outline-offset: 2px;
+}
+
 .header-copy h1 {
     font-size: 32px;
     font-weight: 800;
