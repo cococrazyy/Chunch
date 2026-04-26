@@ -412,6 +412,31 @@ def admin_absences():
                 db.func.lower(Volunteer.first_name) == str(first).lower(),
                 db.func.lower(Volunteer.last_name) == str(last).lower()
             ).first()
+            if volunteer:
+                try:
+                    parsed_start = datetime.strptime(str(start_date), "%m/%d/%Y").date()
+                    parsed_end = datetime.strptime(str(end_date), "%m/%d/%Y").date()
+                except:
+                    parsed_start = None
+                    parsed_end = None
+
+                absence_record = None
+                if parsed_start and parsed_end:
+                    absence_record = Absence.query.filter_by(
+                        volunteer_id=volunteer.id,
+                        start_date=parsed_start,
+                        end_date=parsed_end
+                    ).first()
+
+                if absence_record:
+                    existing_assignment = Assignment.query.filter_by(
+                        absence_id=absence_record.absence_id,
+                        is_covering=True
+                    ).first()
+
+                    # If coverage exists for this absence, don't show it
+                    if existing_assignment:
+                        continue
 
             station_name = None
             volunteer_id = None
