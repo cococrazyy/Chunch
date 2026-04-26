@@ -401,6 +401,7 @@ def admin_absences():
 
             start_time = row.get("Absence start time")
             end_time = row.get("Absence end time")
+            absence_key = f"{first}_{last}_{start_date}_{end_date}"
 
             comments = row.get("Additional comments")
 
@@ -434,6 +435,7 @@ def admin_absences():
                 f"&start_time={start_time or ''}"
                 f"&end_time={end_time or ''}"
                 f"&notes={comments or ''}"
+                f"&absence_key={absence_key}"
             )
 
             absences.append({
