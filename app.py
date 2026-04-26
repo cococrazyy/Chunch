@@ -392,27 +392,12 @@ def admin_absences():
 
         absences = []
 
-        from datetime import datetime
-
-        def format_date_for_input(d):
-            if not d:
-                return ""
-            if isinstance(d, datetime):
-                return d.strftime("%Y-%m-%d")
-            try:
-                return datetime.strptime(d, "%m/%d/%Y").strftime("%Y-%m-%d")
-            except:
-                return str(d)
-
         for row in rows:
             first = row.get("First name", "")
             last = row.get("Last name", "")
 
-            start_date_raw = row.get("Absence start date")
-            end_date_raw = row.get("Absence end date")
-
-            start_date = format_date_for_input(start_date_raw)
-            end_date = format_date_for_input(end_date_raw)
+            start_date = row.get("Absence start date")
+            end_date = row.get("Absence end date")
 
             start_time = row.get("Absence start time")
             end_time = row.get("Absence end time")
@@ -440,6 +425,7 @@ def admin_absences():
                 if assignment and assignment.station:
                     station_name = str(assignment.station.station_name)
 
+            # build URL to auto-fill need coverage page
             coverage_url = (
                 f"/admin/need-coverage?"
                 f"volunteer_id={volunteer_id or ''}"
