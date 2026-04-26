@@ -259,14 +259,9 @@
                             {{ a.comments or "—" }}
                         </td>
                         <td>
-                            <form method="POST" action="/admin/need-coverage">
-                                <input type="hidden" name="volunteer_id" value="{{ a.volunteer_id }}">
-                                <input type="hidden" name="start_date" value="{{ a.start_date }}">
-                                <input type="hidden" name="end_date" value="{{ a.end_date }}">
-                                <input type="hidden" name="notes" value="{{ a.comments or '' }}">
-
-                                <button class="action-btn" type="submit">Find Coverage</button>
-                            </form>
+                            <a class="action-link" href="{{ a.coverage_url }}">
+                                <button class="action-btn" type="button">Find Coverage</button>
+                            </a>
                         </td>
                     </tr>
                     {% endfor %}
