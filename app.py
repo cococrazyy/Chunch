@@ -2248,7 +2248,10 @@ def add_volunteer():
     station_id = request.form.get("station_id", type = int)
     start_hour = request.form.get("start_hour", type=int)
     end_hour = request.form.get("end_hour", type=int)
-    
+    if start_hour is None or end_hour is None:
+        return "Start and end hour are required", 400
+    if end_hour <= start_hour:
+        return "Invalid time range", 400
     
     existing = Volunteer.query.filter_by(first_name = first_name, email=email).first()
     if existing:
@@ -2349,14 +2352,17 @@ def edit_master_volunteer(volunteer_id):
     email = request.form.get("email", "").strip().lower()
     phone = request.form.get("phone", "").strip()
     is_floater = request.form.get("is_floater", "no") == "yes"
-
-    if not first_name or not last_name or not email:
-        flash("All fields are required.")
-        return redirect(f"/master-list/edit-volunteer/{volunteer_id}")
-
-    existing = Volunteer.query.filter_by(email=email).first()
+    station_id = request.form.get("station_id", type = int)
+    start_hour = request.form.get("start_hour", type=int)
+    end_hour = request.form.get("end_hour", type=int)
+    if start_hour is None or end_hour is None:
+        return "Start and end hour are required", 400
+    if end_hour <= start_hour:
+        return "Invalid time range", 400
+        
+    existing = Volunteer.query.filter_by(first_name = first_name, last_name = last_name).first()
     if existing and existing.id != volunteer.id:
-        flash("Volunteer with that email already exists.")
+        flash("Volunteer already exists.")
         return redirect(f"/master-list/edit-volunteer/{volunteer_id}")
 
     volunteer.first_name = first_name
@@ -2364,6 +2370,19 @@ def edit_master_volunteer(volunteer_id):
     volunteer.email = email
     volunteer.phone = phone
     volunteer.is_floater = is_floater
+    volunteer.station_id = station_id
+    
+    def format_hour(h): 
+        if h == 0: 
+            return "12AM" 
+        elif h < 12: 
+            return f"{h}AM" 
+        elif h == 12: 
+            return "12PM" 
+        else: 
+            return f"{h-12}PM"
+
+    volunteer.typical_shift = f"{format_hour(start_hour)} - {format_hour(end_hour)}"
 
     db.session.commit()
 
