@@ -2399,18 +2399,13 @@ def edit_master_volunteer(volunteer_id):
             #flash("First name, last name, and email are required.")
             #return redirect(f"/admin/master-list/edit-volunteer/{volunteer_id}")
 
-        existing = Volunteer.query.filter_by(first_name = first_name, last_name = last_name).first()
-        if existing and existing.id != volunteer.id:
-            flash("Volunteer already exists.")
-            return redirect(f"/admin/master-list/edit-volunteer/{volunteer_id}")
-
         typical_shift = f"{format_hour(start_hour)} - {format_hour(end_hour)}"
 
         volunteer.first_name = first_name
         volunteer.last_name = last_name
         volunteer.email = email
         volunteer.phone = phone
-        volunteer.role = role
+        volunteer.account.role = role
         volunteer.typical_shift = typical_shift
         volunteer.unavailability = unavailability
         volunteer.capability_restrictions = capability_restrictions
@@ -2418,15 +2413,7 @@ def edit_master_volunteer(volunteer_id):
         volunteer.is_floater = is_floater
 
         db.session.commit()
-
-    start_hour, end_hour = parse_shift(volunteer.typical_shift)
-
-    return render_template(
-    "master-list.html", 
-    volunteer=volunteer,
-    start_hour = start_hour,
-    end_hour = end_hour
-    ) 
+    return redirect("/admin/master-list")
     
 @app.route("/student-spotlight")
 def student_spotlight():
