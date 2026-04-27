@@ -1055,12 +1055,13 @@ function renderStationBoard(stationData) {
                         // added for captain/admin symbol
                         const captainBadge = isCaptain(volunteer) ? " (C)" : "";
                         const adminBadge = isAdmin(volunteer) ? " (A)" : "";
+                        const techBadge = isTech(volunteer) ? " (T)" : "";
                         return `
                             <button class="volunteer-pill" type="button" onclick='openVolunteerPanel(${JSON.stringify(JSON.stringify({...volunteer, 
                                 // added for station
                                 station: stationName,
                                 }))})'>
-                                ${displayName}${captainBadge}${adminBadge}${displayTime}
+                                ${displayName}${captainBadge}${adminBadge}${techBadge}${displayTime}
                             </button>
                         `;
                     }).join("")}
