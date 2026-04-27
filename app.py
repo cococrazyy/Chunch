@@ -2270,13 +2270,13 @@ def add_volunteer():
     
     for hour in range(start_hour, end_hour+1):
         availability = Availability(
-            volunteer_id=volunteer.id,
+            volunteer_id=new_volunteer.id,
             hour=hour
         )
         db.session.add(availability)
     
     assignment = Assignment(
-        volunteer_id=volunteer.id,
+        volunteer_id=new_volunteer.id,
         station_id=station_id,
     )
     db.session.add(assignment)
@@ -2290,7 +2290,7 @@ def add_volunteer():
         else: 
             return f"{h-12}PM"
 
-    volunteer.typical_shift = f"{format_hour(start_hour)} - {format_hour(end_hour)}"
+    new_volunteer.typical_shift = f"{format_hour(start_hour)} - {format_hour(end_hour)}"
     db.session.commit()
     grant_drive_access(new_volunteer.email)
     return redirect("/admin/master-list")
