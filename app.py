@@ -2125,7 +2125,12 @@ def accept_applicant():
     
     start_hour = request.form.get("start_hour", type=int)
     end_hour = request.form.get("end_hour", type=int)
-
+    
+    if start_hour is None or end_hour is None:
+        return "Start and end hour are required", 400
+    if end_hour <= start_hour:
+        return "Invalid time range", 400
+        
     applicant = Applicant.query.get_or_404(applicants_id)
     volunteer = Volunteer(
         first_name=applicant.first_name,
@@ -2138,9 +2143,6 @@ def accept_applicant():
     
     db.session.add(volunteer)
     db.session.flush()  
-    
-    if end_hour <= start_hour:
-        return "Invalid time range", 400
         
     for hour in range(start_hour, end_hour+1):
         availability = Availability(
@@ -2154,7 +2156,17 @@ def accept_applicant():
         station_id=station_id,
     )
     db.session.add(assignment)
+    def format_hour(h): 
+    if h == 0: 
+        return "12AM" 
+    elif h < 12: 
+        return f"{h}AM" 
+    elif h == 12: 
+        return "12PM" 
+    else: 
+        return f"{h-12}PM"
 
+    volunteer.typical_shift = f"{format_hour(start_hour)} - {format_hour(end_hour)}"
     applicant.status = "accepted"
     db.session.commit()
 
