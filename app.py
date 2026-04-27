@@ -2253,7 +2253,7 @@ def master_list():
             "email": v.email,
             "phone": v.phone,
             "role": user.role.capitalize() if user is not None else "Volunteer",
-            "is_floater": v.is_floater
+            "is_floater": v.is_floater,
             "start_hour": start_hour,
             "end_hour": end_hour,
             "station_id": v.station_id,
