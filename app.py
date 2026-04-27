@@ -2342,52 +2342,101 @@ def undo_delete(volunteer_id):
 def edit_master_volunteer(volunteer_id):
     if "user_id" not in session:
         return redirect("/")
-
+    
     volunteer = Volunteer.query.get_or_404(volunteer_id)
-    if not volunteer:
+    
+    def parse_shift(shift_str):
+        if not shift_str:
+            return None, None
+    
+        try:
+            start_str, end_str = shift_str.split(" - ")
+
+            def parse_hour(h):
+                h = h.strip().upper()
+    
+                if "AM" in h:
+                    hour = int(h.replace("AM", ""))
+                    return 0 if hour == 12 else hour
+    
+                if "PM" in h:
+                    hour = int(h.replace("PM", ""))
+                    return 12 if hour == 12 else hour + 12
+    
+                return None
+
+            start_hour = parse_hour(start_str)
+            end_hour = parse_hour(end_str)
+            
+            return start_hour, end_hour
+
+        except Exception:
+            return None, None
+    def format_hour(hour):
+        if hour == 0:
+            return "12AM"
+        elif hour < 12:
+            return f"{hour}AM"
+        elif hour == 12:
+            return "12PM"
+        else:
+            return f"{hour - 12}PM"
+    
+    if request.method == "POST":
+        first_name = request.form.get("first_name", "").strip()
+        last_name = request.form.get("last_name", "").strip()
+        email = request.form.get("email", "").strip().lower()
+        phone = request.form.get("phone", "").strip()
+        role = request.form.get("role", "").strip().lower()
+        unavailability = request.form.get("unavailability", "").strip()
+        capability_restrictions = request.form.get("capability_restrictions", "").strip()
+        station_id = request.form.get("station_id", type=int)
+        start_hour = request.form.get("start_hour", type=int)
+        end_hour = request.form.get("end_hour", type=int)
+        is_floater = request.form.get("is_floater") == "on"
+
+        #if not first_name or not last_name or not email:
+            #flash("First name, last name, and email are required.")
+            #return redirect(f"/admin/master-list/edit-volunteer/{volunteer_id}")
+
+        existing = Volunteer.query.filter_by(first_name = first_name, last_name = last_name).first()
+        if existing and existing.id != volunteer.id:
+            flash("Volunteer already exists.")
+            return redirect(f"/admin/master-list/edit-volunteer/{volunteer_id}")
+
+        if start_hour is None or end_hour is None:
+            flash("Start hour and end hour are required.")
+            return redirect(f"/admin/master-list/edit-volunteer/{volunteer_id}")
+
+        if end_hour <= start_hour:
+            flash("Invalid time range.")
+            return redirect(f"/admin/master-list/edit-volunteer/{volunteer_id}")
+
+        typical_shift = f"{format_hour(start_hour)} - {format_hour(end_hour)}"
+
+        volunteer.first_name = first_name
+        volunteer.last_name = last_name
+        volunteer.email = email
+        volunteer.phone = phone
+        volunteer.role = role
+        volunteer.typical_shift = typical_shift
+        volunteer.unavailability = unavailability
+        volunteer.capability_restrictions = capability_restrictions
+        volunteer.station_id = station_id
+        volunteer.is_floater = is_floater
+
+        db.session.commit()
         return redirect("/admin/master-list")
 
-    first_name = request.form.get("first_name", "").strip()
-    last_name = request.form.get("last_name", "").strip()
-    email = request.form.get("email", "").strip().lower()
-    phone = request.form.get("phone", "").strip()
-    is_floater = request.form.get("is_floater", "no") == "yes"
-    station_id = request.form.get("station_id", type = int)
-    start_hour = request.form.get("start_hour", type=int)
-    end_hour = request.form.get("end_hour", type=int)
-    if start_hour is None or end_hour is None:
-        return "Start and end hour are required", 400
-    if end_hour <= start_hour:
-        return "Invalid time range", 400
-        
-    existing = Volunteer.query.filter_by(first_name = first_name, last_name = last_name).first()
-    if existing and existing.id != volunteer.id:
-        flash("Volunteer already exists.")
-        return redirect(f"/master-list/edit-volunteer/{volunteer_id}")
+    start_hour, end_hour = parse_shift(volunteer.typical_shift)
 
-    volunteer.first_name = first_name
-    volunteer.last_name = last_name
-    volunteer.email = email
-    volunteer.phone = phone
-    volunteer.is_floater = is_floater
-    volunteer.station_id = station_id
+    return render_template(
+    "master-list.html", 
+    volunteer=volunteer,
+    start_hour = start_hour,
+    end_hour = end_hour
+    ) 
     
-    def format_hour(h): 
-        if h == 0: 
-            return "12AM" 
-        elif h < 12: 
-            return f"{h}AM" 
-        elif h == 12: 
-            return "12PM" 
-        else: 
-            return f"{h-12}PM"
-
-    volunteer.typical_shift = f"{format_hour(start_hour)} - {format_hour(end_hour)}"
-
-    db.session.commit()
-
-    return redirect("/admin/master-list")
-
 @app.route("/student-spotlight")
 def student_spotlight():
     try:
