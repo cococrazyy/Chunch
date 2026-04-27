@@ -2157,14 +2157,14 @@ def accept_applicant():
     )
     db.session.add(assignment)
     def format_hour(h): 
-    if h == 0: 
-        return "12AM" 
-    elif h < 12: 
-        return f"{h}AM" 
-    elif h == 12: 
-        return "12PM" 
-    else: 
-        return f"{h-12}PM"
+        if h == 0: 
+            return "12AM" 
+        elif h < 12: 
+            return f"{h}AM" 
+        elif h == 12: 
+            return "12PM" 
+        else: 
+            return f"{h-12}PM"
 
     volunteer.typical_shift = f"{format_hour(start_hour)} - {format_hour(end_hour)}"
     applicant.status = "accepted"
