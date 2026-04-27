@@ -2244,8 +2244,12 @@ def add_volunteer():
     email = request.form.get("email", "").strip().lower()
     phone = request.form.get("phone", "").strip()
     # default is false if get has no return, if true then becomes true
-    is_floater = (request.form.get("is_floater", "no") == "yes") 
-
+    is_floater = (request.form.get("is_floater", "no") == "yes")
+    station_id = request.form.get("station_id", type = int)
+    start_hour = request.form.get("start_hour", type=int)
+    end_hour = request.form.get("end_hour", type=int)
+    
+    
     existing = Volunteer.query.filter_by(first_name = first_name, email=email).first()
     if existing:
         flash("Volunteer with that email already exists.")
@@ -2256,10 +2260,37 @@ def add_volunteer():
         last_name=last_name,
         email=email,
         phone=phone,
-        is_floater=is_floater
+        station_id = station_id,
+        is_floater=is_floater,
+        
     )
 
     db.session.add(new_volunteer)
+    db.session.flush()
+    
+    for hour in range(start_hour, end_hour+1):
+        availability = Availability(
+            volunteer_id=volunteer.id,
+            hour=hour
+        )
+        db.session.add(availability)
+    
+    assignment = Assignment(
+        volunteer_id=volunteer.id,
+        station_id=station_id,
+    )
+    db.session.add(assignment)
+    def format_hour(h): 
+        if h == 0: 
+            return "12AM" 
+        elif h < 12: 
+            return f"{h}AM" 
+        elif h == 12: 
+            return "12PM" 
+        else: 
+            return f"{h-12}PM"
+
+    volunteer.typical_shift = f"{format_hour(start_hour)} - {format_hour(end_hour)}"
     db.session.commit()
     grant_drive_access(new_volunteer.email)
     return redirect("/admin/master-list")
