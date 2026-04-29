@@ -455,6 +455,16 @@ def admin_absences():
                         end_date=parsed_end
                     ).first()
 
+                if absence_record:
+                    existing_assignment = Assignment.query.filter_by(
+                        absence_id=absence_record.absence_id,
+                        is_covering=True
+                    ).first()
+
+                    # If coverage exists for this absence, don't show it
+                    if existing_assignment:
+                        continue
+
             station_name = None
             volunteer_id = None
 
@@ -1499,6 +1509,8 @@ def assign_reserve_coverage():
         )
         db.session.add(reserve_assignment)
 
+        absent_assignment.is_absent = True
+
         db.session.commit()
 
         print("FORM DATA:", request.form)
@@ -1867,7 +1879,7 @@ def debug_hourly_final():
                 continue
 
             # Skip special cases (important)
-            if assignment.is_covering:
+            if assignment.is_absent or assignment.is_covering:
                 continue
 
             # If assignment doesn't match volunteer's station → fix it
@@ -1906,13 +1918,7 @@ def debug_hourly_final():
             else:
                 volunteer_rows_by_id[volunteer_id]["display_time"] = ""
 
-            active_absence = Absence.query.filter(
-                Absence.volunteer_id == volunteer_id,
-                Absence.start_date <= today,
-                Absence.end_date >= today
-            ).first()
-
-            if active_absence:
+            if assignment.is_absent:
                 if absent_station_id is not None:
                     station_to_volunteer_ids[absent_station_id].add(volunteer_id)
                 continue
