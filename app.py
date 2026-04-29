@@ -3243,7 +3243,7 @@ def sync_volunteers():
 
         for row in rows:
             email = str(row.get("Email", "")).strip().lower()
-            volunteer = Volunteer.query.filter_by(email=email).first()
+            volunteer = Volunteer.query.filter_by(first_name = first_name, last_name = last_name).first()
             if not volunteer:
                 continue
 
