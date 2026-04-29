@@ -455,16 +455,6 @@ def admin_absences():
                         end_date=parsed_end
                     ).first()
 
-                if absence_record:
-                    existing_assignment = Assignment.query.filter_by(
-                        absence_id=absence_record.absence_id,
-                        is_covering=True
-                    ).first()
-
-                    # If coverage exists for this absence, don't show it
-                    if existing_assignment:
-                        continue
-
             station_name = None
             volunteer_id = None
 
