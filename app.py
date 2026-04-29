@@ -1509,8 +1509,6 @@ def assign_reserve_coverage():
         )
         db.session.add(reserve_assignment)
 
-        absent_assignment.is_absent = True
-
         db.session.commit()
 
         print("FORM DATA:", request.form)
