@@ -304,16 +304,24 @@ def me():
         "role": session["role"]
     })
 
+# ABSENCES
 @app.route("/admin/load-absences", methods=["POST"])
 def load_absences():
+    """
+        Pulls information about absent volunteers from Google spreadsheet
+    """
     try:
+        # Pull absence information from spreadsheet
         sheet = get_sheet()
         worksheet = sheet.spreadsheet.worksheet("Absence")
         rows = worksheet.get_all_records()
 
+        # Number of absentees in list
         created = 0
 
+        # Loop through data to create absences
         for row in rows:
+            # Get info
             first = str(row.get("First name", "")).strip().lower()
             last = str(row.get("Last name", "")).strip().lower()
 
@@ -325,14 +333,17 @@ def load_absences():
 
             notes = row.get("Additional comments")
 
+            # ??
             if not first or not last or not start_date or not end_date:
                 continue
 
+            # Get all volunteer names
             volunteer = Volunteer.query.filter(
                 db.func.lower(Volunteer.first_name) == first,
                 db.func.lower(Volunteer.last_name) == last
             ).first()
 
+            # Skip the rest if this person is not a volunteer
             if not volunteer:
                 continue
 
@@ -343,12 +354,17 @@ def load_absences():
                 end_date=end_date
             ).first()
 
+            # Skip if this absence exists
             if existing:
                 continue
 
+            # Check ????
             is_partial = bool(partial_start and partial_end)
 
             def parse_hour(t):
+                """
+                    returns military time 
+                """
                 if not t:
                     return None
                 t = str(t).upper().replace(" ", "")
@@ -361,6 +377,7 @@ def load_absences():
                     return num
                 return None
 
+            # Create new absence instance
             absence = Absence(
                 volunteer_id=volunteer.id,
                 start_date=start_date,
@@ -370,8 +387,10 @@ def load_absences():
                 partial_end_hour=parse_hour(partial_end),
                 notes=notes
             )
-
+            
+            # Add absence to the database
             db.session.add(absence)
+            # Increment counter
             created += 1
 
         db.session.commit()
@@ -384,6 +403,9 @@ def load_absences():
 
 @app.route("/admin/absences/delete", methods=["POST"])
 def delete_absence_form():
+    """
+        Remove absence from database and spreadsheet
+    """
     try:
         first = request.form.get("first", "").strip()
         last = request.form.get("last", "").strip()
@@ -404,6 +426,9 @@ def delete_absence_form():
             ):
                 worksheet.delete_rows(i)
                 break
+        absence = Absence.query.filter_by(
+            # volunteer_id
+        )
 
         return redirect("/admin/absences")
 
@@ -517,27 +542,6 @@ def edit_volunteer():
     volunteer.is_floater = data.get("is_floater")
 
     assignment = Assignment.query.filter_by(volunteer_id=volunteer.id).order_by(Assignment.assignment_id.desc()).first()
-    # commenting out for reverting
-    # assignment = Assignment.query.filter_by(volunteer_id=volunteer.id).all() # returns None if volunteer is not in the system
-    # prev_station = assignment.get(volunteer.station_id) if assignment else None
-    # if assignment is None:
-    #     return jsonify({"error": "Volunteer has no assignment"}), 404 
-    # prev_station = {} # assignment.station_id
-    # # if the stations aren't the same, add the volunteer to the new station and remove them from the old station
-    # if(prev_station != volunteer.station_id):
-    #     # assigned_id.append(data["id"])
-    #     db.session.delete(Assignment(volunteer_id=volunteer.id, station_id=prev_station[assignment.volunteer_id]))
-    #     db.session.add(Assignment(volunteer_id=volunteer.id, station_id=volunteer.station_id))
-    #     assignment.station_id = volunteer.station_id 
-    #     current = prev_station.get(assignment.volunteer_id)
-    #     if current is None or assignment.assignment_id != current.assignment_id:
-    #         prev_station[assignment.volunteer_id] = assignment
-    #         db.session.add(assignment)
-    #         db.session.delete(prev_station)
-    #         db.session.commit()
-    
-    # The assignment of the new station, list of volunteers for that station
-    # check for volunteer in this assignment    
 
     if "role" in data:
         new_role = data["role"]
