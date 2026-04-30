@@ -2583,7 +2583,20 @@ def edit_master_volunteer(volunteer_id):
         volunteer.last_name = last_name
         volunteer.email = email
         volunteer.phone = phone
-        volunteer.account.role = role
+        if role == 'volunteer':
+            if volunteer.account:
+                db.session.delete(volunteer.account)
+                volunteer.account = None
+        else: 
+            if volunteer.account is None:
+                volunteer.account = UserAccount(
+                    volunteer_id = volunteer_id,
+                    role = role
+                )
+                db.session.add(volunteer.account)
+            else:
+                volunteer.account.role = role
+        
         volunteer.typical_shift = typical_shift
         volunteer.unavailability = unavailability
         volunteer.capability_restrictions = capability_restrictions
