@@ -2679,11 +2679,13 @@ def volunteer_hours():
 
         db.session.commit()
 
+        #stations = Station.query\
+            #.filter(Station.station_name.notin_(["Reserve", "Absent", "Other"]))\
+            #.order_by(Station.station_name)\
+            #.all()
         stations = Station.query\
-            .filter(Station.station_name.notin_(["Reserve", "Absent", "Other"]))\
-            .order_by(Station.station_name)\
-            .all()
-
+        .order_by(Station.station_name)\
+        .all()
         sheet = get_sheet()
         rows = sheet.get_all_records()
 
@@ -2790,58 +2792,61 @@ def volunteer_hours():
         today = date.today()
         assignments = Assignment.query.all()
 
-        latest_assignment_by_volunteer = {}
-        for assignment in assignments:
-            if assignment.volunteer_id is None:
-                continue
+        #commented out by Aaron 4/29
+        # latest_assignment_by_volunteer = {}
+        # for assignment in assignments:
+        #     if assignment.volunteer_id is None:
+        #         continue
 
-            current = latest_assignment_by_volunteer.get(assignment.volunteer_id)
-            if current is None or assignment.assignment_id > current.assignment_id:
-                latest_assignment_by_volunteer[assignment.volunteer_id] = assignment
+        #     current = latest_assignment_by_volunteer.get(assignment.volunteer_id)
+        #     if current is None or assignment.assignment_id > current.assignment_id:
+        #         latest_assignment_by_volunteer[assignment.volunteer_id] = assignment
 
-        for volunteer_id, assignment in latest_assignment_by_volunteer.items():
-            if volunteer_id not in volunteer_rows_by_id:
-                continue
+        # for volunteer_id, assignment in latest_assignment_by_volunteer.items():
+        #     if volunteer_id not in volunteer_rows_by_id:
+        #         continue
 
-            for volunteer_ids in station_to_volunteer_ids.values():
-                volunteer_ids.discard(volunteer_id)
+        #     for volunteer_ids in station_to_volunteer_ids.values():
+        #         volunteer_ids.discard(volunteer_id)
 
-            if assignment.is_covering and assignment.absence_id:
-                absence = Absence.query.get(assignment.absence_id)
-                if absence and absence.end_date < today:
-                    continue
+        #     if assignment.is_covering and assignment.absence_id:
+        #         absence = Absence.query.get(assignment.absence_id)
+        #         if absence and absence.end_date < today:
+        #             continue
 
-            if assignment.is_absent:
-                continue
+        #     if assignment.is_absent:
+        #         continue
 
-            if assignment.station_id is None:
-                continue
+        #     if assignment.station_id is None:
+        #         continue
 
-            station = Station.query.get(assignment.station_id)
-            if not station:
-                continue
+        #     station = Station.query.get(assignment.station_id)
+        #     if not station:
+        #         continue
 
-            station_name = str(station.station_name)
-            if station_name in ["Reserve", "Absent", "Other"]:
-                continue
+        #     station_name = str(station.station_name)
+        #     if station_name in ["Reserve", "Absent", "Other"]:
+        #         continue
 
-            if (
-                assignment.is_covering and
-                assignment.cover_start_hour is not None and
-                assignment.cover_end_hour is not None
-            ):
-                start_hour = assignment.cover_start_hour
-                end_hour = assignment.cover_end_hour
-                coverage_hours = list(range(start_hour, end_hour + 1))
-                volunteer_rows_by_id[volunteer_id]["hours"] = coverage_hours
-                volunteer_rows_by_id[volunteer_id]["ranges"] = [[start_hour, end_hour]]
-                volunteer_rows_by_id[volunteer_id]["range_label"] = (
-                    f"{format_hour(start_hour)}-{format_hour(end_hour)}"
-                )
+        #     if (
+        #         assignment.is_covering and
+        #         assignment.cover_start_hour is not None and
+        #         assignment.cover_end_hour is not None
+        #     ):
+        #         start_hour = assignment.cover_start_hour
+        #         end_hour = assignment.cover_end_hour
+        #         coverage_hours = list(range(start_hour, end_hour + 1))
+        #         volunteer_rows_by_id[volunteer_id]["hours"] = coverage_hours
+        #         volunteer_rows_by_id[volunteer_id]["ranges"] = [[start_hour, end_hour]]
+        #         volunteer_rows_by_id[volunteer_id]["range_label"] = (
+        #             f"{format_hour(start_hour)}-{format_hour(end_hour)}"
+        #         )
 
-            station_to_volunteer_ids.setdefault(
-                assignment.station_id, set()
-            ).add(volunteer_id)
+        #     station_to_volunteer_ids.setdefault(
+        #         assignment.station_id, set()
+        #     ).add(volunteer_id)
+
+        station_to_volunteer_ids, debug = build_station_state(volunteers, stations)
 
         station_data = {}
         for station in stations:
@@ -2859,8 +2864,9 @@ def volunteer_hours():
             station_data[station_name] = volunteers_for_station
 
         return render_template(
-            "volunteer-hours.html",
-            station_data=station_data
+            "volunteer-hours-cap.html",
+            station_data=station_data,
+            debug=debug
         )
 
     except Exception as e:
