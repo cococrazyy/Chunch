@@ -525,7 +525,23 @@ Thank you!`;
         }
 
         closeAssignPopup();
-        activeAssignForm.submit();
+        fetch(activeAssignForm.action, {
+            method: "POST",
+            body: new FormData(activeAssignForm)
+        })
+        .then(async res => {
+            if (!res.ok) {
+                const text = await res.text();
+                const clean = text.replace(/<[^>]+>/g, "");
+                alert(clean);
+                return;
+            }
+
+            window.location.reload();
+        })
+        .catch(() => {
+            alert("Something went wrong.");
+        });
     }
 
     document.getElementById("coverFullShiftCheckbox").addEventListener("change", function() {
