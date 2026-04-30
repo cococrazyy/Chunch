@@ -2378,10 +2378,7 @@ def master_list():
     for v in volunteers:
         user = UserAccount.query.filter(UserAccount.volunteer_id == v.id).first()
         start_hour, end_hour = parse_shift(v.typical_shift)
-    
-    for v in volunteers:
         #role = role_by_volunteer_id.get(v.id, "volunteer")
-        user = UserAccount.query.filter(UserAccount.volunteer_id == v.id).first() 
         volunteer_rows.append({
             "id": v.id,
             "first_name": v.first_name,
