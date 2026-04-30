@@ -235,7 +235,7 @@ with app.app_context():
 # Serve your existing HTML pages
 @app.route("/")
 def home():
-    return send_from_directory("/templates/", "index.html")
+    return send_from_directory("templates", "index.html")
 
 @app.route("/<path:path>")
 def static_files(path):
