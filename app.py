@@ -3246,7 +3246,8 @@ def sync_volunteers():
             return None
 
         for row in rows:
-            email = str(row.get("Email", "")).strip().lower()
+            first_name = str(row.get("First Name", "")).strip()
+            last_name = str(row.get("Last Name", "")).strip()
             volunteer = Volunteer.query.filter_by(first_name = first_name, last_name = last_name).first()
             if not volunteer:
                 continue
