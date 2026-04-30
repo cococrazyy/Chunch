@@ -1,0 +1,184 @@
+/* 
+    Style code for public-facing component home page 
+*/
+
+/* Universal */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+body {
+    background: #f4f6f9;
+    color: #1f2937;
+    line-height: 1.6;
+}
+h1 {
+    font-size: 48px;
+    margin-bottom: 30px;
+    font-weight: 700;
+    color: #111827;
+}
+p {
+    margin-bottom: 18px;
+    font-size: 18px;
+    color: #374151;
+}
+section {
+    margin: 10px 0;
+    padding: 10px 20px;
+}
+cite {
+    display: block;
+    margin-top: 8px;
+    font-size: 12px;
+}
+
+/* Navbar */
+.navbar {
+    background: #0f172a;
+    padding: 18px 40px;
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+}
+.navbar a {
+    text-decoration: none;
+    color: white;
+    font-weight: 600;
+    padding: 10px 18px;
+    border-radius: 8px;
+    transition: 0.3s ease;
+}
+.navbar a:hover {
+    background: #2563eb;
+}
+
+/* MAIN CONTENT */
+.container {
+    max-width: 900px;
+    margin: 80px auto;
+    text-align: center;
+    padding: 0 20px;
+}
+.tagline {
+    /* background-color: rgb(236, 193, 244); */
+    text-align: center;
+    padding: 5px 10px;
+    margin: 5px auto;
+    width: 400px;
+    /* border-radius: 18px; */
+    /* max-width: 500px; */
+}
+.tagline p {
+    margin-bottom: 2px;
+    font-size: 24px;
+}
+.about {
+    max-width: 1000px;
+    text-align: center;
+    margin: 30px 10px;
+}
+.define {
+    background-color: white;
+    border-radius: 32px;
+    margin: 30px 10px;
+}
+.mission {
+    background-color: white;
+    border-radius: 32px;
+    margin: 30px 10px;
+}
+.story {
+    background-color: white;
+    border-radius: 32px;
+    margin: 30px 10px;
+}
+
+/* Buttons */
+.primary-btn {
+    margin-top: 50px;
+    padding: 18px 40px;
+    font-size: 20px;
+    font-weight: 600;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: white;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+    transition: all 0.3s ease;
+}
+.primary-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(37, 99, 235, 0.4);
+}
+.admin-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    padding: 12px 24px;
+    border-radius: 30px;
+    border: none;
+    background: #e5e7eb;
+    color: #111827;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+.admin-btn:hover {
+    background: #d1d5db;
+}
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 18px;
+    font-size: 22px;
+    font-weight: 600;
+    cursor: pointer;
+    color: #6b7280;
+    transition: 0.2s ease;
+}
+.close-btn:hover {
+    color: #111827;
+}
+
+/* Login modal */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.2s ease;
+    z-index: 999;
+}
+.modal-content {
+    position: relative;
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    width: 360px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+
+/* ????? */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 36px;
+    }
+
+    .navbar {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+}

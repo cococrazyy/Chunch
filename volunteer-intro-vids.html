@@ -1,125 +1,132 @@
+<!-- 
+    TODO: Description of file
+-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Volunteer Intro</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Volunteer Intro</title>
 
-<style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Inter', sans-serif;
-}
+    <!-- Import font & style -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style/volunteer.css">
 
-body {
-    background: #f4f6f9;
-    color: #1f2937;
-}
+    <!-- <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Inter', sans-serif;
+    }
 
-/* Navbar */
-.navbar {
-    background: #0f172a;
-    padding: 18px 40px;
-    display: flex;
-    justify-content: center;
-    gap: 25px;
-    flex-wrap: wrap;
-}
-.navbar a {
-    text-decoration: none;
-    color: white;
-    font-weight: 600;
-    padding: 10px 18px;
-    border-radius: 8px;
-    transition: 0.3s ease;
-}
-.navbar a:hover {
-    background: #2563eb;
-}
+    body {
+        background: #f4f6f9;
+        color: #1f2937;
+    }
 
-/* Layout */
-.container {
-    display: flex;
-    padding: 60px;
-    gap: 60px;
-}
-.info-section {
-    width: 35%;
-    background: white;
-    padding: 40px;
-    border-radius: 20px;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.08);
-}
-.info-section h2 {
-    margin-bottom: 20px;
-}
-.info-section p {
-    margin-bottom: 15px;
-    line-height: 1.6;
-}
+    /* Navbar */
+    .navbar {
+        background: #0f172a;
+        padding: 18px 40px;
+        display: flex;
+        justify-content: center;
+        gap: 25px;
+        flex-wrap: wrap;
+    }
+    .navbar a {
+        text-decoration: none;
+        color: white;
+        font-weight: 600;
+        padding: 10px 18px;
+        border-radius: 8px;
+        transition: 0.3s ease;
+    }
+    .navbar a:hover {
+        background: #2563eb;
+    }
 
-.video-section {
-    width: 65%;
-    text-align: center;
-}
-
-/* Video styling */
-#volunteerInfo {
-    width: 100%;
-    max-width: 700px;
-    height: auto;
-    border-radius: 20px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-}
-
-/* Next button */
-.next-btn {
-    margin-top: 30px;
-    padding: 16px 40px;
-    font-size: 18px;
-    font-weight: 600;
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    background: linear-gradient(135deg, #28a745, #218838);
-    color: white;
-    box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
-    display: none;
-}
-
-/* Help button */
-.help-btn {
-    position: fixed;
-    bottom: 25px;
-    right: 25px;
-    background: #e5e7eb;
-    border: none;
-    border-radius: 50%;
-    width: 45px;
-    height: 45px;
-    font-size: 20px;
-    font-weight: bold;
-    cursor: pointer;
-}
-.help-btn:hover {
-    background: #d1d5db;
-}
-
-/* Mobile view */
-@media (max-width: 768px) {
+    /* Layout */
     .container {
-        flex-direction: column;
-        padding: 30px;
+        display: flex;
+        padding: 60px;
+        gap: 60px;
     }
-    .info-section,
+    .info-section {
+        width: 35%;
+        background: white;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+    }
+    .info-section h2 {
+        margin-bottom: 20px;
+    }
+    .info-section p {
+        margin-bottom: 15px;
+        line-height: 1.6;
+    }
+
     .video-section {
-        width: 100%;
+        width: 65%;
+        text-align: center;
     }
-}
-</style>
+
+    /* Video styling */
+    #volunteerInfo {
+        width: 100%;
+        max-width: 700px;
+        height: auto;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+
+    /* Next button */
+    .next-btn {
+        margin-top: 30px;
+        padding: 16px 40px;
+        font-size: 18px;
+        font-weight: 600;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        background: linear-gradient(135deg, #28a745, #218838);
+        color: white;
+        box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+        display: none;
+    }
+
+    /* Help button */
+    .help-btn {
+        position: fixed;
+        bottom: 25px;
+        right: 25px;
+        background: #e5e7eb;
+        border: none;
+        border-radius: 50%;
+        width: 45px;
+        height: 45px;
+        font-size: 20px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .help-btn:hover {
+        background: #d1d5db;
+    }
+
+    /* Mobile view */
+    @media (max-width: 768px) {
+        .container {
+            flex-direction: column;
+            padding: 30px;
+        }
+        .info-section,
+        .video-section {
+            width: 100%;
+        }
+    }
+    </style> -->
 </head>
 <body>
 
