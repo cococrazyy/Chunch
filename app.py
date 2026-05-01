@@ -558,7 +558,6 @@ def edit_volunteer():
     volunteer.typical_shift = data.get("typical_shift")
     volunteer.unavailability = data.get("unavailability")
     volunteer.capability_restrictions = data.get("capability_restrictions")
-    volunteer.station_id = data.get("station_id")
     volunteer.is_floater = data.get("is_floater")
 
     assignment = Assignment.query.filter_by(volunteer_id=volunteer.id).order_by(Assignment.assignment_id.desc()).first()
@@ -586,13 +585,29 @@ def edit_volunteer():
     # added for station
     if "station_id" in data:
         station_id = data["station_id"]
+
+        # validate station
+        station = None
         if station_id is not None:
             station = Station.query.get(station_id)
             if not station:
                 return {"error": "Station not found"}, 404
-            volunteer.station = station
+
+        #  update latest assignment instead of volunteer
+        assignment = Assignment.query\
+            .filter_by(volunteer_id=volunteer.id)\
+            .order_by(Assignment.assignment_id.desc())\
+            .first()
+
+        if assignment:
+            assignment.station_id = station_id
         else:
-            volunteer.station = None
+            # create assignment if none exists
+            new_assignment = Assignment(
+                volunteer_id=volunteer.id,
+                station_id=station_id
+            )
+            db.session.add(new_assignment)
 
     db.session.commit()
 
