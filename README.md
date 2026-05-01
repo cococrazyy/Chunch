@@ -9,6 +9,12 @@ This project entails a volunteer management system for the Chunch organization a
 - Flask
 - SQLAlchemy
 - PostgreSQL
+- Google Forms
+- Google Sheets
+- Google APIs
+- Google Cloud Identity
+- Render
+- GitHub
 
 Folder System:
 - css: stylesheets, includes style.css and responsive.css
