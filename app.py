@@ -2048,19 +2048,6 @@ def debug_hourly_final():
                     if covered:
                         covered.is_absent = False
 
-        for vid, assignment in latest_assignment_by_volunteer.items():
-            volunteer = next((v for v in volunteers if v.id == vid), None)
-            
-            if not volunteer:
-                continue
-
-            # Skip special cases (important)
-            if assignment.is_covering:
-                continue
-
-            # If assignment doesn't match volunteer's station → fix it
-            if assignment.station_id != volunteer.station_id:
-                assignment.station_id = volunteer.station_id
         
         assigned_volunteer_ids = set(latest_assignment_by_volunteer.keys())
 
