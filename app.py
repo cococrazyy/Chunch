@@ -2079,16 +2079,6 @@ def debug_hourly_final():
             db.session.add(new_assignment)
         db.session.commit()
 
-        refreshed_assignments = Assignment.query.all()
-        latest_assignment_by_volunteer = {}
-        for assignment in refreshed_assignments:
-            if assignment.volunteer_id is None:
-                continue
-
-            current = latest_assignment_by_volunteer.get(assignment.volunteer_id)
-            if current is None or assignment.assignment_id > current.assignment_id:
-                latest_assignment_by_volunteer[assignment.volunteer_id] = assignment
-
         for assignment in latest_assignment_by_volunteer.values():
             volunteer_id = assignment.volunteer_id
             if volunteer_id is None or volunteer_id not in volunteer_rows_by_id:
