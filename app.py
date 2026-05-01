@@ -1969,13 +1969,44 @@ def debug_hourly_final():
         assignments = Assignment.query.all()
 
         latest_assignment_by_volunteer = {}
-        for assignment in assignments:
-            if assignment.volunteer_id is None:
-                continue
 
-            current = latest_assignment_by_volunteer.get(assignment.volunteer_id)
-            if current is None or assignment.assignment_id > current.assignment_id:
-                latest_assignment_by_volunteer[assignment.volunteer_id] = assignment
+        for volunteer in volunteers:
+            assignments_for_volunteer = Assignment.query.filter_by(
+                volunteer_id=volunteer.id
+            ).all()
+
+            chosen = None
+
+            for a in assignments_for_volunteer:
+                if not a.is_covering or not a.absence_id:
+                    continue
+
+                absence = Absence.query.get(a.absence_id)
+                if not absence:
+                    continue
+
+                # PRIORITY 1: active TODAY
+                if absence.start_date <= today <= absence.end_date:
+                    chosen = a
+                    break
+
+                # PRIORITY 2: earliest upcoming
+                if today < absence.start_date:
+                    if not chosen:
+                        chosen = a
+                    else:
+                        existing_absence = Absence.query.get(chosen.absence_id)
+                        if existing_absence and absence.start_date < existing_absence.start_date:
+                            chosen = a
+
+            # fallback is latest assignment
+            if not chosen:
+                chosen = Assignment.query.filter_by(
+                    volunteer_id=volunteer.id
+                ).order_by(Assignment.assignment_id.desc()).first()
+
+            if chosen:
+                latest_assignment_by_volunteer[volunteer.id] = chosen
 
 
         for assignment in latest_assignment_by_volunteer.values():
