@@ -1834,6 +1834,36 @@ def save_need_coverage():
 #    db.session.commit()
 #    return {"message": f"Deleted {len(assignments)} assignments for volunteer {volunteer_id}"}
 
+
+@app.route("/debug/reset-all", methods=["GET"])
+def reset_all():
+    try:
+        # 1. Reset ALL assignments
+        assignments = Assignment.query.all()
+
+        for a in assignments:
+            # reset covering
+            a.is_covering = False
+            a.covering_for_volunteer_id = None
+            a.original_station_id = None
+            a.absence_id = None
+            a.cover_start_hour = None
+            a.cover_end_hour = None
+
+            # reset absence flag
+            a.is_absent = False
+
+        # 2. Delete ALL absences (past + future)
+        Absence.query.delete()
+
+        db.session.commit()
+
+        return "<pre>All covering and absences have been reset.</pre>"
+
+    except Exception as e:
+        db.session.rollback()
+        return {"error": str(e)}, 500
+
 @app.route("/admin/debug-hourly-final")
 def debug_hourly_final():
     try:
@@ -2009,58 +2039,6 @@ def debug_hourly_final():
                 latest_assignment_by_volunteer[volunteer.id] = chosen
 
 
-        for assignment in latest_assignment_by_volunteer.values():
-            if assignment.is_covering and assignment.absence_id:
-                absence = Absence.query.get(assignment.absence_id)
-
-                should_reset = False
-
-                if not absence:
-                    should_reset = True
-                elif absence.is_partial:
-                    if (
-                        absence.start_date <= today <= absence.end_date and
-                        absence.partial_end_hour is not None and
-                        current_hour >= absence.partial_end_hour
-                    ):
-                        should_reset = True
-                    elif today > absence.end_date:
-                        should_reset = True
-                else:
-                    if today > absence.end_date:
-                        should_reset = True
-
-                if should_reset:
-                    if reserve_station:
-                        assignment.station_id = reserve_station.station_id
-
-                    assignment.is_covering = False
-                    assignment.covering_for_volunteer_id = None
-                    assignment.original_station_id = None
-                    assignment.absence_id = None
-                    assignment.cover_start_hour = None
-                    assignment.cover_end_hour = None
-
-                    covered = Assignment.query.filter_by(
-                        volunteer_id=absence.volunteer_id
-                    ).first() if absence else None
-
-                    if covered:
-                        covered.is_absent = False
-
-        for vid, assignment in latest_assignment_by_volunteer.items():
-            volunteer = next((v for v in volunteers if v.id == vid), None)
-            
-            if not volunteer:
-                continue
-
-            # Skip special cases (important)
-            if assignment.is_covering:
-                continue
-
-            # If assignment doesn't match volunteer's station → fix it
-            if assignment.station_id != volunteer.station_id:
-                assignment.station_id = volunteer.station_id
         
         assigned_volunteer_ids = set(latest_assignment_by_volunteer.keys())
 
@@ -2078,16 +2056,6 @@ def debug_hourly_final():
         
             db.session.add(new_assignment)
         db.session.commit()
-
-        refreshed_assignments = Assignment.query.all()
-        latest_assignment_by_volunteer = {}
-        for assignment in refreshed_assignments:
-            if assignment.volunteer_id is None:
-                continue
-
-            current = latest_assignment_by_volunteer.get(assignment.volunteer_id)
-            if current is None or assignment.assignment_id > current.assignment_id:
-                latest_assignment_by_volunteer[assignment.volunteer_id] = assignment
 
         for assignment in latest_assignment_by_volunteer.values():
             volunteer_id = assignment.volunteer_id
