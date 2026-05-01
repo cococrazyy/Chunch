@@ -1464,21 +1464,16 @@ def assign_reserve_coverage():
 
         from datetime import date
 
-        absence = Absence.query.get(absence_id)
-        if not absence:
-            return "<pre>Absence record not found.</pre>", 404
-
         existing_cover = db.session.query(Assignment)\
             .join(Absence, Assignment.absence_id == Absence.absence_id)\
             .filter(
                 Assignment.volunteer_id == reserve_volunteer_id,
                 Assignment.is_covering == True,
-                Absence.start_date <= absence.end_date,
-               Absence.end_date >= absence.start_date
+                Absence.end_date >= date.today()
             ).first()
 
         if existing_cover:
-            return "<pre>This reserve is already scheduled during this time.</pre>", 400
+            return "<pre>This reserve is already scheduled to cover another absence.</pre>", 400
 
         cover_start_hour = request.form.get("cover_start_hour", type=int)
         cover_end_hour = request.form.get("cover_end_hour", type=int)
