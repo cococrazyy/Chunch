@@ -1473,8 +1473,9 @@ def assign_reserve_coverage():
             .filter(
                 Assignment.volunteer_id == reserve_volunteer_id,
                 Assignment.is_covering == True,
+                Assignment.absence_id != absence.absence_id, 
                 Absence.start_date <= absence.end_date,
-               Absence.end_date >= absence.start_date
+                Absence.end_date >= absence.start_date
             ).first()
 
         if existing_cover:
