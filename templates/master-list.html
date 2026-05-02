@@ -93,7 +93,7 @@
                     <th>Email</th>
                     <th>Phone Number</th>
                     <th>Role</th>
-                    <!-- <th></th> --> <!-- Space for edit button -->
+                    <th></th> <!-- Space for edit button -->
                     <th></th> <!-- Header color for delete button -->
                 </tr>
             </thead>
@@ -105,9 +105,9 @@
                     <td>{{ v.email }}</td>
                     <td>{{ v.phone }}</td>
                     <td>{{ v.role }}</td>
-                    <!-- <td class="actions-cell">
+                    <td class="actions-cell">
                         <button class="edit" type="button" onclick="enableEdit({{ v.id }})">Edit</button>
-                    </td> -->
+                    </td>
                     <!-- Delete volunteer button/cell -->
                     <td class="actions-cell">
                         <form method="POST" action="/admin/master-list/delete-volunteer/{{ v.id }}">
@@ -120,7 +120,7 @@
                 </tr>
                 
                 <!-- Non functional edit -->
-                <<tr id="edit-row-{{ v.id }}" class="inline-edit-row" hidden>
+                <tr id="edit-row-{{ v.id }}" class="inline-edit-row" hidden>
                     <!-- What is colspan for? -->
                     <td colspan="6">
                     <form method="POST" action="/admin/master-list/edit-volunteer/{{ v.id }}" class="inline-edit-form">
