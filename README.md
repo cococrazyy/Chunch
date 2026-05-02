@@ -18,7 +18,9 @@ This project entails a volunteer management system for the Chunch organization a
 
 ## Installation and Running Program
 - Fork or download the repository
-- Install dependancies for Flask, SQLAlchemy, and PostgreSQL by downloading requirements.txt file
+- Install dependancies for Flask, SQLAlchemy, and PostgreSQL by downloading the requirements.txt file
+- The website can be found at https://chunch.onrender.com
+- Before being able to sign in to the admin dashboard, reach out to Bryan Scott or **TECH NAME** to be added as a tech or admin
 
 ## Files
 * \_\_pycache\_\_: ??
@@ -36,7 +38,7 @@ This project entails a volunteer management system for the Chunch organization a
   * 4233ac2120b0_initial_migration.py: ??
   * alembic.ini: ??
   * env.py: ??
-  * README: This file that contains information about our project and the files used.
+  * README: ??
   * script.py.mako: ??
 * style: __ELEANOR__
   * application.css:
