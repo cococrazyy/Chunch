@@ -36,7 +36,7 @@ This project entails a volunteer management system for the Chunch organization a
   * 4233ac2120b0_initial_migration.py: ??
   * alembic.ini: ??
   * env.py: ??
-  * README: ??
+  * README: This file that contains information about our project and the files used.
   * script.py.mako: ??
 * style: __ELEANOR__
   * application.css:
@@ -56,10 +56,10 @@ This project entails a volunteer management system for the Chunch organization a
   * application_received.html: __EVELYN__
   * captain.html: Dashboard for users with the captain role, accessible by admin & tech roles.
   * coverage-details.html: __EVELYN__
-  * deleted-volunteers.html: __REID__ __EVELYN__
+  * deleted-volunteers.html: Table of volunteers and their information that were chosen to be deleted from the master list. Volunteers can be either permanently deleted or restored to the master list.
   * inbox.html: __EVELYN__ __REID__
   * index.html: Public-facing component "Home" page.
-  * master-list.html: __REID__ __ELEANOR__
+  * master-list.html: Table of all current volunteers and their information. Also where new volunteers can be added or current volunteers can be deleted.
   * meet-the-team.html: Public-facing component "Meet the Team" page.
   * need-coverage.html: __EVELYN__ __REID__
   * student-spotlight.html: Public-facing component "Student Spotlight" page.
