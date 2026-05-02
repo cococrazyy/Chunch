@@ -1,5 +1,25 @@
 # Chunch
 
+This is the official GitHub repo for the Southwestern University 2026 Capstone, Chunch Volunteer Management System Project.
+
+This project entails a volunteer management system for the Chunch organization at the Crestview Baptist Church. These files contain a public home page and a private admin and captain page, each with their own abilities based on someone's role. 
+
+# Getting Started
+## Dependencies
+- Flask
+- SQLAlchemy
+- PostgreSQL
+- Google Forms
+- Google Sheets
+- Google APIs
+- Google Cloud Identity
+- Render
+- GitHub
+
+## Installation and Running Program
+- Fork or download the repository
+- Install dependancies for Flask, SQLAlchemy, and PostgreSQL by downloading requirements.txt file
+
 Folder System:
 - css: stylesheets, includes style.css and responsive.css
 - js: JavaScript files, script.js

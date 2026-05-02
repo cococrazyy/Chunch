@@ -558,7 +558,6 @@ def edit_volunteer():
     volunteer.typical_shift = data.get("typical_shift")
     volunteer.unavailability = data.get("unavailability")
     volunteer.capability_restrictions = data.get("capability_restrictions")
-    volunteer.station_id = data.get("station_id")
     volunteer.is_floater = data.get("is_floater")
 
     assignment = Assignment.query.filter_by(volunteer_id=volunteer.id).order_by(Assignment.assignment_id.desc()).first()
@@ -586,13 +585,29 @@ def edit_volunteer():
     # added for station
     if "station_id" in data:
         station_id = data["station_id"]
+
+        # validate station
+        station = None
         if station_id is not None:
             station = Station.query.get(station_id)
             if not station:
                 return {"error": "Station not found"}, 404
-            volunteer.station = station
+
+        #  update latest assignment instead of volunteer
+        assignment = Assignment.query\
+            .filter_by(volunteer_id=volunteer.id)\
+            .order_by(Assignment.assignment_id.desc())\
+            .first()
+
+        if assignment:
+            assignment.station_id = station_id
         else:
-            volunteer.station = None
+            # create assignment if none exists
+            new_assignment = Assignment(
+                volunteer_id=volunteer.id,
+                station_id=station_id
+            )
+            db.session.add(new_assignment)
 
     db.session.commit()
 
@@ -1755,85 +1770,6 @@ def save_need_coverage():
         db.session.rollback()
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
-#     s = Station.query.filter_by(station_name="Line Servers").first()
-
-#     volunteers = Volunteer.query\
-#         .filter(Volunteer.deleted_at.is_(None))\
-#         .order_by(Volunteer.id)\
-#         .all()
-
-#     v = None
-#     for volunteer in volunteers:
-#         valid_hours = []
-#         for a in volunteer.availability:
-#             if a.deleted_at is not None:
-#                 continue
-#             try:
-#                 hour = int(str(a.hour).strip())
-#             except (ValueError, TypeError):
-#                 continue
-#             if 5 <= hour <= 16:
-#                 valid_hours.append(hour)
-
-#         if valid_hours:
-#             v = volunteer
-#             break
-
-#     if not v or not s:
-#         return "Missing volunteer with hours or station"
-
-#     existing = Assignment.query.filter_by(
-#         volunteer_id=v.id,
-#         station_id=s.station_id,
-#         schedule_id=None
-#     ).first()
-
-#     if existing:
-#         return {
-#             "message": "Assignment already exists",
-#             "volunteer": v.id,
-#             "station": s.station_id
-#         }
-
-#     assignment = Assignment(
-#         volunteer_id=v.id,
-#         station_id=s.station_id,
-#         schedule_id=None
-#     )
-
-#     db.session.add(assignment)
-#     db.session.commit()
-
-#     return {
-#         "message": "Assignment added",
-#         "volunteer": v.id,
-#         "station": s.station_id
-#     }
-
-# Delete assignments based on assignment number
-#@app.route("/debug/delete-assignment/<int:assignment_id>/get")
-#def delete_assignment(assignment_id):
-    #assignment = Assignment.query.get(assignment_id)
-    #if not assignment:
-        #return {"error": f"Assignment {assignment_id} not found"}, 404
-
-    #db.session.delete(assignment)
-    #db.session.commit()
-    #return {"message": f"Assignment {assignment_id} deleted"}
-
-# Delete assignments based on volunteer id
-#@app.route("/debug/delete-assignments-for-volunteer/<int:volunteer_id>", methods=["POST"])
-#def delete_assignments_for_volunteer(volunteer_id):
-#    assignments = Assignment.query.filter_by(volunteer_id=volunteer_id).all()
-#    if not assignments:
-#        return {"message": "No assignments to delete"}, 404
-#
-#    for a in assignments:
-#        db.session.delete(a)
-#
-#    db.session.commit()
-#    return {"message": f"Deleted {len(assignments)} assignments for volunteer {volunteer_id}"}
-
 
 @app.route("/debug/reset-all", methods=["GET"])
 def reset_all():
@@ -2889,59 +2825,6 @@ def volunteer_hours():
         today = date.today()
         assignments = Assignment.query.all()
 
-        #commented out by Aaron 4/29
-        # latest_assignment_by_volunteer = {}
-        # for assignment in assignments:
-        #     if assignment.volunteer_id is None:
-        #         continue
-
-        #     current = latest_assignment_by_volunteer.get(assignment.volunteer_id)
-        #     if current is None or assignment.assignment_id > current.assignment_id:
-        #         latest_assignment_by_volunteer[assignment.volunteer_id] = assignment
-
-        # for volunteer_id, assignment in latest_assignment_by_volunteer.items():
-        #     if volunteer_id not in volunteer_rows_by_id:
-        #         continue
-
-        #     for volunteer_ids in station_to_volunteer_ids.values():
-        #         volunteer_ids.discard(volunteer_id)
-
-        #     if assignment.is_covering and assignment.absence_id:
-        #         absence = Absence.query.get(assignment.absence_id)
-        #         if absence and absence.end_date < today:
-        #             continue
-
-        #     if assignment.is_absent:
-        #         continue
-
-        #     if assignment.station_id is None:
-        #         continue
-
-        #     station = Station.query.get(assignment.station_id)
-        #     if not station:
-        #         continue
-
-        #     station_name = str(station.station_name)
-        #     if station_name in ["Reserve", "Absent", "Other"]:
-        #         continue
-
-        #     if (
-        #         assignment.is_covering and
-        #         assignment.cover_start_hour is not None and
-        #         assignment.cover_end_hour is not None
-        #     ):
-        #         start_hour = assignment.cover_start_hour
-        #         end_hour = assignment.cover_end_hour
-        #         coverage_hours = list(range(start_hour, end_hour + 1))
-        #         volunteer_rows_by_id[volunteer_id]["hours"] = coverage_hours
-        #         volunteer_rows_by_id[volunteer_id]["ranges"] = [[start_hour, end_hour]]
-        #         volunteer_rows_by_id[volunteer_id]["range_label"] = (
-        #             f"{format_hour(start_hour)}-{format_hour(end_hour)}"
-        #         )
-
-        #     station_to_volunteer_ids.setdefault(
-        #         assignment.station_id, set()
-        #     ).add(volunteer_id)
 
         station_to_volunteer_ids, debug = build_station_state(volunteers, stations)
 
@@ -3179,55 +3062,6 @@ def sync_applicants():
         db.session.rollback()
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
-# @app.route("/admin/sync-applicants", methods=["GET", "POST"])
-# def sync_applicants():
-#     try:
-#         if "user_id" not in session:
-#             return redirect("/")
-
-#         sheet = get_applicant_sheet()
-#         rows = sheet.get_all_records()
-
-#         for row in rows:
-#             first_name = str(row.get("First Name", "")).strip()
-#             last_name = str(row.get("Last Name", "")).strip()
-#             email = str(row.get("Email", "")).strip().lower()
-#             phone = str(row.get("Phone Number", "")).strip()
-
-#             member = str(row.get("Member", "")).strip()
-#             unavailability = str(row.get("Unavailability", "")).strip()
-#             other_info = str(row.get("Other Info", "")).strip()
-
-#             if not email:
-#                 continue
-
-#             existing = Applicant.query.filter_by(email=email).first()
-
-#             if not existing:
-#                 applicant = Applicant(
-#                     first_name=first_name,
-#                     last_name=last_name,
-#                     email=email,
-#                     phone=phone,
-#                     availability=member,
-#                     unavailability=unavailability,
-#                     status="pending"
-#                 )
-#                 db.session.add(applicant)
-#             else:
-#                 existing.first_name = first_name
-#                 existing.last_name = last_name
-#                 existing.phone = phone
-#                 existing.availability = member
-#                 existing.unavailability = unavailability
-
-#         db.session.commit()
-
-#         return redirect("/admin/inbox")
-
-#     except Exception as e:
-#         db.session.rollback()
-#         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
 
 def get_drive_service():
@@ -3296,8 +3130,8 @@ def sync_volunteers():
 
             if not volunteer:
                 volunteer = Volunteer(
-                    first_name=row["First Name"],
-                    last_name=row["Last Name"],
+                    first_name=first_name,
+                    last_name=last_name,
                     email=email,
                     phone=phone,
                     capability_restrictions=capability_restrictions,

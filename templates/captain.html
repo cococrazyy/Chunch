@@ -479,6 +479,11 @@ function isAdmin(volunteer) {
     return (volunteer.role || "").toString().toLowerCase() === "admin";
 }
 
+function isTech(volunteer) {
+    if(!volunteer || typeof volunteer === "string") return false;
+    return (volunteer.role || "").toString().toLowerCase() === "tech";
+}
+
 function formatDatePretty(dateStr) {
     if (!dateStr) return "";
     const d = new Date(dateStr);
@@ -582,9 +587,10 @@ function renderStationBoard(stationData) {
                         // added for captain/admin symbol
                         const captainBadge = isCaptain(volunteer) ? " (C)" : "";
                         const adminBadge = isAdmin(volunteer) ? " (A)" : "";
+                        const techBadge = isTech(volunteer) ? " (T)" : "";
                         return `
                             <button class="volunteer-pill" type="button" onclick='openVolunteerPanel(${JSON.stringify(JSON.stringify(volunteer))})'>
-                                ${displayName}${captainBadge}${adminBadge}${displayTime}
+                                ${displayName}${captainBadge}${adminBadge}${techBadge}${displayTime}
                             </button>
                         `;
                     }).join("")}
