@@ -9,193 +9,171 @@
 
     <title>Volunteer Master List</title>
 
-    <!-- Import font & style -->
+    <!-- Import style -->
     <link rel="stylesheet" href="/style/master-list.css">
 </head>
 
 <body>
     <div class="container">
+        <h1>Volunteer Master List</h1>
 
-    <h1>Volunteer Master List</h1>
+        <div class="top-actions">
+            <button class="primary" onclick="toggleForm()">Add Volunteer</button>
+            <form method="POST" action="/admin/sync-volunteers">
+                <button class="secondary" type="submit">Update Volunteer List</button>
+            </form>
+            <button class="secondary" onclick="window.location.href='/admin/master-list/deleted-volunteers'">
+                View Deleted
+            </button>
 
-    <div class="top-actions">
-        <button class="primary" onclick="toggleForm()">Add Volunteer</button>
-        <form method="POST" action="/admin/sync-volunteers">
-            <button class="secondary" type="submit">Update Volunteer List</button>
-        </form>
-        <button class="secondary" onclick="window.location.href='/admin/master-list/deleted-volunteers'">
-            View Deleted
-        </button>
+            <button class="secondary" onclick="window.location.href='/admin'">
+                Back
+            </button>
+        </div>
 
-        <button class="secondary" onclick="window.location.href='/admin'">
-            Back
-        </button>
-    </div>
+        <!-- TODO: description -->
+        <div id="addForm">
+            <form method="POST" action="/admin/master-list/add-volunteer">
+                <input type="text" name="first_name" placeholder="First Name" required>
+                <input type="text" name="last_name" placeholder="Last Name" required>
+                <input type="email" name="email" placeholder="Email" required>
+                <input type="tel" name="phone" placeholder="Phone Number">
+                <select name="station_id">
+                    <option value="">Select Station</option>
+                    <option value="baked potato bar">Baked Potato Bar</option>
+                    <option value="busboys/sanitation">Busboys/sanitation</option>
+                    <option value="desserts">Desserts</option>
+                    <option value="dishwashers">Dishwashers</option>
+                    <option value="drinks">Drinks</option>
+                    <option value="general manager">General Manager</option>
+                    <option value="greeters">Greeters</option>
+                    <option value="kitchen">Kitchen</option>
+                    <option value="line servers">Line Servers</option>
+                    <option value="reserve">Reserve</option>
+                    <option value="salad bar">Salad Bar</option>
+                    <option value="setup team">Setup Team</option>
+                    <option value="teardown team">Teardown Team</option>
+                    <option value="vegan">Vegan</option>
+                </select>
+                <!-- TODO: Add an if statement somewhere that sets the station to 9 if none are selected -->
+                
+                <select name="role">
+                    <option value="">Select Role</option>
+                    <option value="volunteer">Volunteer</option>
+                    <option value="admin">Admin</option>
+                    <option value="captain">Captain</option>
+                    <option value="tech">Tech</option>
+                </select>
 
-    <div id="addForm">
-        <form method="POST" action="/admin/master-list/add-volunteer">
-            <input type="text" name="first_name" placeholder="First Name" required>
-            <input type="text" name="last_name" placeholder="Last Name" required>
-            <input type="email" name="email" placeholder="Email" required>
-            <input type="tel" name="phone" placeholder="Phone Number">
-            <select name="station_id">
-                <option value="">Select Station</option>
-                <option value="baked potato bar">Baked Potato Bar</option>
-                <option value="busboys/sanitation">Busboys/sanitation</option>
-                <option value="desserts">Desserts</option>
-                <option value="dishwashers">Dishwashers</option>
-                <option value="drinks">Drinks</option>
-                <option value="general manager">General Manager</option>
-                <option value="greeters">Greeters</option>
-                <option value="kitchen">Kitchen</option>
-                <option value="line servers">Line Servers</option>
-                <option value="reserve">Reserve</option>
-                <option value="salad bar">Salad Bar</option>
-                <option value="setup team">Setup Team</option>
-                <option value="teardown team">Teardown Team</option>
-                <option value="vegan">Vegan</option>
-            </select>
-            <!-- Add an if statement somewhere that sets the station to 9 if none are selected -->
+                <label>Start Hour:</label>
+                <select name="start_hour" required>
+                    {% for h in range(0, 24) %}
+                        <option value="{{ h }}">{{ h }}:00</option>
+                    {% endfor %}
+                </select>
+                <label>End Hour:</label>
+                <select name="end_hour" required>
+                    {% for h in range(1, 25) %}
+                        <option value="{{ h }}">{{ h }}:00</option>
+                    {% endfor %}
+                </select>
+                
+                <!-- Floater input -->
+                <!-- <label for="floater">Floater: </label>
+                <input type="checkbox" name="is_floater" id="floater"> -->
+
+                <button class="primary" type="submit">Save</button>
+            </form>
+        </div>
             
-            <select name="role">
-                <option value="">Select Role</option>
-                <option value="volunteer">Volunteer</option>
-                <option value="admin">Admin</option>
-                <option value="captain">Captain</option>
-                <option value="tech">Tech</option>
-            </select>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone Number</th>
+                    <th>Role</th>
+                    <!-- <th></th> --> <!-- Space for edit button -->
+                    <th></th> <!-- Header color for delete button -->
+                </tr>
+            </thead>
 
-            <label>Start Hour:</label>
-            <select name="start_hour" required>
-                {% for h in range(0, 24) %}
-                    <option value="{{ h }}">{{ h }}:00</option>
-                {% endfor %}
-            </select>
-            <label>End Hour:</label>
-            <select name="end_hour" required>
-                {% for h in range(1, 25) %}
-                    <option value="{{ h }}">{{ h }}:00</option>
-                {% endfor %}
-            </select>
-            
-            <!-- Floater input -->
-            <!-- <label for="floater">Floater: </label>
-            <input type="checkbox" name="is_floater" id="floater"> -->
-
-            <button class="primary" type="submit">Save</button>
-        </form>
-    </div>
-
-    <!--
-    <div id="editForm">
-        <form method="POST" action="/admin/master-list/edit-volunteer">
-            <input type="text" name="first_name" id="editFirstName" style="display:none;">
-            <input type="text" name="last_name" id="editLastName" style="display:none;">
-            <input type="email" name="email" id="editEmail" style="display:none;">
-            <input type="tel" name="phone" id="editPhone" style="display:none;">
-            <select name="editRole" id="editRole" style="display:none;">
-                <option value="">Select Role</option>
-                <option value="volunteer">Volunteer</option>
-                <option value="captain">Captain</option>
-                <option value="admin">Admin</option>
-                <option value="tech">Tech</option>
-            </select>
-            <input type="checkbox" name="is_floater" id="editFloater" style="display:none;">
-            <button class="primary" type="button" id="saveBtn" onclick="saveVolunteer()" style="display:none;">Save</button>
-    </div>
-    -->
-        
-    <table>
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone Number</th>
-                <th>Role</th>
-                <!-- <th>Station</th> -->
-                <!-- <th></th> -->
-                <th></th>
-            </tr>
-        </thead>
-
-        <tbody>
-            {% for v in volunteers %}
-            <tr id="view-row-{{ v.id }}">
-                <td>{{ v.first_name }} {{ v.last_name }}</td>
-                <td>{{ v.email }}</td>
-                <td>{{ v.phone }}</td>
-                <td>{{ v.role }}</td>
-                <!-- <td>{{ v.station_id }}</td> --> <!-- get name of station?? -->
-                <!-- <td class="actions-cell">
-                    <button class="edit" type="button" onclick="enableEdit({{ v.id }})">Edit</button>
-                </td> -->
-                <td class="actions-cell">
-                    <form method="POST" action="/admin/master-list/delete-volunteer/{{ v.id }}">
-                        <button class="danger" type="submit"
-                            onclick="return confirm('Delete this volunteer?')">
-                            Delete
-                        </button>
-                    </form>
-                </td>
-            </tr>
-            <<tr id="edit-row-{{ v.id }}" class="inline-edit-row" hidden>
-                <td colspan="6">
+            <tbody>
+                {% for v in volunteers %}
+                <tr id="view-row-{{ v.id }}">
+                    <td>{{ v.first_name }} {{ v.last_name }}</td>
+                    <td>{{ v.email }}</td>
+                    <td>{{ v.phone }}</td>
+                    <td>{{ v.role }}</td>
+                    <!-- <td class="actions-cell">
+                        <button class="edit" type="button" onclick="enableEdit({{ v.id }})">Edit</button>
+                    </td> -->
+                    <!-- Delete volunteer button/cell -->
+                    <td class="actions-cell">
+                        <form method="POST" action="/admin/master-list/delete-volunteer/{{ v.id }}">
+                            <button class="danger" type="submit"
+                                onclick="return confirm('Delete this volunteer?')">
+                                Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                
+                <!-- Non functional edit -->
+                <<tr id="edit-row-{{ v.id }}" class="inline-edit-row" hidden>
+                    <!-- What is colspan for? -->
+                    <td colspan="6">
                     <form method="POST" action="/admin/master-list/edit-volunteer/{{ v.id }}" class="inline-edit-form">
-                        <div class="form-row">
-                            <input type="text" name="first_name" value="{{ v.first_name }}">
+                        <input type="text" name="first_name" value="{{ v.first_name }}">
+                        <input type="text" name="last_name" value="{{ v.last_name }}">
+                        <input type="email" name="email" value="{{ v.email or '' }}">
+                        <input type="tel" name="phone" placeholder="Phone Number" value="{{ v.phone or '' }}"> 
 
-                            <input type="text" name="last_name" value="{{ v.last_name }}">
+                        <select name="role" id="editRole">
+                            <option value="">Select Role</option>
+                            <option value="volunteer" {% if v.role|lower == "volunteer" %}selected{% endif %}>Volunteer</option>
+                            <option value="captain" {% if v.role|lower == "captain" %}selected{% endif %}>Captain</option>
+                            <option value="admin" {% if v.role|lower == "admin" %}selected{% endif %}>Admin</option>
+                            <option value="tech" {% if v.role|lower == "tech" %}selected{% endif %}>Tech</option>
+                        </select>
 
-                            <input type="email" name="email" value="{{ v.email or '' }}">
+                        <input type="text" name="unavailability" placeholder="Unavailability" value="{{ v.unavailability or '' }}">
 
-                            <input type="tel" name="phone" placeholder="Phone Number" value="{{ v.phone or '' }}"> 
+                        <input type="text" name="capability_restrictions" placeholder="Capability Restrictions"
+                            value="{{ v.capability_restrictions or '' }}">
+                        <!-- Station dropdown organized alphabetically -->
+                        <select name="station_id">
+                            <option value="">Select Station</option>
+                            <option value="baked potato bar" {% if v.station_id == 12 %}selected{% endif %}>Baked Potato Bar</option>
+                            <option value="busboys/sanitation" {% if v.station_id == 7 %}selected{% endif %}>Busboys/sanitation</option>
+                            <option value="desserts" {% if v.station_id == 6 %}selected{% endif %}>Desserts</option>
+                            <option value="dishwashers" {% if v.station_id == 8 %}selected{% endif %}>Dishwashers</option>
+                            <option value="drinks" {% if v.station_id == 5 %}selected{% endif %}>Drinks</option>
+                            <option value="general manager" {% if v.station_id == 10 %}selected{% endif %}>General Manager</option>
+                            <option value="greeters" {% if v.station_id == 11 %}selected{% endif %}>Greeters</option>
+                            <option value="kitchen" {% if v.station_id == 4 %}selected{% endif %}>Kitchen</option>
+                            <option value="line servers" {% if v.station_id == 3 %}selected{% endif %}>Line Servers</option>
+                            <option value="reserve" {% if v.station_id == 9 %}selected{% endif %}>Reserve</option>
+                            <option value="salad bar" {% if v.station_id == 13 %}selected{% endif %}>Salad Bar</option>
+                            <option value="setup team" {% if v.station_id == 1 %}selected{% endif %}>Setup Team</option>
+                            <option value="teardown team" {% if v.station_id == 2 %}selected{% endif %}>Teardown Team</option>
+                            <option value="vegan" {% if v.station_id == 16 %}selected{% endif %}>Vegan</option>
+                        </select>
 
-                            <select name="role" id="editRole">
-                                <option value="">Select Role</option>
-                                <option value="volunteer" {% if v.role|lower == "volunteer" %}selected{% endif %}>Volunteer</option>
-                                <option value="captain" {% if v.role|lower == "captain" %}selected{% endif %}>Captain</option>
-                                <option value="admin" {% if v.role|lower == "admin" %}selected{% endif %}>Admin</option>
-                                <option value="tech" {% if v.role|lower == "tech" %}selected{% endif %}>Tech</option>
-                            </select>
+                        <label for="start_hour_{{ v.id }}">Start Hour:</label>
+                        <input type="number" name="start_hour" id="start_hour_{{ v.id }}" min="0" max="23"
+                            value="{{ v.start_hour if v.start_hour is not none else '' }}">
 
-                            <input type="text" name="unavailability" placeholder="Unavailability" value="{{ v.unavailability or '' }}">
+                        <label for="end_hour_{{ v.id }}">End Hour:</label>
+                        <input type="number" name="end_hour" id="end_hour_{{ v.id }}" min="1" max="24"
+                            value="{{ v.end_hour if v.end_hour is not none else '' }}">
 
-                            <input type="text" name="capability_restrictions" placeholder="Capability Restrictions"
-                                value="{{ v.capability_restrictions or '' }}">
-
-                            <select name="station_id">
-                                <option value="">Select Station</option>
-                                <option value="baked potato bar" {% if v.station_id == 12 %}selected{% endif %}>Baked Potato Bar</option>
-                                <option value="busboys/sanitation" {% if v.station_id == 7 %}selected{% endif %}>Busboys/sanitation</option>
-                                <option value="desserts" {% if v.station_id == 6 %}selected{% endif %}>Desserts</option>
-                                <option value="dishwashers" {% if v.station_id == 8 %}selected{% endif %}>Dishwashers</option>
-                                <option value="drinks" {% if v.station_id == 5 %}selected{% endif %}>Drinks</option>
-                                <option value="general manager" {% if v.station_id == 10 %}selected{% endif %}>General Manager</option>
-                                <option value="greeters" {% if v.station_id == 11 %}selected{% endif %}>Greeters</option>
-                                <option value="kitchen" {% if v.station_id == 4 %}selected{% endif %}>Kitchen</option>
-                                <option value="line servers" {% if v.station_id == 3 %}selected{% endif %}>Line Servers</option>
-                                <option value="reserve" {% if v.station_id == 9 %}selected{% endif %}>Reserve</option>
-                                <option value="salad bar" {% if v.station_id == 13 %}selected{% endif %}>Salad Bar</option>
-                                <option value="setup team" {% if v.station_id == 1 %}selected{% endif %}>Setup Team</option>
-                                <option value="teardown team" {% if v.station_id == 2 %}selected{% endif %}>Teardown Team</option>
-                                <option value="vegan" {% if v.station_id == 16 %}selected{% endif %}>Vegan</option>
-                            </select>
-
-                            <label for="start_hour_{{ v.id }}">Start Hour:</label>
-                            <input type="number" name="start_hour" id="start_hour_{{ v.id }}" min="0" max="23"
-                                value="{{ v.start_hour if v.start_hour is not none else '' }}">
-
-                            <label for="end_hour_{{ v.id }}">End Hour:</label>
-                            <input type="number" name="end_hour" id="end_hour_{{ v.id }}" min="1" max="24"
-                                value="{{ v.end_hour if v.end_hour is not none else '' }}">
-
-                            <!-- Check again, what is this for? Doesn't match the floater in other locations? -->
-                            <span class="checkbox-wrap">
-                                <label for="editFloater">Floater:</label>
-                                <input type="checkbox" name="floater" id="editFloater" 
-                                    {% if v.is_floater %} checked {% endif %}>
-                            </span>
-                        </div>
+                        <!-- Check again, what is this for? Doesn't match the floater in other locations? -->
+                        <span class="checkbox-wrap">
+                            <label for="editFloater">Floater:</label>
+                            <input type="checkbox" name="floater" id="editFloater" 
+                                {% if v.is_floater %} checked {% endif %}>
+                        </span>
 
                         <!-- What is this for? It seems like there is an error using interpolation within a JavaScript command -->
                         <div class="button-row">
@@ -203,12 +181,11 @@
                             <button class="cancel" type="button" onclick="cancelEdit({{ v.id }})">Cancel</button>
                         </div>
                     </form>
-                </td>
-            </tr> -->
-            {% endfor %}
-        </tbody>
-    </table>
-
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 
     <script>
