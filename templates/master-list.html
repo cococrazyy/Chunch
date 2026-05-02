@@ -56,7 +56,6 @@
                     <option value="vegan">Vegan</option>
                 </select>
                 <!-- TODO: Add an if statement somewhere that sets the station to 9 if none are selected -->
-                
                 <select name="role">
                     <option value="">Select Role</option>
                     <option value="volunteer">Volunteer</option>
@@ -74,7 +73,7 @@
                 <label>End Hour:</label>
                 <select name="end_hour" required>
                     {% for h in range(1, 25) %}
-                        <option value="{{ h }}">{{ h }}:00</option>
+                        <option value="{{ h }}">{{ h }}</option>
                     {% endfor %}
                 </select>
                 
@@ -130,7 +129,6 @@
                         <input type="tel" name="phone" placeholder="Phone Number" value="{{ v.phone or '' }}"> 
 
                         <select name="role" id="editRole">
-                            <option value="">Select Role</option>
                             <option value="volunteer" {% if v.role|lower == "volunteer" %}selected{% endif %}>Volunteer</option>
                             <option value="captain" {% if v.role|lower == "captain" %}selected{% endif %}>Captain</option>
                             <option value="admin" {% if v.role|lower == "admin" %}selected{% endif %}>Admin</option>
@@ -143,21 +141,20 @@
                             value="{{ v.capability_restrictions or '' }}">
                         <!-- Station dropdown organized alphabetically -->
                         <select name="station_id">
-                            <option value="">Select Station</option>
-                            <option value="baked potato bar" {% if v.station_id == 12 %}selected{% endif %}>Baked Potato Bar</option>
-                            <option value="busboys/sanitation" {% if v.station_id == 7 %}selected{% endif %}>Busboys/sanitation</option>
-                            <option value="desserts" {% if v.station_id == 6 %}selected{% endif %}>Desserts</option>
-                            <option value="dishwashers" {% if v.station_id == 8 %}selected{% endif %}>Dishwashers</option>
-                            <option value="drinks" {% if v.station_id == 5 %}selected{% endif %}>Drinks</option>
-                            <option value="general manager" {% if v.station_id == 10 %}selected{% endif %}>General Manager</option>
-                            <option value="greeters" {% if v.station_id == 11 %}selected{% endif %}>Greeters</option>
-                            <option value="kitchen" {% if v.station_id == 4 %}selected{% endif %}>Kitchen</option>
-                            <option value="line servers" {% if v.station_id == 3 %}selected{% endif %}>Line Servers</option>
-                            <option value="reserve" {% if v.station_id == 9 %}selected{% endif %}>Reserve</option>
-                            <option value="salad bar" {% if v.station_id == 13 %}selected{% endif %}>Salad Bar</option>
-                            <option value="setup team" {% if v.station_id == 1 %}selected{% endif %}>Setup Team</option>
-                            <option value="teardown team" {% if v.station_id == 2 %}selected{% endif %}>Teardown Team</option>
-                            <option value="vegan" {% if v.station_id == 16 %}selected{% endif %}>Vegan</option>
+                            <option value="12" {% if v.station_id == 12 %}selected{% endif %}>Baked Potato Bar</option>
+                            <option value="7" {% if v.station_id == 7 %}selected{% endif %}>Busboys/sanitation</option>
+                            <option value="6" {% if v.station_id == 6 %}selected{% endif %}>Desserts</option>
+                            <option value="8" {% if v.station_id == 8 %}selected{% endif %}>Dishwashers</option>
+                            <option value="5" {% if v.station_id == 5 %}selected{% endif %}>Drinks</option>
+                            <option value="10" {% if v.station_id == 10 %}selected{% endif %}>General Manager</option>
+                            <option value="11" {% if v.station_id == 11 %}selected{% endif %}>Greeters</option>
+                            <option value="4" {% if v.station_id == 4 %}selected{% endif %}>Kitchen</option>
+                            <option value="3" {% if v.station_id == 3 %}selected{% endif %}>Line Servers</option>
+                            <option value="9" {% if v.station_id == 9 %}selected{% endif %}>Reserve</option>
+                            <option value="13" {% if v.station_id == 13 %}selected{% endif %}>Salad Bar</option>
+                            <option value="1" {% if v.station_id == 1 %}selected{% endif %}>Setup Team</option>
+                            <option value="2" {% if v.station_id == 2 %}selected{% endif %}>Teardown Team</option>
+                            <option value="16" {% if v.station_id == 16 %}selected{% endif %}>Vegan</option>
                         </select>
 
                         <label for="start_hour_{{ v.id }}">Start Hour:</label>
@@ -168,12 +165,11 @@
                         <input type="number" name="end_hour" id="end_hour_{{ v.id }}" min="1" max="24"
                             value="{{ v.end_hour if v.end_hour is not none else '' }}">
 
-                        <!-- Check again, what is this for? Doesn't match the floater in other locations? -->
-                        <span class="checkbox-wrap">
+                        <!-- <span class="checkbox-wrap">
                             <label for="editFloater">Floater:</label>
                             <input type="checkbox" name="floater" id="editFloater" 
                                 {% if v.is_floater %} checked {% endif %}>
-                        </span>
+                        </span> -->
 
                         <!-- What is this for? It seems like there is an error using interpolation within a JavaScript command -->
                         <div class="button-row">
@@ -208,8 +204,7 @@
         }
     }
 
-    // Added for edit
-
+    // Added for edit functionality
     document.addEventListener("click", function (e) {
         if (!isSelectionLocked) return;
 
