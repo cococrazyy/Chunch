@@ -20,7 +20,7 @@ This project entails a volunteer management system for the Chunch organization a
 - Fork or download the repository
 - Install dependancies for Flask, SQLAlchemy, and PostgreSQL by downloading the requirements.txt file
 - The website can be found at https://chunch.onrender.com
-- Before being able to sign in to the admin dashboard, reach out to Bryan Scott or **TECH NAME** to be added as a tech or admin
+- Before being able to sign in to the admin dashboard, reach out to Bryan Scott or **TECH NAME** to be added as a tech or admin.
 
 ## Files
 * \_\_pycache\_\_: ??
@@ -40,17 +40,17 @@ This project entails a volunteer management system for the Chunch organization a
   * env.py: ??
   * README: ??
   * script.py.mako: ??
-* style: __ELEANOR__
-  * application.css: 
-  * contribute.css: Style code for public-facing "Contribute" page.
-  * coverage.css: 
-  * home.css: Style code for public-facing "Home" page.
-  * master-list.css: 
-  * meet-the-team.css: Style code for public-facing "Meet The Team" page.
+* style: All CSS style code for the `.html` files in `/templates`.
+  * application.css: Corresponds to`applicant-detail.html` & `application_received.html`.
+  * contribute.css: Style code for public-facing "Contribute" page; corresponds to `contribute.html`.
+  * coverage.css: Corresponds to `coverage-details.html` & `need-coverage.html`. 
+  * home.css: Style code for public-facing "Home" page; corresponds to `index.html`.
+  * master-list.css: Corresponds to `master-list.html`.
+  * meet-the-team.css: Style code for public-facing "Meet The Team" page; corresponds to `meet-the-team.html`.
   * public.css: Incomplete file that would hold all style code for public-facing components.
-  * student.css: Style code for public-facing "Student Spotlight" page.
-  * volunteer.css: Style code for public-facing "Volunteer" page.
-* templates:
+  * student.css: Style code for public-facing "Student Spotlight" page; corresponds to `student-spotlight.html`.
+  * volunteer.css: Style code for public-facing "Volunteer" page; corresponds to `volunteer-intro-vids.html`.
+* templates: All `.html` code files for all webpages. 
   * absence-forms.html: __EVELYN__
   * admin.html: Dashboard for users with the admin or tech role.
   * applicant-detail.html: __EVELYN__
@@ -58,11 +58,11 @@ This project entails a volunteer management system for the Chunch organization a
   * captain.html: Dashboard for users with the captain role, accessible by admin & tech roles.
   * coverage-details.html: __EVELYN__
   * deleted-volunteers.html: Table of volunteers and their information that were chosen to be deleted from the master list. Volunteers can be either permanently deleted or restored to the master list.
-  * inbox.html: Inbox page on the admin dashboard that allows admins to accept or decline new volunteer applicants.
+  * inbox.html: Inbox accessible through the admin dashboard that allows the user to accept or decline new volunteer applicants.
   * index.html: Public-facing component "Home" page.
   * master-list.html: Table of all current volunteers and their information. Also where new volunteers can be added or current volunteers can be deleted.
   * meet-the-team.html: Public-facing component "Meet the Team" page.
-  * need-coverage.html: Page that is used by captains and admins to find coverage and submit absences for volunteers.
+  * need-coverage.html: Page that is accessible through either dashboard for captains and admins to find coverage and submit absences for volunteers.
   * student-spotlight.html: Public-facing component "Student Spotlight" page.
   * volunteer-hours-cap.html: __ELEANOR__
   * volunteer-hours.html: Hourly view __EVELYN__
