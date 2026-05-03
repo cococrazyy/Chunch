@@ -2472,6 +2472,10 @@ def edit_master_volunteer(volunteer_id):
         .filter_by(volunteer_id=volunteer.id)\
         .order_by(Assignment.assignment_id.desc())\
         .first()
+    availability = Availability.query\
+        .filter_by(volunteer_id = volunteer_id)\
+        .order_by(Availability.availability_id.desc())\
+        .first()
     
     def format_hour(hour):
         if hour is None:
@@ -2525,8 +2529,11 @@ def edit_master_volunteer(volunteer_id):
             else:
                 volunteer.account.role = role
         
+        # Assignment information
         if assignment:
             assignment.station_id = station_id
+        if role is "tech":
+            assignment.station_id = None
         
         db.session.commit()
     return redirect("/admin/master-list")
@@ -2780,6 +2787,7 @@ def volunteer_hours():
             first_name = str(row.get("First Name", "")).strip().lower()
             last_name = str(row.get("Last Name", "")).strip().lower()
             email = str(row.get("Email", "")).strip().lower()
+            # Directly from Google Sheet
             typical_station = str(row.get("Typical Station", "")).strip().lower()
 
             if not typical_station or typical_station in ["reserve", "absent", "other"]:
@@ -2796,7 +2804,6 @@ def volunteer_hours():
 
         today = date.today()
         assignments = Assignment.query.all()
-
 
         station_to_volunteer_ids, debug = build_station_state(volunteers, stations)
 
@@ -2816,7 +2823,7 @@ def volunteer_hours():
             station_data[station_name] = volunteers_for_station
 
         return render_template(
-            "volunteer-hours-cap.html",
+            "volunteer-hours.html",
             station_data=station_data,
             debug=debug
         )
