@@ -52,31 +52,29 @@ migrate = Migrate(app, db)
 # creating a volunteer class
 #class Volunteer(db.Model, SoftDeleteMixin):
 class Volunteer(db.Model, SoftDeleteMixin):
-
     __tablename__ = "volunteers"
 
     id = Column(Integer, primary_key=True)
 
     first_name = Column(String(50))
     last_name = Column(String(50))
-
     email = Column(String(100))
     phone = Column(String(100))
     typical_shift = Column(String(100))
     unavailability = Column(String(100))
     capability_restrictions = Column(String(500))
     station_id = Column(Integer, ForeignKey("station.station_id"))
-    is_floater = Column(Boolean)
-    # added for station
+    is_floater = Column(Boolean) # Unused
+
     station = relationship("Station", foreign_keys=[station_id])
     account = relationship("UserAccount", back_populates="volunteer", uselist=False)
-    #station = relationship("Station")
 
 #for people signing up to volunteer that will be placed in inbox
 class Applicant(db.Model, SoftDeleteMixin):
     __tablename__ = "applicants"
 
     id = Column(Integer, primary_key=True)
+
     first_name = Column(String(50))
     last_name = Column(String(50))
     email = Column(String(50))
@@ -98,6 +96,7 @@ class UserAccount(db.Model):
     __tablename__ = "user_account"
 
     user_id = Column(Integer, primary_key=True)
+
     volunteer_id = Column(Integer, ForeignKey("volunteers.id"), unique=True)
     password = Column(String(255), nullable=False)
     role = Column(
@@ -110,10 +109,13 @@ class UserAccount(db.Model):
         ), nullable=False
     ) 
     volunteer = relationship("Volunteer", back_populates="account")
+
 # creating a stations table
 class Station(db.Model):
     __tablename__ = "station"
+
     station_id = Column(Integer, primary_key=True)
+
     station_name = Column(
         Enum(
             "Setup Team",
@@ -142,15 +144,11 @@ class Absence(db.Model):
     absence_id = Column(Integer, primary_key=True)
 
     volunteer_id = Column(Integer, ForeignKey("volunteers.id"), nullable=False)
-
     start_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)
-
     is_partial = Column(Boolean, nullable=False, default=False)
-
     partial_start_hour = Column(Integer, nullable=True)
     partial_end_hour = Column(Integer, nullable=True)
-
     notes = Column(String(255), nullable=True)
 
     volunteer = relationship("Volunteer", backref="absences")
@@ -158,19 +156,21 @@ class Absence(db.Model):
 # creating schedule table
 class Schedule(db.Model, SoftDeleteMixin):
     __tablename__ = "schedule"
+
     schedule_id = Column(Integer, primary_key=True)
+
     date = Column(Date)
     time = Column(Time)
 
 # creating assignment table
 class Assignment(db.Model):
     __tablename__ = "assignments"
+
     assignment_id = Column(Integer, primary_key=True)
-    
+
     volunteer_id = Column(Integer, ForeignKey("volunteers.id"))
     station_id = Column(Integer, ForeignKey("station.station_id"))
     schedule_id = Column(Integer, ForeignKey("schedule.schedule_id"))
-    
     created_by = Column(Integer, ForeignKey("user_account.user_id"))
 
     is_absent = Column(Boolean, default=False)
@@ -185,7 +185,6 @@ class Assignment(db.Model):
     station = relationship("Station", foreign_keys=[station_id])
     schedule = relationship("Schedule", backref="assignments")
     
-
 # creating a class that will store the availiablity hours for each person
 class Availability(db.Model, SoftDeleteMixin):
     __tablename__ = "availability"
@@ -193,7 +192,6 @@ class Availability(db.Model, SoftDeleteMixin):
     availability_id = Column(Integer, primary_key=True)
 
     volunteer_id = Column(Integer, ForeignKey("volunteers.id"))
-
     hour = Column(String(50))       # Example: 8, 9, 10, 11
 
     volunteer = relationship("Volunteer", backref=backref("availability", cascade = "all, delete-orphan"))
@@ -283,13 +281,6 @@ def google_login():
         render_template("captain.html")
     
     return jsonify({"success": True, "role": user.role})
-
-# def get_account():
-#     if "user_id" not in session:
-#         return jsonify({"error": "Not logged in"}), 401
-
-#     user = UserAccount.query.get(session["user_id"])
-#     return jsonify({user});
 
 @app.route("/debug/absent-id")
 def get_absent_id():
@@ -558,7 +549,7 @@ def edit_volunteer():
     volunteer.typical_shift = data.get("typical_shift")
     volunteer.unavailability = data.get("unavailability")
     volunteer.capability_restrictions = data.get("capability_restrictions")
-    volunteer.is_floater = data.get("is_floater")
+    volunteer.is_floater = data.get("is_floater") # Unused
 
     assignment = Assignment.query.filter_by(volunteer_id=volunteer.id).order_by(Assignment.assignment_id.desc()).first()
 
@@ -577,12 +568,11 @@ def edit_volunteer():
         elif new_role in {"admin", "captain", "tech"}:
             new_account = UserAccount(
                 volunteer_id=volunteer.id,
-                password="TEMP_PASSWORD",  # replace later with hashed
+                password="TEMP_PASSWORD",  # replace later with hashed ????
                 role=new_role
             )
             db.session.add(new_account)
     
-    # added for station
     if "station_id" in data:
         station_id = data["station_id"]
 
@@ -593,7 +583,7 @@ def edit_volunteer():
             if not station:
                 return {"error": "Station not found"}, 404
 
-        #  update latest assignment instead of volunteer
+        # update latest assignment instead of volunteer
         assignment = Assignment.query\
             .filter_by(volunteer_id=volunteer.id)\
             .order_by(Assignment.assignment_id.desc())\
@@ -625,7 +615,6 @@ def captain_page():
             .all()
 
         return render_template("captain.html", volunteers=volunteers)
-        # return redirect("/captain", volunteers=volunteers)
 
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
@@ -2415,13 +2404,16 @@ def add_volunteer():
     phone = request.form.get("phone", "").strip()
     # default is false if get has no return, if true then becomes true
     is_floater = (request.form.get("is_floater", "no") == "yes")
-    station_id = request.form.get("station_id", type = int)
+    station_id = request.form.get("station_id", type=int)
     start_hour = request.form.get("start_hour", type=int)
     end_hour = request.form.get("end_hour", type=int)
     if start_hour is None or end_hour is None:
         return "Start and end hour are required", 400
     if end_hour <= start_hour:
         return "Invalid time range", 400
+    # Default station to Reserve if none is assigned
+    if station_id is None:
+        station_id = 9
     
     existing = Volunteer.query.filter_by(first_name = first_name, email=email).first()
     if existing:
@@ -2435,7 +2427,6 @@ def add_volunteer():
         phone=phone,
         station_id = station_id,
         is_floater=is_floater,
-        
     )
 
     db.session.add(new_volunteer)
@@ -2448,11 +2439,13 @@ def add_volunteer():
         )
         db.session.add(availability)
     
+    # Create assignment
     assignment = Assignment(
         volunteer_id=new_volunteer.id,
         station_id=station_id,
     )
-    db.session.add(assignment)
+    db.session.add(assignment) # Add assignment
+
     def format_hour(h): 
         if h == 0: 
             return "12AM" 
@@ -2466,6 +2459,76 @@ def add_volunteer():
     new_volunteer.typical_shift = f"{format_hour(start_hour)} - {format_hour(end_hour)}"
     db.session.commit()
     grant_drive_access(new_volunteer.email)
+    
+    return redirect("/admin/master-list")
+
+@app.route("/admin/master-list/edit-volunteer/<int:volunteer_id>", methods=["POST", "GET"])
+def edit_master_volunteer(volunteer_id):
+    if "user_id" not in session:
+        return redirect("/")
+    
+    volunteer = Volunteer.query.get_or_404(volunteer_id)
+    assignment = Assignment.query\
+        .filter_by(volunteer_id=volunteer.id)\
+        .order_by(Assignment.assignment_id.desc())\
+        .first()
+    
+    def format_hour(hour):
+        if hour is None:
+            return ""
+        if hour == 0:
+            return "12AM"
+        elif hour < 12:
+            return f"{hour}AM"
+        elif hour == 12:
+            return "12PM"
+        else:
+            return f"{hour - 12}PM"
+    
+    if request.method == "POST":
+        first_name = request.form.get("first_name", "").strip()
+        last_name = request.form.get("last_name", "").strip()
+        email = request.form.get("email", "").strip().lower()
+        phone = request.form.get("phone", "").strip()
+        role = request.form.get("role", "").strip().lower()
+        unavailability = request.form.get("unavailability", "").strip()
+        capability_restrictions = request.form.get("capability_restrictions", "").strip()
+        station_id = request.form.get("station_id", type=int)
+        start_hour = request.form.get("start_hour", type=int)
+        end_hour = request.form.get("end_hour", type=int)
+        is_floater = request.form.get("is_floater") == "on"
+
+        typical_shift = f"{format_hour(start_hour)} - {format_hour(end_hour)}"
+
+        # Volunteer information
+        volunteer.first_name = first_name
+        volunteer.last_name = last_name
+        volunteer.email = email
+        volunteer.phone = phone
+        volunteer.typical_shift = typical_shift
+        volunteer.unavailability = unavailability
+        volunteer.capability_restrictions = capability_restrictions
+        volunteer.station_id = station_id
+        volunteer.is_floater = is_floater # Unused
+    
+        if role == 'volunteer':
+            if volunteer.account:
+                db.session.delete(volunteer.account)
+                volunteer.account = None
+        else: 
+            if volunteer.account is None:
+                volunteer.account = UserAccount(
+                    volunteer_id = volunteer_id,
+                    role = role
+                )
+                db.session.add(volunteer.account)
+            else:
+                volunteer.account.role = role
+        
+        if assignment:
+            assignment.station_id = station_id
+        
+        db.session.commit()
     return redirect("/admin/master-list")
 
 #soft deleting a user
@@ -2520,97 +2583,6 @@ def undo_delete(volunteer_id):
         db.session.commit()
     return redirect("/admin/master-list/deleted-volunteers")
 
-@app.route("/admin/master-list/edit-volunteer/<int:volunteer_id>", methods=["POST", "GET"])
-def edit_master_volunteer(volunteer_id):
-    if "user_id" not in session:
-        return redirect("/")
-    
-    volunteer = Volunteer.query.get_or_404(volunteer_id)
-    
-    def parse_shift(shift_str):
-        if not shift_str:
-            return None, None
-    
-        try:
-            start_str, end_str = shift_str.split(" - ")
-
-            def parse_hour(h):
-                h = h.strip().upper()
-    
-                if "AM" in h:
-                    hour = int(h.replace("AM", ""))
-                    return 0 if hour == 12 else hour
-    
-                if "PM" in h:
-                    hour = int(h.replace("PM", ""))
-                    return 12 if hour == 12 else hour + 12
-    
-                return None
-
-            start_hour = parse_hour(start_str)
-            end_hour = parse_hour(end_str)
-            
-            return start_hour, end_hour
-
-        except Exception:
-            return None, None
-    def format_hour(hour):
-        if hour is None:
-            return ""
-        if hour == 0:
-            return "12AM"
-        elif hour < 12:
-            return f"{hour}AM"
-        elif hour == 12:
-            return "12PM"
-        else:
-            return f"{hour - 12}PM"
-    
-    if request.method == "POST":
-        first_name = request.form.get("first_name", "").strip()
-        last_name = request.form.get("last_name", "").strip()
-        email = request.form.get("email", "").strip().lower()
-        phone = request.form.get("phone", "").strip()
-        role = request.form.get("role", "").strip().lower()
-        unavailability = request.form.get("unavailability", "").strip()
-        capability_restrictions = request.form.get("capability_restrictions", "").strip()
-        station_id = request.form.get("station_id", type=int)
-        start_hour = request.form.get("start_hour", type=int)
-        end_hour = request.form.get("end_hour", type=int)
-        is_floater = request.form.get("is_floater") == "on"
-
-        #if not first_name or not last_name or not email:
-            #flash("First name, last name, and email are required.")
-            #return redirect(f"/admin/master-list/edit-volunteer/{volunteer_id}")
-
-        typical_shift = f"{format_hour(start_hour)} - {format_hour(end_hour)}"
-
-        volunteer.first_name = first_name
-        volunteer.last_name = last_name
-        volunteer.email = email
-        volunteer.phone = phone
-        if role == 'volunteer':
-            if volunteer.account:
-                db.session.delete(volunteer.account)
-                volunteer.account = None
-        else: 
-            if volunteer.account is None:
-                volunteer.account = UserAccount(
-                    volunteer_id = volunteer_id,
-                    role = role
-                )
-                db.session.add(volunteer.account)
-            else:
-                volunteer.account.role = role
-        
-        volunteer.typical_shift = typical_shift
-        volunteer.unavailability = unavailability
-        volunteer.capability_restrictions = capability_restrictions
-        volunteer.station_id = station_id
-        volunteer.is_floater = is_floater
-
-        db.session.commit()
-    return redirect("/admin/master-list")
     
 @app.route("/student-spotlight")
 def student_spotlight():
