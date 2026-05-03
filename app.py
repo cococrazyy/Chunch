@@ -592,6 +592,7 @@ def edit_volunteer():
         if assignment:
             assignment.station_id = station_id
         else:
+            
             # create assignment if none exists
             new_assignment = Assignment(
                 volunteer_id=volunteer.id,
@@ -2316,6 +2317,7 @@ def delete_applicant(applicants_id):
 
     return redirect("/admin/inbox")
     
+# MASTER LIST
 @app.route("/admin/master-list")
 def master_list():
     volunteers = Volunteer.query\
@@ -2392,7 +2394,6 @@ def master_list():
 
     return render_template("master-list.html", volunteers=volunteer_rows)
     
-
 @app.route("/admin/master-list/add-volunteer", methods=["POST"])
 def add_volunteer():
     if "user_id" not in session:
@@ -2415,9 +2416,9 @@ def add_volunteer():
     if end_hour <= start_hour:
         return "Invalid time range", 400
     # Default station to Reserve if none is assigned
-    if role is "tech":
+    if role == "tech":
         station_id = None
-    elif station_id is None:
+    if station_id is None:
         station_id = 9
     
     existing = Volunteer.query.filter_by(first_name = first_name, email=email).first()
@@ -2444,12 +2445,13 @@ def add_volunteer():
         )
         db.session.add(availability)
     
-    # Create assignment
-    assignment = Assignment(
-        volunteer_id=new_volunteer.id,
-        station_id=station_id,
-    )
-    db.session.add(assignment) # Add assignment
+    # Create assignment for volunteers with a station
+    if station_id is not None:
+        assignment = Assignment(
+            volunteer_id=new_volunteer.id,
+            station_id=station_id,
+        )
+        db.session.add(assignment) # Add assignment
 
     def format_hour(h): 
         if h == 0: 
@@ -2477,10 +2479,6 @@ def edit_master_volunteer(volunteer_id):
         .filter_by(volunteer_id=volunteer.id)\
         .order_by(Assignment.assignment_id.desc())\
         .first()
-    availability = Availability.query\
-        .filter_by(volunteer_id = volunteer_id)\
-        .order_by(Availability.availability_id.desc())\
-        .first()
     
     def format_hour(hour):
         if hour is None:
@@ -2500,12 +2498,12 @@ def edit_master_volunteer(volunteer_id):
         email = request.form.get("email", "").strip().lower()
         phone = request.form.get("phone", "").strip()
         role = request.form.get("role", "").strip().lower()
+        station_id = request.form.get("station_id", type=int)
         unavailability = request.form.get("unavailability", "").strip()
         capability_restrictions = request.form.get("capability_restrictions", "").strip()
-        station_id = request.form.get("station_id", type=int)
         start_hour = request.form.get("start_hour", type=int)
         end_hour = request.form.get("end_hour", type=int)
-        is_floater = request.form.get("is_floater") == "on"
+        is_floater = (request.form.get("is_floater", "no") == "yes")
 
         typical_shift = f"{format_hour(start_hour)} - {format_hour(end_hour)}"
 
@@ -2537,7 +2535,7 @@ def edit_master_volunteer(volunteer_id):
         # Assignment information
         if assignment:
             assignment.station_id = station_id
-        if role is "tech":
+        if role == "tech":
             assignment.station_id = None
         
         db.session.commit()
