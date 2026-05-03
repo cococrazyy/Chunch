@@ -1166,8 +1166,8 @@ function openVolunteerPanel(volunteerJson) {
     document.getElementById("detailName").textContent = volunteer.name || "Volunteer";
     document.getElementById("detailEmail").textContent = volunteer.email || "None listed";
     document.getElementById("detailPhone").textContent = formatPhonePretty(volunteer.phone) || "None listed";
-    document.getElementById("detailCaptain").textContent = formatRolePretty(volunteer.role);
-    const roleSelect = document.getElementById("editRole");
+    document.getElementById("detailRole").textContent = formatRolePretty(volunteer.role);
+    // const roleSelect = document.getElementById("editRole");
     // roleSelect.value = formatRolePretty(volunteer.role) || "None listed";
     // roleSelect.value = (volunteer.role || "volunteer");
     
@@ -1245,7 +1245,7 @@ function closeVolunteerPanel() {
     document.getElementById("detailUnavailability").style.display = "block";
     document.getElementById("detailRestrictions").style.display = "block";
     // Remove or replace with "detailRole", change above as well if changed
-    document.getElementById("detailCaptain").style.display = "block";
+    document.getElementById("detailRole").style.display = "block";
     // added for station
     document.getElementById("detailStation").style.display = "block";
 
@@ -1275,7 +1275,7 @@ function editVolunteer() {
     document.getElementById("detailPhone").style.display = "none";
     document.getElementById("detailShift").style.display = "none";
     // Remove or replace with "detailRole", change above as well if changed
-    document.getElementById("detailCaptain").style.display = "none";
+    document.getElementById("detailRole").style.display = "none";
     document.getElementById("detailUnavailability").style.display = "none";
     document.getElementById("detailRestrictions").style.display = "none";
     document.getElementById("detailStation").style.display = "none";
@@ -1385,7 +1385,6 @@ function saveVolunteer() {
 }
 
 // Added for edit
-
 document.addEventListener("click", function (e) {
     if (!isSelectionLocked) return;
 
@@ -1398,15 +1397,6 @@ document.addEventListener("click", function (e) {
     e.stopPropagation();
     e.preventDefault();
 }, true);
-
-
-// function handleAuthClick(event) {
-//     gapi.auth2.getAuthInstance().signIn();
-// }
-
-// function handleSignoutClick(event) {
-//     gapi.auth2.getAuthInstance().signOut();
-// }
 
 async function logOut() {
     const res = await fetch("/api/google-logout", {
@@ -1431,32 +1421,6 @@ async function logOut() {
             window.location.href = "/"; // redirect to home page after logout
         });
 }
-
-// function logOut() {
-//     fetch("/api/google-logout", {method: "POST"})
-//     .then(() => {
-//         var auth2 = gapi.auth2.getAuthInstance();
-//         auth2.signOut().then(function () {
-//             console.log('User signed out.');
-//             window.location.href = "/"; // redirect to home page after logout
-//         });
-//     });
-// }
-// let loggedIn = true;
-// async function signOut() {
-//     const response = await fetch("/api/google-logout", {
-//         method: "POST",
-//         headers: {
-//             "Content-Type": "application/json"
-//         },
-//         body: JSON.stringify({})
-//     });
-
-//     var auth2 = gapi.auth2.getAuthInstance();
-//     auth2.signOut().then(function () {
-//         console.log('User signed out.');
-//     });
-// }
 
 // initial load
 loadStationBoard();
@@ -1499,15 +1463,14 @@ loadStationBoard();
 
         <div class="detail-card">
             <div class="detail-label">Role</div>
-            <!-- Is this being used? Change to "detailRole"? -->
-            <div class="detail-value" id="detailCaptain">—</div>
+            <div class="detail-value" id="detailRole">—</div>
         
             <select id="editRole" class="date-picker" style="display:none;">
                 <option value="admin">Admin</option>
                 <option value="captain">Captain</option>
                 <option value="volunteer">Volunteer</option>
                 <!-- Might want to comment out because tech shouldn't be changed by admin -->
-                <option value="tech">Tech</option>
+                <!-- <option value="tech">Tech</option> -->
             </select>
         </div>
 
@@ -1551,23 +1514,20 @@ loadStationBoard();
             <div id="detailStation" class="detail-value"></div>
             <!-- Edit mode -->
             <select id="editStation" class="date-picker" style="display:none;">
-                <option value="1">Setup Team</option>
-                <option value="2">Teardown Team</option>
-                <option value="3">Line Servers</option>
-                <option value="4">Kitchen</option>
-                <option value="5">Drink Station</option>
-                <option value="6">Desserts</option>
+                <option value="12">Baked Potato Bar</option>
                 <option value="7">Busboys/sanitation</option>
+                <option value="6">Desserts</option>
                 <option value="8">Dishwashers</option>
-                <option value="9">Reserve</option>
+                <option value="5">Drinks</option>
                 <option value="10">General Manager</option>
                 <option value="11">Greeters</option>
-                <option value="12">Baked Potato Bar</option>
+                <option value="4">Kitchen</option>
+                <option value="3">Line Servers</option>
+                <option value="9">Reserve</option>
                 <option value="13">Salad Bar</option>
-                <option value="14">Absent</option>
-                <option value="15">Other</option>
-                <option value="16">Vegan Station</option>
-                
+                <option value="1">Setup Team</option>
+                <option value="2">Teardown Team</option>
+                <option value="16">Vegan</option>
             </select>
 
             <!-- <div id="floater" style="position:absolute; right:20px; top:20px; font-size:12px; color:#718096;">
