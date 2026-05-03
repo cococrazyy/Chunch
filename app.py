@@ -2402,17 +2402,22 @@ def add_volunteer():
     last_name = request.form.get("last_name", "").strip()
     email = request.form.get("email", "").strip().lower()
     phone = request.form.get("phone", "").strip()
-    # default is false if get has no return, if true then becomes true
-    is_floater = (request.form.get("is_floater", "no") == "yes")
+    role = request.form.get("role", "").strip().lower()
     station_id = request.form.get("station_id", type=int)
     start_hour = request.form.get("start_hour", type=int)
     end_hour = request.form.get("end_hour", type=int)
+    
+    # if_floater default is false if get has no return
+    is_floater = (request.form.get("is_floater", "no") == "yes")
+
     if start_hour is None or end_hour is None:
         return "Start and end hour are required", 400
     if end_hour <= start_hour:
         return "Invalid time range", 400
     # Default station to Reserve if none is assigned
-    if station_id is None:
+    if role is "tech":
+        station_id = None
+    elif station_id is None:
         station_id = 9
     
     existing = Volunteer.query.filter_by(first_name = first_name, email=email).first()
