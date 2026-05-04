@@ -60,7 +60,7 @@ This project entails a volunteer management system for the Chunch organization a
   * absence-forms.html: Creates absence form button and gets all submitted absences.
   * admin.html: Dashboard for users with the admin or tech role.
   * applicant-detail.html: Inside absence forms and showing the absence forms and their corresponding information for each volunteer.
-  * application_received.html: __EVELYN__
+  * application_received.html: Shows short message after receiving new volunteer application.
   * captain.html: Dashboard for users with the captain role, accessible by admin & tech roles.
   * coverage-details.html: Finds volunteers that can cover an absent volunteer.
   * deleted-volunteers.html: Table of volunteers and their information that were chosen to be deleted from the master list. Volunteers can be either permanently deleted or restored to the master list.
@@ -70,8 +70,8 @@ This project entails a volunteer management system for the Chunch organization a
   * meet-the-team.html: Public-facing component "Meet the Team" page.
   * need-coverage.html: Page that is accessible through either dashboard for captains and admins to find coverage and submit absences for volunteers.
   * student-spotlight.html: Public-facing component "Student Spotlight" page.
-  * volunteer-hours-cap.html: __ELEANOR__
-  * volunteer-hours.html: Hourly view __EVELYN__
+  * volunteer-hours-cap.html: Hourly view for captains. Returns user to captain page.
+  * volunteer-hours.html: Hourly view for admins. Returns user to admin page.
   * volunteer-intro-vids.html: Public-facing component "Volunteer" page.
 * app.py: __AARON__
 * credentials.json: ??
