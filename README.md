@@ -62,7 +62,7 @@ This project entails a volunteer management system for the Chunch organization a
   * applicant-detail.html: Inside absence forms and showing the absence forms and their corresponding information for each volunteer.
   * application_received.html: __EVELYN__
   * captain.html: Dashboard for users with the captain role, accessible by admin & tech roles.
-  * coverage-details.html: __EVELYN__
+  * coverage-details.html: Finds volunteers that can cover an absent volunteer.
   * deleted-volunteers.html: Table of volunteers and their information that were chosen to be deleted from the master list. Volunteers can be either permanently deleted or restored to the master list.
   * inbox.html: Inbox accessible through the admin dashboard that allows the user to accept or decline new volunteer applicants.
   * index.html: Public-facing component "Home" page.
