@@ -1,5 +1,7 @@
 <!-- 
-    TODO: Description of file
+    This page displays a list of volunteers who have been deleted 
+    from the master list. Admins can either permanently delete 
+    these volunteers or restore them back to the master list.
 -->
 <!DOCTYPE html>
 <html lang="en-US">
@@ -9,58 +11,65 @@
     
     <title>Deleted Volunteers</title>
 
-    <!-- Import style -->
+    <!-- Page-specific stylesheet -->
     <link rel="stylesheet" href="/style/deleted.css">
 </head>
 <body>
     <div class="container">
+        <!-- Page Header -->
+        <h1>Deleted Volunteers</h1>
 
-    <h1>Deleted Volunteers</h1>
+        <!-- Navigation back to the main master list -->
+        <div class="top-actions">
+            <button class="secondary" onclick="window.location.href='/admin/master-list'">
+            Back to Master List
+            </button>
+        </div>
 
-    <div class="top-actions">
-        <button class="secondary" onclick="window.location.href='/admin/master-list'">
-        Back to Master List
-        </button>
-    </div>
+        <!-- Table of deleted volunteers -->
+        <table>
+            <thead>
+                <tr>
+                    <!-- Column headers for volunteer information -->
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone Number</th>
+                    <th></th> <!-- Actions column -->
+                </tr>
+            </thead>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone Number</th>
-                <th></th>
-            </tr>
-        </thead>
+            <tbody>
+                <!-- Loop through each deleted volunteer -->
+                {% for d in deleted %}
+                <tr>
+                    <!-- Display volunteer details -->
+                    <td>{{ d.first_name }} {{ d.last_name }}</td>
+                    <td>{{ d.email }}</td>
+                    <td>{{ d.phone }}</td>
+                    
+                    <!-- Action buttons for each volunteer -->
+                    <td class="actions-cell">
+                        <!-- Permanently delete volunteer -->
+                        <form method="POST" action="/admin/master-list/deleted-volunteers/permadelete/{{ d.id }}">
+                            <button class="danger" type="submit"
+                                onclick="return confirm('Permanently delete this volunteer?')">
+                                Permanently Delete
+                            </button>
+                        </form>
 
-        <tbody>
-            {% for d in deleted %}
-            <tr>
-                <td>{{ d.first_name }} {{ d.last_name }}</td>
-                <td>{{ d.email }}</td>
-                <td>{{ d.phone }}</td>
-                <td class="actions-cell">
+                        <!-- Restore volunteer to master list -->
+                        <form method="POST" action="/admin/master-list/deleted-volunteers/undo/{{ d.id }}">
+                            <button class="success" type="submit"
+                                onclick="return confirm('Undo deletion of this volunteer?')">
+                                Restore
+                            </button>
+                        </form>
 
-                    <form method="POST" action="/admin/master-list/deleted-volunteers/permadelete/{{ d.id }}">
-                        <button class="danger" type="submit"
-                            onclick="return confirm('Permanently delete this volunteer?')">
-                            Permanently Delete
-                        </button>
-                    </form>
-
-                    <form method="POST" action="/admin/master-list/deleted-volunteers/undo/{{ d.id }}">
-                        <button class="success" type="submit"
-                            onclick="return confirm('Undo deletion of this volunteer?')">
-                            Restore
-                        </button>
-                    </form>
-
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </body>
 </html>
