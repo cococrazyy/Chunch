@@ -1,5 +1,7 @@
 <!-- 
-    TODO: Description of file
+    This file contains the HTML and JavaScript code that creates the coverage‑request
+    page for captains and admins. It allows selecting a volunteer, specifying full
+    or partial‑shift absences, and submitting the request for coverage.
 -->
 <!DOCTYPE html>
 <html lang="en-US">
@@ -10,7 +12,7 @@
     <title>Request Coverage</title>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     
-    <!-- Import style -->
+    <!-- Import page stylesheet -->
     <link rel="stylesheet" href="/style/coverage.css">
 </head>
 <body>
@@ -19,29 +21,24 @@
     <h2>Request Coverage</h2>
     <p>Select the volunteer and absence details.</p>
 
+    <!-- Coverage request form -->
     <form method="POST" action="/admin/need-coverage/save">
+
         <div class="field">
             <label for="volunteer_id">Volunteer</label>
-            <!-- for only one name
-            <select id="volunteer_id" name="volunteer_id" required> -->
-            <!--<select id="volunteer_id" name="volunteer_id[]" multiple required>
+
+            <!-- Volunteer dropdown (enhanced with Select2) -->
+            <select id="volunteer_id" name="volunteer_id" required>
                 <option></option> <!-- placeholder -->
-                <!--{% for v in volunteers %}
+                {% for v in volunteers %}
                     <option value="{{ v.id }}">
                         {{ v.first_name }} {{ v.last_name }}
                     </option>
                 {% endfor %}
             </select>
-        </div> -->
-        <select id="volunteer_id" name="volunteer_id" required>
-            <option></option> <!-- placeholder -->
-            {% for v in volunteers %}
-                <option value="{{ v.id }}">
-                {{ v.first_name }} {{ v.last_name }}
-                </option>
-            {% endfor %}
-        </select>
+        </div>
 
+        <!-- Date range selection -->
         <div class="inline-row">
             <div class="field">
                 <label for="start_date">Start Date</label>
@@ -54,6 +51,7 @@
             </div>
         </div>
 
+        <!-- Absence type selector -->
         <div class="field">
             <label for="is_partial">Absence Type</label>
             <select id="is_partial" name="is_partial" onchange="togglePartialFields()" required>
@@ -62,6 +60,7 @@
             </select>
         </div>
 
+        <!-- Partial‑shift hour fields -->
         <div id="partialFields">
             <div class="inline-row">
                 <div class="field">
@@ -76,11 +75,13 @@
             </div>
         </div>
 
+        <!-- Optional notes -->
         <div class="field">
             <label for="notes">Notes</label>
             <textarea id="notes" name="notes" rows="3" placeholder="Optional"></textarea>
         </div>
 
+        <!-- Form actions -->
         <div class="actions">
             <button class="request" id="primary" type="submit">Save Absence</button>
             <button class="request" id="secondary" type="button" onclick="window.location.href='/admin'">Back</button>
@@ -88,16 +89,18 @@
     </form>
 </div>
 
+<!-- Select2 + jQuery dependencies -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
+// Show/hide partial‑shift hour fields
 function togglePartialFields() {
     const isPartial = document.getElementById("is_partial").value === "true";
     document.getElementById("partialFields").style.display = isPartial ? "block" : "none";
 }
 
-
+// Autofill form fields from URL parameters (used when navigating from dashboards)
 function autofillFromURL() {
     const params = new URLSearchParams(window.location.search);
 
@@ -105,7 +108,7 @@ function autofillFromURL() {
     const startDate = params.get("start_date");
     const endDate = params.get("end_date");
 
-    // Convert MM/DD/YYYY to YYYY-MM-DD (required for input[type=date])
+    // Convert MM/DD/YYYY → YYYY-MM-DD for date inputs
     function formatDate(dateStr) {
         if (!dateStr) return "";
         const parts = dateStr.split("/");
@@ -127,19 +130,20 @@ function autofillFromURL() {
         const select = document.getElementById("volunteer_id");
         select.value = volunteerId;
 
-        // REQUIRED for Select2 to visually update
+        // Required for Select2 to visually update
         $('#volunteer_id').trigger('change');
     }
 }
 
+// Initialize Select2 and apply autofill
 $(document).ready(function() {
     $('#volunteer_id').select2({
         placeholder: "Type to search a volunteer",
         allowClear: true,
         width: '100%',
 
+        // Custom name‑matching logic for better search
         matcher: function(params, data) {
-            // If no search term, show all options
             if ($.trim(params.term) === '') {
                 return data;
             }
@@ -147,18 +151,16 @@ $(document).ready(function() {
             const query = params.term.toLowerCase();
             const text = data.text.toLowerCase();
 
-            // Split full name into parts
+            // Split full name into parts and match any part
             const parts = text.split(" ");
-
-            // Check if ANY part starts with the query
             const match = parts.some(part => part.startsWith(query));
 
             return match ? data : null;
         }
     });
+
     autofillFromURL();
 });
-
 </script>
 
 </body>

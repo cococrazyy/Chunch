@@ -1,5 +1,7 @@
 <!-- 
-    TODO: Description of file
+    This file contains the HTML and JavaScript code that creates the public-facing
+    Student Spotlight page. It displays student-submitted stories and reflections
+    about their experience with Chunch.
 -->
 <!DOCTYPE html>
 <html lang="en-US">
@@ -9,13 +11,15 @@
     
     <title>Student Spotlight</title>
     
-    <!-- Import font & style -->
+    <!-- Import fonts & page-specific stylesheet -->
     <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/style/student.css">
 </head>
 
 <body>
+
+    <!-- Navigation bar -->
     <nav class="navbar">
         <a href="/">HOME</a>
         <a href="/meet-the-team">MEET THE TEAM</a>
@@ -24,17 +28,21 @@
         <a href="/student-spotlight">STUDENTS</a>
     </nav>
 
+    <!-- Main content container -->
     <div class="container">
         <h1>Student Spotlight</h1>
         <p class="subtitle">Hear directly from students about what Chunch means to them.</p>
 
+        <!-- Call-to-action for students to submit their own stories -->
         <div class="cta">
             <p>Have something to say?</p>
-            <a href="https://docs.google.com/forms/d/e/1FAIpQLSfz55ZJ2GFwnNhRyz69MfZYN2_6Hn_bMDhvHZwtIEb8jn9VBw/viewform?usp=header" target="_blank">
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSfz55ZJ2GFwnNhRyz69MfZYN2_6Hn_bMDhvHZwtIEb8jn9VBw/viewform?usp=header" 
+               target="_blank">
                 Share Your Story
             </a>
         </div>
 
+        <!-- Spotlight entries (rendered if available) -->
         {% if spotlight_entries %}
             <div class="spotlight-grid">
                 {% for entry in spotlight_entries %}
@@ -45,9 +53,12 @@
                     </div>
                 {% endfor %}
             </div>
+
+        <!-- Fallback when no entries exist -->
         {% else %}
             <p class="empty-state">No spotlight entries available yet.</p>
         {% endif %}
     </div>
+
 </body>
 </html>

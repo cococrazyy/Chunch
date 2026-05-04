@@ -70,7 +70,7 @@ This project entails a volunteer management system for the Chunch organization a
   * meet-the-team.html: Public-facing component "Meet the Team" page.
   * need-coverage.html: Page that is accessible through either dashboard for captains and admins to find coverage and submit absences for volunteers.
   * student-spotlight.html: Public-facing component "Student Spotlight" page.
-  * volunteer-hours.html: Hourly view for admins. Returns user to admin page.
+  * volunteer-hours.html: Hourly view for user. Returns user to the admin or captain page.
   * volunteer-intro-vids.html: Public-facing component "Volunteer" page.
 * app.py: Main Flask application containing all routes and core logic.
 * credentials.json: Stores credentials for Google API access (used for Sheets integration).

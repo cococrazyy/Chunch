@@ -1,5 +1,7 @@
 <!-- 
-    TODO: Description of file
+    This file contains the HTML and JavaScript code that creates the public-facing
+    Meet The Team page. It displays volunteer team members along with their
+    station roles, hobbies, highlights, and personal advice for students.
 -->
 <!DOCTYPE html>
 <html lang="en-US">
@@ -9,7 +11,7 @@
     
     <title>Meet the Team</title>
 
-    <!-- Import font & style -->
+    <!-- Import fonts & page-specific stylesheet -->
     <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/style/meet-the-team.css">
@@ -17,6 +19,7 @@
 
 <body>
 
+<!-- Navigation bar -->
 <nav class="navbar">
     <a href="/">HOME</a>
     <a href="/meet-the-team">MEET THE TEAM</a>
@@ -26,17 +29,24 @@
 </nav>
 
 <div class="container">
+
+    <!-- Page header and introduction -->
     <div class="page-header">
         <h1>Meet the Team</h1>
         <p>Get to know the people who help make Chunch happen.</p>
     </div>
 
+    <!-- Team member cards (rendered only if data exists) -->
     {% if team_members %}
         <div class="team-grid">
+
             {% for member in team_members %}
                 <div class="team-card">
+
+                    <!-- Member name -->
                     <div class="member-name">{{ member.name }}</div>
 
+                    <!-- Station assignment -->
                     {% if member.station %}
                         <div class="info-block">
                             <div class="info-text">
@@ -45,6 +55,7 @@
                         </div>
                     {% endif %}
 
+                    <!-- Hobbies -->
                     {% if member.hobbies %}
                         <div class="info-block">
                             <div class="info-text">
@@ -53,6 +64,7 @@
                         </div>
                     {% endif %}
 
+                    <!-- Highlight of volunteering -->
                     {% if member.highlight %}
                         <div class="info-block">
                             <div class="info-text">
@@ -61,6 +73,7 @@
                         </div>
                     {% endif %}
 
+                    <!-- Advice for students -->
                     {% if member.advice %}
                         <div class="info-block">
                             <div class="info-text">
@@ -68,12 +81,17 @@
                             </div>
                         </div>
                     {% endif %}
+
                 </div>
             {% endfor %}
+
         </div>
+
+    <!-- Fallback when no team members are available -->
     {% else %}
         <div class="empty-state">No team members available yet.</div>
     {% endif %}
+
 </div>
 
 </body>

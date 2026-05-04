@@ -1,5 +1,8 @@
 <!-- 
-    TODO: Description of file
+    This file contains the HTML and JavaScript code that creates the hourly
+    volunteer‑coverage view. It displays each station’s volunteer time ranges
+    using a Chart.js bar visualization. This page is accessible only to admins
+    and captains and includes navigation back to their respective dashboards.
 -->
 <!DOCTYPE html>
 <html lang="en-US">
@@ -9,14 +12,17 @@
 
     <title>Volunteer Hours by Station</title>
 
-    <!-- Import style -->
+    <!-- Import stylesheet for hourly view layout -->
     <link rel="stylesheet" href="/style/hourly-view.css">
+
+    <!-- Chart.js for rendering hourly bar charts -->
     <!-- TODO: Descript this script -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 <div class="container">
 
+    <!-- Page header with navigation and print controls -->
     <div class="top-bar">
         <h1>Volunteer Hours by Station</h1>
         <div class="top-bar-actions">
@@ -25,11 +31,13 @@
         </div>
     </div>
 
+    <!-- Station selector -->
     <div class="controls">
         <label for="stationSelect">Select Station:</label>
         <select id="stationSelect"></select>
     </div>
 
+    <!-- Chart display card -->
     <div class="chart-card">
         <h2 id="stationHeading" class="station-heading"></h2>
         <div id="chartWrapper">
@@ -40,11 +48,18 @@
 </div>
 
 <script>
+    // Station data injected from backend
     const stationData = {{ station_data | tojson | safe }};
+
+    // Stations excluded from hourly visualization
     const blockedStations = ["Reserve", "Absent", "Other"];
+
+    // Filter valid stations for selection
     const stationNames = Object.keys(stationData).filter(
-    stationName => !blockedStations.includes(stationName)
+        stationName => !blockedStations.includes(stationName)
     );
+
+    // DOM references
     const stationSelect = document.getElementById('stationSelect');
     const stationHeading = document.getElementById('stationHeading');
     const ctx = document.getElementById('hoursChart').getContext('2d');
@@ -52,12 +67,14 @@
     let hoursChart = null;
     let currentStationName = "";
 
+    // Convert numeric hour to readable label
     function formatHourLabel(value) {
         if (value === 12) return "12PM";
         if (value < 12) return value + "AM";
         return (value - 12) + "PM";
     }
 
+    // Build Chart.js datasets from volunteer time ranges
     function buildDatasets(volunteers) {
         const datasets = [];
 
@@ -85,6 +102,7 @@
             });
         });
 
+        // Fallback dataset when no hours exist
         if (datasets.length === 0) {
             datasets.push({
                 label: "No scheduled hours",
@@ -100,6 +118,7 @@
         return datasets;
     }
 
+    // Render the hourly chart for a selected station
     function renderChart(stationName) {
         currentStationName = stationName;
         const volunteers = stationData[stationName] || [];
@@ -107,6 +126,7 @@
 
         stationHeading.textContent = stationName;
 
+        // Destroy existing chart before re-rendering
         if (hoursChart) {
             hoursChart.destroy();
         }
@@ -123,28 +143,20 @@
                 maintainAspectRatio: false,
                 animation: false,
                 layout: {
-                    padding: {
-                        top: 6
-                    }
+                    padding: { top: 6 }
                 },
                 plugins: {
-                    legend: {
-                        display: false
-                    },
+                    legend: { display: false },
                     tooltip: {
                         callbacks: {
                             label: function(context) {
                                 const volunteer = volunteers[context.dataIndex];
-                                if (!volunteer || !volunteer.range_label) {
-                                    return "";
-                                }
+                                if (!volunteer || !volunteer.range_label) return "";
                                 return volunteer.name + ": " + volunteer.range_label;
                             }
                         }
                     },
-                    title: {
-                        display: false
-                    }
+                    title: { display: false }
                 },
                 scales: {
                     x: {
@@ -154,9 +166,7 @@
                             minRotation: 45,
                             autoSkip: false
                         },
-                        grid: {
-                            display: false
-                        }
+                        grid: { display: false }
                     },
                     y: {
                         reverse: true,
@@ -178,6 +188,7 @@
         });
     }
 
+    // Print the currently displayed chart
     function printCurrentChart() {
         if (hoursChart) {
             hoursChart.resize();
@@ -189,6 +200,7 @@
         }
     }
 
+    // Ensure chart renders correctly before and after printing
     window.addEventListener('beforeprint', () => {
         if (hoursChart) {
             hoursChart.resize();
@@ -203,6 +215,7 @@
         }
     });
 
+    // Populate station dropdown
     stationNames.forEach(stationName => {
         const option = document.createElement('option');
         option.value = stationName;
@@ -210,11 +223,13 @@
         stationSelect.appendChild(option);
     });
 
+    // Auto-load first station chart
     if (stationNames.length > 0) {
         stationSelect.value = stationNames[0];
         renderChart(stationNames[0]);
     }
 
+    // Re-render chart when station selection changes
     stationSelect.addEventListener('change', function() {
         renderChart(this.value);
     });

@@ -1,5 +1,6 @@
 <!-- 
-    This file contains the HTML and JavaScript code for a responsive Admin Dashboard. 
+    This file contains the HTML and JavaScript code for a responsive 
+    Admin Dashboard. Only accessible by users with the “admin” or “tech” role.
 -->
 <!DOCTYPE html>
 <html lang="en-US">
@@ -9,10 +10,11 @@
     
     <title>Administrator Dashboard</title>
     
-    <!-- Import font & style-->
+    <!-- Page-specifc font & stylesheet -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/style/admin.css">
 
+    <!-- Google Sign-In (unused but included) -->
     <script src="https://apis.google.com/js/platform.js" async defer></script>
     <meta name="google-signin-client_id" content="483439290581-t6qm63e9rcuvm62l6j3cghvj71eo5h1k.apps.googleusercontent.com">
 </head>
@@ -20,15 +22,17 @@
 
 <div class="header">
     <div class="header-top">
+        <!-- Page header -->
         <h1>Admin Dashboard</h1>
-        <!-- Sign out Button, non-functional -->
+
+        <!-- Sign out Button, placeholder (currently disabled) -->
         <!-- <button onclick="logOut();">
             <span class="icon">🚪</span>
             <span class="label">Sign Out</span>
         </button> -->
     </div>
 
-    <!-- Navigation buttons -->
+    <!-- Navigation buttons for admin tools -->
     <div class="header-actions">
         <button onclick="window.location.href='/admin/inbox'">
             <span class="icon">📬</span>
@@ -61,6 +65,8 @@
 </div>
 
 <div class="page">
+
+    <!-- Summary statistics for quick overview -->
     <div class="summary-bar">
         <div class="summary-card">
             <div class="summary-label">Total Volunteers</div>
@@ -80,6 +86,7 @@
         </div>
     </div>
 
+    <!-- Station board header -->
     <div class="board-header">
         <div>
             <h2>Station Board</h2>
@@ -87,8 +94,10 @@
         </div>
     </div>
 
+    <!-- Dynamic station grid -->
     <div class="grid" id="scheduleGrid"></div>
 
+    <!-- Coverage request box -->
     <div id="coverageBox" class="coverage-box">
         <h3>Request Coverage</h3>
         <p>Select the volunteer who will be absent.</p>
@@ -108,11 +117,14 @@
 </div>
 
 <script>
-
-
+/* ------------------------------
+   Global state and configuration
+------------------------------ */
 let isEditMode = false;
 let isSelectionLocked = false;    
 let currentVolunteer = null;
+
+/* Mapping station names to Databse stations */
 const stationClassMap = {
     "Setup Team": "setup",
     "Teardown Team": "teardown",
@@ -135,7 +147,9 @@ const stationClassMap = {
 let currentStationData = {};
 let currentAbsentEditVolunteer = null;
 
-
+/* ------------------------------
+   Utility functions
+------------------------------ */
 async function resetToReserve() {
     if (!currentVolunteer || !currentVolunteer.id) {
         alert("No volunteer selected");
@@ -236,6 +250,9 @@ function formatRolePretty(role) {
     return role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
 }
 
+/* ------------------------------
+   Absence editing modal controls
+------------------------------ */
 function openAbsentEditPicker() {
     const select = document.getElementById("absentVolunteerSelect");
     if (!select) return;
@@ -292,6 +309,9 @@ function showAbsenceActionSection(sectionName) {
     }
 }
 
+/* ------------------------------
+   Absence modification flows
+------------------------------ */
 function startAbsentEdit() {
     const select = document.getElementById("absentVolunteerSelect");
     if (!select) return;
@@ -502,6 +522,9 @@ async function handleReserveDecision(choice) {
     }
 }
 
+/* ------------------------------
+   Station board rendering
+------------------------------ */
 function renderStationBoard(stationData) {
     currentStationData = stationData || {};
 
@@ -526,15 +549,17 @@ function renderStationBoard(stationData) {
         // added for A-Z stations
         let volunteers = (station.volunteers || []).slice(); // copy so we don't mutate original
 
+        // Sort volunteers by role priority, then alphabetically
         volunteers.sort((a, b) => {
             const roleA = (a.role || "").toLowerCase();
             const roleB = (b.role || "").toLowerCase();
 
-            // Priority: admin (0), captain (1), others (2)
+            // Priority: admin (0), captain (1), tech (2)
             const getPriority = (role) => {
                 if (role === "admin") return 0;
                 if (role === "captain") return 1;
-                return 2;
+                if (role === "tech") return 2;
+                return 3;
             };
 
             const priorityA = getPriority(roleA);
@@ -700,31 +725,34 @@ function openVolunteerPanel(volunteerJson) {
     document.getElementById("editName").style.display = "none";
     document.getElementById("editEmail").style.display = "none";
     document.getElementById("editPhone").style.display = "none";
+    document.getElementById("editRole").style.display = "none";
+    document.getElementById("editStation").style.display = "none";
+    document.getElementById("editShift").style.display = "none";
+    document.getElementById("editUnavailability").style.display = "none";
+    document.getElementById("editRestrictions").style.display = "none";
     
     document.getElementById("detailName").style.display = "inline";
     document.getElementById("detailEmail").style.display = "block";
     document.getElementById("detailPhone").style.display = "block";
+    document.getElementById("detailRole").style.display = "block";
+    document.getElementById("detailStation").style.display = "block";
+    document.getElementById("detailShift").style.display = "block";
+    document.getElementById("detailUnavailability").style.display = "block";
+    document.getElementById("detailRestrictions").style.display = "block";
 
     document.getElementById("editBtn").style.display = "inline-block";
     document.getElementById("saveBtn").style.display = "none";
 
-    
     currentVolunteer = volunteer;
 
     document.getElementById("detailName").textContent = volunteer.name || "Volunteer";
     document.getElementById("detailEmail").textContent = volunteer.email || "None listed";
     document.getElementById("detailPhone").textContent = formatPhonePretty(volunteer.phone) || "None listed";
     document.getElementById("detailRole").textContent = formatRolePretty(volunteer.role);
-    // const roleSelect = document.getElementById("editRole");
-    // roleSelect.value = formatRolePretty(volunteer.role) || "None listed";
-    // roleSelect.value = (volunteer.role || "volunteer");
-    
+    document.getElementById("detailStation").textContent = volunteer.station || "Unassigned";
     document.getElementById("detailShift").textContent = volunteer.display_time || volunteer.typical_shift || "None listed";
     document.getElementById("detailUnavailability").textContent = volunteer.unavailability || "None listed";
     document.getElementById("detailRestrictions").textContent = volunteer.capability_restrictions || "None listed";
-
-    // added for station
-    document.getElementById("detailStation").textContent = volunteer.station || "Unassigned";
     document.getElementById("editStation").value = volunteer.station_id || "";
 
     const absenceCard = document.getElementById("detailAbsenceCard");
@@ -767,36 +795,30 @@ function openVolunteerPanel(volunteerJson) {
 
     document.getElementById("detailPanel").classList.add("open");
     document.getElementById("detailOverlay").classList.add("open");
-    
-        
 }
 
 function closeVolunteerPanel() {
     document.getElementById("detailPanel").classList.remove("open");
     document.getElementById("detailOverlay").classList.remove("open");
 
+    document.getElementById("editStation").style.display = "none";
     document.getElementById("editName").style.display = "none";
     document.getElementById("editEmail").style.display = "none";
     document.getElementById("editPhone").style.display = "none";
+    document.getElementById("editRole").style.display = "none";
+    document.getElementById("editStation").style.display = "none";
     document.getElementById("editShift").style.display = "none";
     document.getElementById("editUnavailability").style.display = "none";
     document.getElementById("editRestrictions").style.display = "none";
-    document.getElementById("editRole").style.display = "none";
-    // added for station
-    document.getElementById("editStation").style.display = "none";
-
-
+    
     document.getElementById("detailName").style.display = "inline";
     document.getElementById("detailEmail").style.display = "block";
     document.getElementById("detailPhone").style.display = "block";
+    document.getElementById("detailRole").style.display = "block";
+    document.getElementById("detailStation").style.display = "block";
     document.getElementById("detailShift").style.display = "block";
     document.getElementById("detailUnavailability").style.display = "block";
     document.getElementById("detailRestrictions").style.display = "block";
-    // Remove or replace with "detailRole", change above as well if changed
-    document.getElementById("detailRole").style.display = "block";
-    // added for station
-    document.getElementById("detailStation").style.display = "block";
-
 
     document.getElementById("editBtn").style.display = "inline-block";
     document.getElementById("saveBtn").style.display = "none";
@@ -804,29 +826,25 @@ function closeVolunteerPanel() {
     document.getElementById("editName").value = "";
     document.getElementById("editEmail").value = "";
     document.getElementById("editPhone").value = "";
+    document.getElementById("editRole").value = "";
+    document.getElementById("editStation").value = "";
     document.getElementById("editShift").value = "";
     document.getElementById("editUnavailability").value = "";
     document.getElementById("editRestrictions").value = "";
-    document.getElementById("editRole").value = "";
-    document.getElementById("editStation").value = "";
 
     currentVolunteer = null;
-    
 }
-
-// TODO possible add change volunteer status so that volunteer can become captains
 
 function editVolunteer() {
     if(!currentVolunteer) return;
     document.getElementById("detailName").style.display = "none";
     document.getElementById("detailEmail").style.display = "none";
     document.getElementById("detailPhone").style.display = "none";
-    document.getElementById("detailShift").style.display = "none";
-    // Remove or replace with "detailRole", change above as well if changed
     document.getElementById("detailRole").style.display = "none";
+    document.getElementById("detailStation").style.display = "none";
+    document.getElementById("detailShift").style.display = "none";
     document.getElementById("detailUnavailability").style.display = "none";
     document.getElementById("detailRestrictions").style.display = "none";
-    document.getElementById("detailStation").style.display = "none";
 
     const nameInput = document.getElementById("editName");
     const emailInput = document.getElementById("editEmail");
@@ -859,7 +877,7 @@ function editVolunteer() {
     stationSelect.innerHTML = "";
 
     const stations = [
-        // { id: 14, name: "Absent" },
+        // { id: 14, name: "Absent" }, // Cannot be assigned, used for tracking absences
         { id: 12, name: "Baked Potato Bar" },
         { id: 7, name: "Busboys/sanitation" },
         { id: 6, name: "Desserts" },
@@ -869,7 +887,7 @@ function editVolunteer() {
         { id: 11, name: "Greeters" },
         { id: 4, name: "Kitchen" },
         { id: 3, name: "Line Servers" },
-        // { id: 15, name: "Other" },
+        // { id: 15, name: "Other" }, // Not used
         { id: 9, name: "Reserve" },
         { id: 13, name: "Salad Bar" },
         { id: 1, name: "Setup Team" },
@@ -890,7 +908,6 @@ function editVolunteer() {
     });
     document.getElementById("editBtn").style.display = "none";
     document.getElementById("saveBtn").style.display = "inline-block";
-    
 }
 
 function saveVolunteer() {

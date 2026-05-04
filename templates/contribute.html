@@ -1,58 +1,183 @@
 <!-- 
-    TODO: Description of file
+    This file contains the HTML and JavaScript code that creates the public-facing
+    Home page for Chunch. It introduces the organization, its mission, story,
+    founders, and location, and provides access to volunteer signup and
+    admin/captain login via Google Identity Services.
 -->
 <!DOCTYPE html>
-<html lang ="en-US"> <!-- Sets the language of the page to English for SEO -->
-    <head>
-        <meta charset = "UTF-8"> <!--supports special characters-->
-        <!-- Helps to support mobile use, tells the page to render page size to the device size and not just a default  -->
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-        
-        <title>Contribute</title>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Chunch</title>
+    
+    <!-- Import fonts & page-specific stylesheet -->
+    <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style/home.css">
 
-        <!-- Import font & style -->
-        <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="/style/contribute.css">
-    </head>
-    <body>
-        <!-- Navbar at top of page -->
-        <nav class="navbar">
-            <a href="/">HOME</a>
-            <a href="/meet-the-team">MEET THE TEAM</a>
-            <a href="/templates/contribute.html">CONTRIBUTE</a>
-            <a href="/templates/volunteer-intro-vids.html">VOLUNTEER</a>
-            <a href="/student-spotlight">STUDENTS</a>
-        </nav>
+    <!-- Google Identity Services for admin/captain login -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <meta name="google-signin-client_id" content="483439290581-t6qm63e9rcuvm62l6j3cghvj71eo5h1k.apps.googleusercontent.com">
+</head>
 
-        <h1>Contribute</h1> <!-- main heading-->
-        <p>Your donation helps us continue development.</p> <!-- Description text -->
+<body>
 
-        
+    <!-- Navigation bar -->
+    <nav class="navbar">
+        <a href="/">HOME</a>
+        <a href="/meet-the-team">MEET THE TEAM</a>
+        <a href="/templates/contribute.html">CONTRIBUTE</a>
+        <a href="/templates/volunteer-intro-vids.html">VOLUNTEER</a>
+        <a href="/student-spotlight">STUDENTS</a>
+    </nav>
 
-        <!-- non monetary donation option -->
-        <section class="food">
-            <h2>Donate Food or Desserts</h2>
-            <!-- need more info from bryan on when, where, how to contribute via food-->
-            <p>
-            If you would like to donate food or desserts to Chunch, please drop them off with Bryan or Cheryl Scott <br> at
-            <strong>the southeast doors of Crestview Baptist Church</strong> by <strong>10:30 a.m. on Monday morning</strong>.
-            </p>
-        </section>
+    <div class="container">
 
-        <!-- Funding -->
-        <section class="donate">
-            <h2>Funding</h2>
-            <!-- Reference for wording: https://howtosayguide.com/how-to-say-we-accept-donations/https://howtosayguide.com/how-to-say-we-accept-donations/ -->
-            <p>Financial donations are not expected, but will be gratefully accepted.<br>Online payments can be made using the button below.</p>
-            <!-- Button that links to paypal -->
-            <button onclick="window.location.href='https://www.fellowshiponegiving.com/app/giving/cres2300218';">Donate Now</button>
-        </section>
+        <!-- Main About section containing mission, story, and founders -->
+        <div class="about">
 
-        <section class="volunteer">
-            <h2>Volunteer</h2>
-            <p>Want to contribute in a more direct way? Become a part of the team!<p>
-            <button onclick="window.location.href='volunteer-intro-vids.html'">Apply Here</button>
-        </section>
-    </body>
+            <!-- Header with tagline -->
+            <section class="header">
+                <h1>About Us</h1>
+                <div class="tagline">
+                    <p>“Taste and see that the Lord is good.”</p>
+                    <cite>– PSALM 34:8</cite>
+                </div>
+            </section>
+
+            <!-- What is Chunch? -->
+            <section class="define">
+                <h2>What is Chunch?</h2>
+                <p>From the first Monday of the fall semester at Southwestern University, murmurs of excitement spread across campus. Often, the source of this joy is two words: church lunch, or “chunch,” as it’s fondly called by students, is a staple of student life.</p>
+                <p>Bryan and Cheryl Scott, leaders of the College Ministry at Crestview Baptist Church, can answer that question: Chunch is a free home-cooked meal for Southwestern students where they eat with friends in a loving community.</p>
+                <p>Now, from 11:00 a.m. to 2:00 p.m. on Mondays, the doors are open to serve lunch. Any SU student is invited, regardless of religious affiliation or none at all. As long as a student wants a good home-cooked meal, they’re welcome to come.</p>
+            </section>
+
+            <!-- Mission statement -->
+            <section class="mission">
+                <h2>Our Mission</h2>
+                <p>Provide a space that creates a welcoming and loving community for Southwestern students where they are accepted as they are, loved unconditionally, and served well with a home-cooked meal.</p>
+            </section>
+
+            <!-- History of Chunch -->
+            <section class="story">
+                <h2>Our Story</h2> <!-- History, etc. Name can change-->
+                <p>Cheryl will tell you God gave her a vision to minister to the students of Southwestern University by providing a homecooked meal at no charge. Fulfilling that vision, in the fall of 2014, Church Lunch (Chunch) was born at Crestview Baptist Church.</p>
+                <p>Our first lunch was served on September 8, 2014, and with great anticipation and positivity Cheryl and the volunteers prepared food for 100. Well, 7 students came in two groups, one group of 3 and a second group of 4 that were vegan. At that time, we had a salad and fruit bar, but no options for a vegan diet.  Cheryl promised if they would come back the next week there would be a vegan dish for them.</p>
+                <p>The following Monday, once again with great anticipation and positivity, Cheryl and the volunteers prepared for, you guessed it, 100. We didn’t quite hit 100 that day but attendance did increase 100% as 14 students joined us. In case you’re wondering, the 4 vegan students did return to find several options made just for them. They were eager to share meal ideas that helped make the vegan station what it is today.</p>
+                <p>The third week was pivotal in many ways and includes the story of 25. It is an amazing story. If you want to hear about it, find Ms Cheryl at Chunch and just ask her to tell you the story of 25. To make a long story short, the numbers quickly grew to 100 and continued to grow. Fast forward to 2026 and Chunch is serving around 700 every Monday.</p>
+            </section>
+
+            <!-- Founders -->
+            <section class="founders">
+                <h2>Meet Our Founders</h2>
+                <div class="card">Bryan</div>
+                <div class="card">Cheryl</div>
+            </section>
+
+            <!-- Location with embedded Google Map -->
+            <section class="location">
+                <h2>Location</h2>
+                <a href="https://maps.app.goo.gl/JJVY3KidaUKQGFmf8">2300 Williams Dr, Georgetown, TX 78628</a>
+
+                <!-- Google Maps embed -->
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d6864.295806589393!2d-97.6888767!3d30.657963399999996!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8644d6054236cad3%3A0x10aa477b197a59d2!2sCrestview%20Baptist%20Church!5e0!3m2!1sen!2sus!4v1774844067965!5m2!1sen!2sus" 
+                    width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </section>
+        </div>
+
+        <!-- Volunteer application button -->
+        <button class="primary-btn" onclick="window.location.href='volunteer-intro-vids.html'">
+            Apply to Volunteer
+        </button>
+    </div>
+
+    <!-- Admin / Captain login button -->
+    <button class="admin-btn" onclick="openModal()">Admin / Captain Sign In</button>
+
+    <!-- Login modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">✕</span>
+            <h2>Admin / Captain Login</h2>
+
+            <!-- Google Sign-In configuration -->
+            <div id="g_id_onload"
+                data-client_id="483439290581-t6qm63e9rcuvm62l6j3cghvj71eo5h1k.apps.googleusercontent.com"
+                data-callback="handleCredentialResponse"
+                data-auto_prompt="false">
+            </div>
+
+            <div class="g_id_signin"
+                data-type="standard"
+                data-shape="pill"
+                data-theme="outline"
+                data-size="large">
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Reference to modal element
+    const modal = document.getElementById("loginModal");
+
+    // Open login modal
+    function openModal() {
+        modal.style.display = "flex";
+    }
+
+    // Close login modal
+    function closeModal() {
+        modal.style.display = "none";
+    }
+
+    // Close modal when clicking outside of it
+    window.onclick = function(event) {
+        if (event.target === modal) {
+            closeModal();
+        }
+    };
+
+    // Close modal with ESC key
+    document.addEventListener("keydown", function(event) {
+        if (event.key === "Escape") {
+            closeModal();
+        }
+    });
+
+    // Google Sign-In authentication handler
+    async function handleCredentialResponse(response) {
+        const res = await fetch("/api/google-login", {
+            method: "POST", 
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ credential: response.credential })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+            if (data.role === "admin" || data.role === "tech") {
+                window.location.href = "/admin";
+            } else if (data.role === "captain") {
+                window.location.href = "/captain";
+            } else {
+                alert("You are not authorized.");
+                closeModal();
+            }
+        }
+    }
+
+    // Decode JWT token (utility function)
+    function parseJwt(token) {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        return JSON.parse(atob(base64));
+    }
+    </script>
+
+</body>
 </html>
