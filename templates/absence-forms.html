@@ -1,5 +1,5 @@
 <!-- 
-    TODO: Description of file
+    Creates absence form button and retrieves all submitted absences.
 -->
 <!DOCTYPE html>
 <html lang="en-US">
@@ -9,23 +9,26 @@
 
     <title>Absence Forms</title>
     
-    <!-- Import font & style -->
+    <!-- Page-specific stylesheet & font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/style/absence.css">
 </head>
 <body>
 
 <div class="header">
+    <!-- Page Header -->
     <h1>Absence Forms</h1>
     <p>Submitted absence requests from the Google Form. Open any request directly in Need Coverage.</p>
 </div>
 
 <div class="page">
+    <!-- Navigation and form link actions -->
     <div class="top-actions">
         <a href="/admin" class="btn secondary">← Back to Dashboard</a> 
         <a href="https://docs.google.com/forms/d/e/1FAIpQLSed_82jxFxWXRH30AwzWQgxuRMocNjDV6_-PnE6dK6QhJ93YQ/viewform?usp=header" class="btn secondary">Fill Out Absence Form</a>
     </div>
 
+    <!-- Optional debug output block -->
     {% if debug %}
     <pre style="
         background: #111;
@@ -39,11 +42,14 @@
     </pre>
     {% endif %}
     <div class="table-card">
+        
         {% if absences %}
+        <!-- Table wrapper for scrolling -->
         <div class="table-wrap">
             <table>
                 <thead>
                     <tr>
+                        <!-- Column headers for absence request details -->
                         <th>Volunteer</th>
                         <th>Station</th>
                         <th>Dates</th>
@@ -54,12 +60,18 @@
                     </tr>
                 </thead>
                 <tbody>
+                    <!-- Loop through each submitted absence form -->
                     {% for a in absences %}
                     <tr>
+                        <!-- Volunteer name -->
                         <td>
                             <div class="name-cell">{{ a.first }} {{ a.last }}</div>
                         </td>
+
+                        <!-- Station name or placeholder -->
                         <td>{{ a.station or "—" }}</td>
+                        
+                        <!-- Date range -->
                         <td>
                             <div>{{ a.start_date }}</div>
                             <div class="subtle">
@@ -70,6 +82,8 @@
                                 {% endif %}
                             </div>
                         </td>
+                        
+                        <!-- Time request (optional) -->
                         <td>
                             {% if a.start_time or a.end_time %}
                                 <div>{{ a.start_time or "—" }} to {{ a.end_time or "—" }}</div>
@@ -77,6 +91,8 @@
                                 <div class="subtle">No specific time submitted</div>
                             {% endif %}
                         </td>
+
+                        <!-- Shift type: full or partial -->
                         <td>
                             {% if a.is_partial %}
                                 <span class="badge partial">Partial Shift</span>
@@ -85,14 +101,20 @@
                                 <span class="badge full">Full Shift</span>
                             {% endif %}
                         </td>
+
+                        <!-- Additional comments about volunteers -->
                         <td>
                             {{ a.comments or "—" }}
                         </td>
+
+                        <!-- Action buttons: coverage link or delete -->
                         <td style="display:flex; gap:8px;">
+                            <!-- Link to Need Coverage page -->
                             <a class="action-link" href="{{ a.coverage_url }}">
                                 <button class="action-btn" type="button">Find Coverage</button>
                             </a>
 
+                            <!-- Delete absence submission -->
                             <form method="POST" action="/admin/absences/delete" style="margin:0;">
                                 <input type="hidden" name="first" value="{{ a.first }}">
                                 <input type="hidden" name="last" value="{{ a.last }}">
@@ -110,6 +132,7 @@
             </table>
         </div>
         {% else %}
+        <!-- Shown when no absence submissions exist -->
         <div class="empty-state">No absence form submissions found.</div>
         {% endif %}
     </div>
