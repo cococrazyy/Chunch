@@ -57,7 +57,7 @@ This project entails a volunteer management system for the Chunch organization a
   * student.css: Style code for public-facing "Student Spotlight" page; corresponds to `student-spotlight.html`.
   * volunteer.css: Style code for public-facing "Volunteer" page; corresponds to `volunteer-intro-vids.html`.
 * templates: All `.html` code files for all webpages. 
-  * absence-forms.html: __EVELYN__
+  * absence-forms.html: Creates absence form button and gets all submitted absences.
   * admin.html: Dashboard for users with the admin or tech role.
   * applicant-detail.html: Inside absence forms and showing the absence forms and their corresponding information for each volunteer.
   * application_received.html: __EVELYN__
