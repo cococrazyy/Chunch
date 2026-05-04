@@ -51,6 +51,7 @@ migrate = Migrate(app, db)
 
 # creating a volunteer class
 #class Volunteer(db.Model, SoftDeleteMixin):
+# TODO: Fill out Docstring
 class Volunteer(db.Model, SoftDeleteMixin):
     """
     TODO: Describe class
@@ -73,6 +74,7 @@ class Volunteer(db.Model, SoftDeleteMixin):
     account = relationship("UserAccount", back_populates="volunteer", uselist=False)
 
 #for people signing up to volunteer that will be placed in inbox
+# TODO: Fill out Docstring
 class Applicant(db.Model, SoftDeleteMixin):
     """
     TODO: Describe class
@@ -98,6 +100,7 @@ class Applicant(db.Model, SoftDeleteMixin):
     
 # creating user account class
 # only admins and captains should have be on this table
+# TODO: Fill out Docstring
 class UserAccount(db.Model):
     """
     TODO: Describe class
@@ -120,6 +123,7 @@ class UserAccount(db.Model):
     volunteer = relationship("Volunteer", back_populates="account")
 
 # creating a stations table
+# TODO: Fill out Docstring
 class Station(db.Model):
     """
     TODO: Describe class
@@ -150,6 +154,7 @@ class Station(db.Model):
         )
     )
 
+# TODO: Fill out Docstring
 class Absence(db.Model):
     """
     TODO: Describe class
@@ -169,6 +174,7 @@ class Absence(db.Model):
     volunteer = relationship("Volunteer", backref="absences")
 
 # creating schedule table
+# TODO: Fill out Docstring
 class Schedule(db.Model, SoftDeleteMixin):
     """
     TODO: Describe class
@@ -181,6 +187,7 @@ class Schedule(db.Model, SoftDeleteMixin):
     time = Column(Time)
 
 # creating assignment table
+# TODO: Fill out Docstring
 class Assignment(db.Model):
     """
     TODO: Describe class
@@ -207,6 +214,7 @@ class Assignment(db.Model):
     schedule = relationship("Schedule", backref="assignments")
     
 # creating a class that will store the availiablity hours for each person
+# TODO: Fill out Docstring
 class Availability(db.Model, SoftDeleteMixin):
     """
     TODO: Describe class
@@ -583,8 +591,13 @@ def admin_absences():
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
+# TODO: Update Docstring
+# TODO: Add comments
 @app.route("/admin/edit-volunteer", methods=["POST"])
 def edit_volunteer():
+    """
+    TODO: Describe function
+    """
     data = request.get_json()
 
     volunteer = Volunteer.query.get_or_404(data["id"])
@@ -652,8 +665,13 @@ def edit_volunteer():
     return {"success": True}
 
 #captain page route
+# TODO: Update Docstring
+# TODO: Add comments
 @app.route("/captain")
 def captain_page():
+    """
+    TODO: Describe function
+    """
     try:
         if "user_id" not in session: # or "role" is not "captain":
             return redirect("/")
@@ -672,16 +690,26 @@ def captain_page():
 
 # currently used as of 4/29
 # Sign out of admin/captain
+# TODO: Update Docstring
+# TODO: Add comments
 @app.route("/api/google-logout", methods=["POST"])
 def google_logout():
+    """
+    TODO: Describe function
+    """
     if "user_id" in session:
         session.clear()
         return redirect("/")
     #return jsonify({"success": True, "message": "User was not logged in", })
     return jsonify({"fail": False, "message": "User was not logged in", })
 
+# TODO: Update Docstring
+# TODO: Add comments
 @app.route("/captain/volunteer-hours-cap")
 def volunteer_hours_captain():
+    """
+    TODO: Describe function
+    """
     try:
         volunteers = Volunteer.query\
             .filter(Volunteer.deleted_at.is_(None))\
@@ -908,7 +936,12 @@ def volunteer_hours_captain():
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 from datetime import date
 
+# TODO: Update Docstring
+# TODO: Add comments
 def build_station_state(volunteers, stations):
+    """
+    TODO: Describe function
+    """
     today = date.today()
 
     debug_lines = []
@@ -1008,8 +1041,13 @@ def build_station_state(volunteers, stations):
     return station_to_volunteer_ids, "\n".join(debug_lines)
 
 #admin route
+# TODO: Update Docstring
+# TODO: Add comments
 @app.route("/admin")
 def admin_page():
+    """
+    TODO: Describe function
+    """
     try:
         debug_admin = request.args.get("debug_admin") == "1"
 
@@ -1031,8 +1069,13 @@ def admin_page():
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
+# TODO: Update Docstring
+# TODO: Add comments
 @app.route("/admin/coverage/details")
 def coverage_details():
+    """
+    TODO: Describe function
+    """
     volunteer_id = request.args.get("volunteer_id", type=int)
     covered_start = request.args.get("covered_start", type=int)
     covered_end = request.args.get("covered_end", type=int)
@@ -1269,8 +1312,13 @@ def coverage_details():
         absence_key=absence_key
     )
 
+# TODO: Update Docstring
+# TODO: Add comments
 @app.route("/debug/restore-reserve/<int:volunteer_id>")
 def restore_reserve(volunteer_id):
+    """
+    TODO: Describe function
+    """
     try:
         reserve_station = Station.query.filter_by(station_name="Reserve").first()
         if not reserve_station:
@@ -2365,8 +2413,13 @@ def delete_applicant(applicants_id):
     return redirect("/admin/inbox")
     
 # MASTER LIST
+# TODO: Update Docstring
+# TODO: Add comments
 @app.route("/admin/master-list")
 def master_list():
+    """
+    TODO: Describe function
+    """
     volunteers = Volunteer.query\
         .filter(Volunteer.deleted_at.is_(None))\
         .order_by(Volunteer.last_name)\
@@ -2441,8 +2494,13 @@ def master_list():
 
     return render_template("master-list.html", volunteers=volunteer_rows)
     
+# TODO: Update Docstring
+# TODO: Add comments
 @app.route("/admin/master-list/add-volunteer", methods=["POST"])
 def add_volunteer():
+    """
+    TODO: Describe function
+    """
     if "user_id" not in session:
         return redirect("/")
     
@@ -2462,10 +2520,6 @@ def add_volunteer():
         return "Start and end hour are required", 400
     if end_hour <= start_hour:
         return "Invalid time range", 400
-    
-    # Default role to Volunteer if none is assigned
-    # if role is None:
-    #     role = "volunteer"
     
     # Default station to Reserve if none is assigned
     if station_id is None:
@@ -2488,6 +2542,21 @@ def add_volunteer():
     db.session.add(new_volunteer)
     db.session.flush()
     
+    if role is not None:
+        if new_volunteer.account:
+            if role in {"admin", "captain", "tech"}:
+                new_volunteer.account.role = role
+            else:
+                db.session.delete(new_volunteer.account)
+        
+        elif role in {"admin", "captain", "tech"}:
+            new_account = UserAccount(
+                volunteer_id=new_volunteer.id,
+                password="TEMP_PASSWORD",  # replace later with hashed ????
+                role=role
+            )
+            db.session.add(new_account)
+
     for hour in range(start_hour, end_hour+1):
         availability = Availability(
             volunteer_id=new_volunteer.id,
@@ -2519,8 +2588,13 @@ def add_volunteer():
     
     return redirect("/admin/master-list")
 
+# TODO: Update Docstring
+# TODO: Add comments
 @app.route("/admin/master-list/edit-volunteer/<int:volunteer_id>", methods=["POST", "GET"])
 def edit_master_volunteer(volunteer_id):
+    """
+    TODO: Describe function
+    """
     if "user_id" not in session:
         return redirect("/")
     
@@ -2590,8 +2664,13 @@ def edit_master_volunteer(volunteer_id):
     return redirect("/admin/master-list")
 
 #soft deleting a user
+# TODO: Update Docstring
+# TODO: Add comments
 @app.route("/admin/master-list/delete-volunteer/<int:volunteer_id>", methods=["POST"])
 def delete_volunteer(volunteer_id):
+    """
+    TODO: Describe function
+    """
     if "user_id" not in session:
         return redirect("/")
 
@@ -2601,16 +2680,26 @@ def delete_volunteer(volunteer_id):
 
     return redirect("/admin/master-list")
 
+# TODO: Update Docstring
+# TODO: Add comments
 @app.route("/admin/master-list/deleted-volunteers")
 def view_deleted():
+    """
+    TODO: Describe function
+    """
     if "user_id" not in session:
         return redirect("/")
 
     deleted = Volunteer.query.filter(Volunteer.deleted_at.is_not(None))
     return render_template("deleted-volunteers.html", deleted=deleted)
 
+# TODO: Update Docstring
+# TODO: Add comments
 @app.route("/admin/master-list/deleted-volunteers/permadelete/<int:volunteer_id>", methods=["POST"])
 def perma_delete(volunteer_id):
+    """
+    TODO: Describe function
+    """
     if "user_id" not in session:
         return redirect("/")
     volunteer = Volunteer.query.get_or_404(volunteer_id)
@@ -2631,8 +2720,13 @@ def perma_delete(volunteer_id):
     db.session.commit()
     return redirect("/admin/master-list/deleted-volunteers")
 
+# TODO: Update Docstring
+# TODO: Add comments
 @app.route("/admin/master-list/deleted-volunteers/undo/<int:volunteer_id>", methods=["POST"])
 def undo_delete(volunteer_id):
+    """
+    TODO: Describe function
+    """
     if "user_id" not in session:
         return redirect("/")
     volunteer = Volunteer.query.get_or_404(volunteer_id)
@@ -2641,9 +2735,13 @@ def undo_delete(volunteer_id):
         db.session.commit()
     return redirect("/admin/master-list/deleted-volunteers")
 
-    
+# TODO: Update Docstring
+# TODO: Add comments
 @app.route("/student-spotlight")
 def student_spotlight():
+    """
+    TODO: Describe function
+    """  
     try:
         sheet = get_spotlight_sheet()
         rows = sheet.get_all_records()
@@ -2673,9 +2771,14 @@ def student_spotlight():
 
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
-    
+
+# TODO: Update Docstring
+# TODO: Add comments
 @app.route("/admin/debug-assignments2")
 def debug_assignments():
+    """
+    TODO: Describe function
+    """
     assignments = Assignment.query.all()
     stations = Station.query.order_by(Station.station_id).all()
     volunteers = Volunteer.query.order_by(Volunteer.id).all()
@@ -2708,8 +2811,13 @@ def debug_assignments():
     }
 
 # Adding route to new volunteer hours page
+# TODO: Update Docstring
+# TODO: Add comments
 @app.route("/admin/volunteer-hours")
 def volunteer_hours():
+    """
+    TODO: Describe function
+    """
     try:
         volunteers = Volunteer.query\
             .filter(Volunteer.deleted_at.is_(None))\
@@ -2783,8 +2891,12 @@ def volunteer_hours():
 
             ranges.append([start, prev])
             return ranges
-
+        # TODO: Update Docstring
+        # TODO: Add comments
         def format_hour(h):
+            """
+            TODO: Describe function
+            """
             if h == 0:
                 return "12AM"
             elif h < 12:
@@ -2882,8 +2994,13 @@ def volunteer_hours():
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
+# TODO: Update Docstring
+# TODO: Add comments
 @app.route("/admin/debug-hourly-matches")
 def debug_hourly_matches():
+    """
+    TODO: Describe function
+    """
     volunteers = Volunteer.query\
         .filter(Volunteer.deleted_at.is_(None))\
         .order_by(Volunteer.last_name, Volunteer.first_name)\
@@ -2901,7 +3018,12 @@ def debug_hourly_matches():
         if v.email
     }
 
+    # TODO: Update Docstring
+    # TODO: Add comments
     def parse_hours(availability_rows):
+        """
+        TODO: Describe function
+        """
         cleaned_hours = []
 
         for row in availability_rows:
@@ -2945,7 +3067,12 @@ def debug_hourly_matches():
 
     return {"rows": output}
 
+# TODO: Update Docstring
+# TODO: Add comments
 def seed_admin():
+    """
+    TODO: Describe function
+    """
     
     email = "anthonyb@southwestern.edu"   # must match Google email
     first_name = "Barbara"
@@ -2984,7 +3111,12 @@ import json
 import gspread
 from google.oauth2.service_account import Credentials
 
+# TODO: Update Docstring
+# TODO: Add comments
 def get_sheet():
+    """
+    TODO: Describe function
+    """
     creds_dict = json.loads(os.environ["GOOGLE_SERVICE_JSON"])
 
     scopes = [
@@ -3001,7 +3133,12 @@ def get_sheet():
 
     return sheet
 
+# TODO: Update Docstring
+# TODO: Add comments
 def get_applicant_sheet():
+    """
+    TODO: Describe function
+    """
     creds_dict = json.loads(os.environ["GOOGLE_SERVICE_JSON"])
 
     scopes = [
@@ -3015,7 +3152,12 @@ def get_applicant_sheet():
     sheet = spreadsheet.worksheet("Applicants")
     return sheet
 
+# TODO: Update Docstring
+# TODO: Add comments
 def get_spotlight_sheet():
+    """
+    TODO: Describe function
+    """
     creds_dict = json.loads(os.environ["GOOGLE_SERVICE_JSON"])
 
     scopes = [
@@ -3030,14 +3172,24 @@ def get_spotlight_sheet():
     sheet = spreadsheet.worksheet("Spotlight")
     return sheet
 
+# TODO: Update Docstring
+# TODO: Add comments
 @app.route("/admin/inbox/<int:applicant_id>")
 def applicant_detail(applicant_id):
+    """
+    TODO: Describe function
+    """
     applicant = Applicant.query.get_or_404(applicant_id)
     return render_template("applicant-detail.html", applicant=applicant)
 
 # Need to make this into a button in the inbox
+# TODO: Update Docstring
+# TODO: Add comments
 @app.route("/admin/sync-applicants", methods=["GET", "POST"])
 def sync_applicants():
+    """
+    TODO: Describe function
+    """
     if "user_id" not in session:
         return redirect("/")
 
@@ -3093,8 +3245,12 @@ def sync_applicants():
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
 
-
+# TODO: Update Docstring
+# TODO: Add comments
 def get_drive_service():
+    """
+    TODO: Describe function
+    """
     creds_dict = json.loads(os.environ["GOOGLE_DRIVE_JSON"])
 
     scopes = ["https://www.googleapis.com/auth/drive"]
@@ -3109,8 +3265,12 @@ def get_drive_service():
     return service
 
 DRIVE_FOLDER_ID = "1IwmKyFWKEvAB86WKg9I7C9N1BBvrSzD-"
-
+# TODO: Update Docstring
+# TODO: Add comments
 def grant_drive_access(email):
+    """
+    TODO: Describe function
+    """
     service = get_drive_service()
 
     permission = {
@@ -3128,9 +3288,13 @@ def grant_drive_access(email):
     except Exception as e:
         print(f"Drive permission error for {email}: {e}")
 
-    
+# TODO: Update Docstring
+# TODO: Add comments
 @app.route("/admin/sync-volunteers", methods=["GET", "POST"])
 def sync_volunteers():
+    """
+    TODO: Describe function
+    """    
     try:
         if "user_id" not in session:
             return redirect("/")
@@ -3267,8 +3431,13 @@ def sync_volunteers():
         db.session.rollback()
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
     
+# TODO: Update Docstring
+# TODO: Add comments
 @app.route("/admin/need-coverage")
 def need_coverage():
+    """
+    TODO: Describe function
+    """
     if "user_id" not in session:
         return redirect("/")
 
@@ -3306,7 +3475,12 @@ from flask.cli import with_appcontext
 @click.argument("last_name")
 @with_appcontext
 
+# TODO: Update Docstring
+# TODO: Add comments
 def create_admin(email, first_name, last_name):
+    """
+    TODO: Describe function
+    """
     volunteer = Volunteer.query.filter_by(email=email).first()
 
     if not volunteer:
