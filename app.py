@@ -489,7 +489,7 @@ def delete_absence_form():
 @app.route("/admin/absences")
 def admin_absences():
     """
-    TODO: Describe function
+    Pulls all absences that were submitted from the google sheet.
     """
     #pull from the absence tab within the chunch volunteer info sheet
     try:
@@ -601,7 +601,7 @@ def edit_volunteer():
     data = request.get_json()
 
     volunteer = Volunteer.query.get_or_404(data["id"])
-
+    # Gets volunteer information
     volunteer.first_name = data.get("first_name")
     volunteer.last_name = data.get("last_name")
     volunteer.email = data.get("email")
@@ -611,8 +611,10 @@ def edit_volunteer():
     volunteer.capability_restrictions = data.get("capability_restrictions")
     volunteer.is_floater = data.get("is_floater") # Unused
 
+    # Sees if there is assignment of volunteer
     assignment = Assignment.query.filter_by(volunteer_id=volunteer.id).order_by(Assignment.assignment_id.desc()).first()
 
+    # Gets role of volunteer
     if "role" in data:
         new_role = data["role"]
         
@@ -632,7 +634,8 @@ def edit_volunteer():
                 role=new_role
             )
             db.session.add(new_account)
-    
+
+    # Gets station
     if "station_id" in data:
         station_id = data["station_id"]
 
@@ -670,7 +673,7 @@ def edit_volunteer():
 @app.route("/captain")
 def captain_page():
     """
-    TODO: Describe function
+    Returns user to captain page if they have the captain role or back to home page if not.
     """
     try:
         if "user_id" not in session: # or "role" is not "captain":
