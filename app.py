@@ -286,8 +286,6 @@ def home():
     """
     return send_from_directory("templates", "index.html")
 
-# TODO: Update Docstring
-# TODO: Add comments
 @app.route("/<path:path>")
 def static_files(path):
     """
@@ -299,8 +297,7 @@ def static_files(path):
     
     return send_from_directory(".", path)
 
-# TODO: Update Docstring
-# TODO: Add comments
+
 @app.route("/api/google-login", methods=["POST"])
 def google_login():
     """
@@ -368,9 +365,6 @@ def me():
         "role": session["role"]
     })
 
-# ABSENCES
-# TODO: Update Docstring
-# TODO: Update/verify comments
 
 @app.route("/admin/load-absences", methods=["POST"])
 def load_absences():
@@ -469,13 +463,10 @@ def load_absences():
         return {"error": str(e)}, 500
 
 
-# TODO: Verify correctness of Docstring
-# TODO: Update/verify comments
-#delete button for absence forms
 @app.route("/admin/absences/delete", methods=["POST"])
 def delete_absence_form():
     """
-        Remove absence from database and spreadsheet
+    Remove absence from database and spreadsheet
     """
     try:
         # gather the form information from the Absence tab within the Chunch Volunteer Info Sheet
@@ -510,9 +501,7 @@ def delete_absence_form():
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
-#absence form page
-# TODO: Update Docstring
-# TODO: Update/verify comments
+
 @app.route("/admin/absences")
 def admin_absences():
     """
@@ -618,8 +607,6 @@ def admin_absences():
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
-# TODO: Update Docstring
-# TODO: Add comments
 @app.route("/admin/edit-volunteer", methods=["POST"])
 def edit_volunteer():
     """
@@ -699,9 +686,6 @@ def edit_volunteer():
 
     return {"success": True}
 
-#captain page route
-# TODO: Update Docstring
-# TODO: Add comments
 @app.route("/captain")
 def captain_page():
     """
@@ -723,10 +707,6 @@ def captain_page():
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
-# currently used as of 4/29
-# Sign out of admin/captain
-# TODO: Update Docstring
-# TODO: Add comments
 @app.route("/api/google-logout", methods=["POST"])
 def google_logout():
     """
@@ -743,8 +723,6 @@ def google_logout():
 
 from datetime import date
 
-# TODO: Update Docstring
-# TODO: Add comments
 def build_station_state(volunteers, stations):
     """
     Builds the current station assignment state for all volunteers.
@@ -851,9 +829,6 @@ def build_station_state(volunteers, stations):
 
     return station_to_volunteer_ids, "\n".join(debug_lines)
 
-#admin route
-# TODO: Update Docstring
-# TODO: Add comments
 @app.route("/admin")
 def admin_page():
     """
@@ -884,8 +859,6 @@ def admin_page():
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
-# TODO: Update Docstring
-# TODO: Add comments
 @app.route("/admin/coverage/details")
 def coverage_details():
     """
@@ -1131,8 +1104,6 @@ def coverage_details():
         absence_key=absence_key
     )
 
-# TODO: Update Docstring
-# TODO: Add comments
 @app.route("/debug/restore-reserve/<int:volunteer_id>")
 def restore_reserve(volunteer_id):
     """
@@ -2311,9 +2282,6 @@ def delete_applicant(applicants_id):
 
     return redirect("/admin/inbox")
     
-# MASTER LIST
-# TODO: Update Docstring
-# TODO: Add comments
 @app.route("/admin/master-list")
 def master_list():
     """
@@ -2396,8 +2364,6 @@ def master_list():
 
     return render_template("master-list.html", volunteers=volunteer_rows)
     
-# TODO: Update Docstring
-# TODO: Add comments
 @app.route("/admin/master-list/add-volunteer", methods=["POST"])
 def add_volunteer():
     """
@@ -2494,8 +2460,6 @@ def add_volunteer():
     
     return redirect("/admin/master-list")
 
-# TODO: Update Docstring
-# TODO: Add comments
 @app.route("/admin/master-list/edit-volunteer/<int:volunteer_id>", methods=["POST", "GET"])
 def edit_master_volunteer(volunteer_id):
     """
@@ -2573,9 +2537,6 @@ def edit_master_volunteer(volunteer_id):
         db.session.commit()
     return redirect("/admin/master-list")
 
-#soft deleting a user
-# TODO: Update Docstring
-# TODO: Add comments
 @app.route("/admin/master-list/delete-volunteer/<int:volunteer_id>", methods=["POST"])
 def delete_volunteer(volunteer_id):
     """
@@ -2590,8 +2551,6 @@ def delete_volunteer(volunteer_id):
 
     return redirect("/admin/master-list")
 
-# TODO: Update Docstring
-# TODO: Add comments
 @app.route("/admin/master-list/deleted-volunteers")
 def view_deleted():
     """
@@ -2603,8 +2562,6 @@ def view_deleted():
     deleted = Volunteer.query.filter(Volunteer.deleted_at.is_not(None))
     return render_template("deleted-volunteers.html", deleted=deleted)
 
-# TODO: Update Docstring
-# TODO: Add comments
 @app.route("/admin/master-list/deleted-volunteers/permadelete/<int:volunteer_id>", methods=["POST"])
 def perma_delete(volunteer_id):
     """
@@ -2630,8 +2587,6 @@ def perma_delete(volunteer_id):
     db.session.commit()
     return redirect("/admin/master-list/deleted-volunteers")
 
-# TODO: Update Docstring
-# TODO: Add comments
 @app.route("/admin/master-list/deleted-volunteers/undo/<int:volunteer_id>", methods=["POST"])
 def undo_delete(volunteer_id):
     """
@@ -2645,8 +2600,6 @@ def undo_delete(volunteer_id):
         db.session.commit()
     return redirect("/admin/master-list/deleted-volunteers")
 
-# TODO: Update Docstring
-# TODO: Add comments
 @app.route("/student-spotlight")
 def student_spotlight():
     """
@@ -2682,12 +2635,10 @@ def student_spotlight():
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
-# TODO: Update Docstring
-# TODO: Add comments
 @app.route("/admin/debug-assignments2")
 def debug_assignments():
     """
-    TODO: Describe function
+    Debug route for inspecting assignment, station, and volunteer data.
     """
     assignments = Assignment.query.all()
     stations = Station.query.order_by(Station.station_id).all()
@@ -2720,13 +2671,10 @@ def debug_assignments():
         ]
     }
 
-# Adding route to new volunteer hours page
-# TODO: Update Docstring
-# TODO: Add comments
 @app.route("/admin/volunteer-hours")
 def volunteer_hours():
     """
-    Debug route for inspecting assignment, station, and volunteer data.    
+    View the schedules of volunteers on an hourly view per station.     
     """
     try:
         volunteers = Volunteer.query\
@@ -2801,12 +2749,8 @@ def volunteer_hours():
 
             ranges.append([start, prev])
             return ranges
-        # TODO: Update Docstring
-        # TODO: Add comments
+        
         def format_hour(h):
-            """
-            TODO: Describe function
-            """
             if h == 0:
                 return "12AM"
             elif h < 12:
@@ -2904,8 +2848,6 @@ def volunteer_hours():
     except Exception as e:
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
-# TODO: Update Docstring
-# TODO: Add comments
 @app.route("/admin/debug-hourly-matches")
 def debug_hourly_matches():
     """
@@ -2928,12 +2870,7 @@ def debug_hourly_matches():
         if v.email
     }
 
-    # TODO: Update Docstring
-    # TODO: Add comments
     def parse_hours(availability_rows):
-        """
-        TODO: Describe function
-        """
         cleaned_hours = []
 
         for row in availability_rows:
@@ -2977,13 +2914,10 @@ def debug_hourly_matches():
 
     return {"rows": output}
 
-# TODO: Update Docstring
-# TODO: Add comments
 def seed_admin():
     """
     Add an admin manually by routing to this page. 
-    """
-    
+    """ 
     email = ""   # must match Google email
     first_name = "" # change to first name of email owner
     last_name = "" # change to last name of email owner
@@ -3021,8 +2955,6 @@ import json
 import gspread
 from google.oauth2.service_account import Credentials
 
-# TODO: Update Docstring
-# TODO: Add comments
 def get_sheet():
     """
     Retrieves the Google Sheet named "Chunch Volunteer Info" and the tab "Volunteer Information"
@@ -3043,8 +2975,6 @@ def get_sheet():
 
     return sheet
 
-# TODO: Update Docstring
-# TODO: Add comments
 def get_applicant_sheet():
     """
     Retrieves the Google Sheet named "Chunch Volunteer Info" and the tab "Applicant Information"
@@ -3062,8 +2992,6 @@ def get_applicant_sheet():
     sheet = spreadsheet.worksheet("Applicants")
     return sheet
 
-# TODO: Update Docstring
-# TODO: Add comments
 def get_spotlight_sheet():
     """
     Retrieves the Google Sheet named "Chunch Volunteer Info" and the tab "Spotlight"
@@ -3082,8 +3010,6 @@ def get_spotlight_sheet():
     sheet = spreadsheet.worksheet("Spotlight")
     return sheet
 
-# TODO: Update Docstring
-# TODO: Add comments
 @app.route("/admin/inbox/<int:applicant_id>")
 def applicant_detail(applicant_id):
     """
@@ -3092,9 +3018,6 @@ def applicant_detail(applicant_id):
     applicant = Applicant.query.get_or_404(applicant_id)
     return render_template("applicant-detail.html", applicant=applicant)
 
-# Need to make this into a button in the inbox
-# TODO: Update Docstring
-# TODO: Add comments
 @app.route("/admin/sync-applicants", methods=["GET", "POST"])
 def sync_applicants():
     """
@@ -3154,9 +3077,6 @@ def sync_applicants():
         db.session.rollback()
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
-
-# TODO: Update Docstring
-# TODO: Add comments
 def get_drive_service():
     """
     Retrieve the Google Drive service. 
@@ -3175,8 +3095,7 @@ def get_drive_service():
     return service
 
 DRIVE_FOLDER_ID = "1IwmKyFWKEvAB86WKg9I7C9N1BBvrSzD-"
-# TODO: Update Docstring
-# TODO: Add comments
+
 def grant_drive_access(email):
     """
     Grant someone viewing permissions to the Chunch Google Drive.
@@ -3198,8 +3117,6 @@ def grant_drive_access(email):
     except Exception as e:
         print(f"Drive permission error for {email}: {e}")
 
-# TODO: Update Docstring
-# TODO: Add comments
 @app.route("/admin/sync-volunteers", methods=["GET", "POST"])
 def sync_volunteers():
     """
@@ -3341,8 +3258,6 @@ def sync_volunteers():
         db.session.rollback()
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
     
-# TODO: Update Docstring
-# TODO: Add comments
 @app.route("/admin/need-coverage")
 def need_coverage():
     """
