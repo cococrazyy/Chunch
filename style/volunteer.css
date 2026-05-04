@@ -78,7 +78,6 @@ body {
     background: linear-gradient(135deg, #28a745, #218838);
     color: white;
     box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
-    display: none;
 }
 
 /* Help button */

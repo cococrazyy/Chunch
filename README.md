@@ -85,3 +85,6 @@ This project entails a volunteer management system for the Chunch organization a
 2. The absence editing feature is only partially implemented. While options exist to extend or end an absence, the ability to shorten an absence is not fully functional and lacks complete logic handling.
 
 3. When assigning a reserve for coverage, users are prompted to send an email notification. This feature previously opened the user’s default email client with the recipient, subject, and body prefilled. It no longer functions as intended and instead redirects to the dashboard without triggering any email action.
+
+## Help
+For any questions about certain functions, decisions, or how something works, visit our [user manual](https://docs.google.com/document/d/1HcoxbdVpC1HmBPIjDxcjfuZHgB3Fdi_TelkfTEw9QMQ/edit?tab=t.0) for general use cases, and our [developer manual](https://docs.google.com/document/d/1s-GNOT8Zqm2CYOxQ2-zDmknLLlldH-ajr-_qEqkrPEg/edit?tab=t.0) for more in-depth commentary on our technical decisions. 
