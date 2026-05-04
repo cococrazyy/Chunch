@@ -66,16 +66,18 @@
 
                 <label>Start Hour:</label>
                 <select name="start_hour">
+                    <!-- Initially displays as blank -->
+                    <!-- <option value="">—</option> -->
                     <!-- Time range 5AM - 3PM -->
-                    <option value="">—</option>
                     {% for h in range(5, 15) %}
                     <option value="{{ h }}">{{ h }}</option>
                     {% endfor %}
                 </select>
                 <label>End Hour:</label>
                 <select name="end_hour">
+                    <!-- Initially displays as blank -->
+                    <!-- <option value="">—</option> -->
                     <!-- Time range 6AM - 4PM -->
-                    <option value="">—</option>
                     {% for h in range(6, 16) %}
                         <option value="{{ h }}">{{ h }}</option>
                     {% endfor %}
@@ -122,10 +124,11 @@
                     </td>
                 </tr>
                 
-                <!-- Non functional edit -->
+                <!-- Visible when edit button is pressed, displaying editable volunteer information -->
                 <tr id="edit-row-{{ v.id }}" class="inline-edit-row" hidden>
-                    <!-- What is colspan for? -->
-                    <td colspan="10">
+                    <!-- Treats the row as 1 cell -->
+                    <td colspan="6">
+                    <!-- Form for editing all fields -->
                     <form method="POST" action="/admin/master-list/edit-volunteer/{{ v.id }}" class="inline-edit-form">
                         <input type="text" name="first_name" value="{{ v.first_name }}">
                         <input type="text" name="last_name" value="{{ v.last_name }}">
@@ -176,7 +179,6 @@
                                 {% if v.is_floater %} checked {% endif %}>
                         </span> -->
 
-                        <!-- What is this for? It seems like there is an error using interpolation within a JavaScript command -->
                         <div class="button-row">
                             <button class="primary" type="submit">Save Changes</button>
                             <button class="cancel" type="button" onclick="cancelEdit({{ v.id }})">Cancel</button>

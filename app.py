@@ -52,6 +52,9 @@ migrate = Migrate(app, db)
 # creating a volunteer class
 #class Volunteer(db.Model, SoftDeleteMixin):
 class Volunteer(db.Model, SoftDeleteMixin):
+    """
+    TODO: Describe class
+    """
     __tablename__ = "volunteers"
 
     id = Column(Integer, primary_key=True)
@@ -71,6 +74,9 @@ class Volunteer(db.Model, SoftDeleteMixin):
 
 #for people signing up to volunteer that will be placed in inbox
 class Applicant(db.Model, SoftDeleteMixin):
+    """
+    TODO: Describe class
+    """
     __tablename__ = "applicants"
 
     id = Column(Integer, primary_key=True)
@@ -93,6 +99,9 @@ class Applicant(db.Model, SoftDeleteMixin):
 # creating user account class
 # only admins and captains should have be on this table
 class UserAccount(db.Model):
+    """
+    TODO: Describe class
+    """
     __tablename__ = "user_account"
 
     user_id = Column(Integer, primary_key=True)
@@ -112,6 +121,9 @@ class UserAccount(db.Model):
 
 # creating a stations table
 class Station(db.Model):
+    """
+    TODO: Describe class
+    """
     __tablename__ = "station"
 
     station_id = Column(Integer, primary_key=True)
@@ -139,6 +151,9 @@ class Station(db.Model):
     )
 
 class Absence(db.Model):
+    """
+    TODO: Describe class
+    """
     __tablename__ = "absences"
 
     absence_id = Column(Integer, primary_key=True)
@@ -155,6 +170,9 @@ class Absence(db.Model):
 
 # creating schedule table
 class Schedule(db.Model, SoftDeleteMixin):
+    """
+    TODO: Describe class
+    """
     __tablename__ = "schedule"
 
     schedule_id = Column(Integer, primary_key=True)
@@ -164,6 +182,9 @@ class Schedule(db.Model, SoftDeleteMixin):
 
 # creating assignment table
 class Assignment(db.Model):
+    """
+    TODO: Describe class
+    """
     __tablename__ = "assignments"
 
     assignment_id = Column(Integer, primary_key=True)
@@ -187,6 +208,9 @@ class Assignment(db.Model):
     
 # creating a class that will store the availiablity hours for each person
 class Availability(db.Model, SoftDeleteMixin):
+    """
+    TODO: Describe class
+    """
     __tablename__ = "availability"
 
     availability_id = Column(Integer, primary_key=True)
@@ -230,18 +254,31 @@ with app.app_context():
 
     db.session.commit()
         
+# TODO: Verify correctness of Docstring
 # Serve your existing HTML pages
 @app.route("/")
 def home():
+    """
+    Function that routes all html pages through the templates directory.
+    """
     return send_from_directory("templates", "index.html")
 
+# TODO: Update Docstring
+# TODO: Add comments
 @app.route("/<path:path>")
 def static_files(path):
+    """
+    TODO: Describe function
+    """
     return send_from_directory(".", path)
 
-
+# TODO: Update Docstring
+# TODO: Add comments
 @app.route("/api/google-login", methods=["POST"])
 def google_login():
+    """
+    TODO: Describe function
+    """
     GOOGLE_CLIENT_ID = os.environ["GOOGLE_CLIENT_ID"]
     token = request.json.get("credential")
 
@@ -282,9 +319,13 @@ def google_login():
     
     return jsonify({"success": True, "role": user.role})
 
-
+# TODO: Update Docstring
+# TODO: Add comments
 @app.route("/api/me")
 def me():
+    """
+    TODO: Describe function
+    """
     if "user_id" not in session:
         return jsonify({"error": "Not logged in"}), 401
 
@@ -294,6 +335,8 @@ def me():
     })
 
 # ABSENCES
+# TODO: Update Docstring
+# TODO: Update/verify comments
 @app.route("/admin/load-absences", methods=["POST"])
 def load_absences():
     """
@@ -390,6 +433,9 @@ def load_absences():
         db.session.rollback()
         return {"error": str(e)}, 500
 
+
+# TODO: Verify correctness of Docstring
+# TODO: Update/verify comments
 #delete button for absence forms
 @app.route("/admin/absences/delete", methods=["POST"])
 def delete_absence_form():
@@ -430,8 +476,13 @@ def delete_absence_form():
         return f"<pre>{type(e).__name__}: {str(e)}</pre>", 500
 
 #absence form page
+# TODO: Update Docstring
+# TODO: Update/verify comments
 @app.route("/admin/absences")
 def admin_absences():
+    """
+    TODO: Describe function
+    """
     #pull from the absence tab within the chunch volunteer info sheet
     try:
         sheet = get_sheet()
@@ -2371,7 +2422,7 @@ def master_list():
     for v in volunteers:
         user = UserAccount.query.filter(UserAccount.volunteer_id == v.id).first()
         start_hour, end_hour = parse_shift(v.typical_shift)
-        #role = role_by_volunteer_id.get(v.id, "volunteer")
+        role = role_by_volunteer_id.get(v.id)
         volunteer_rows.append({
             "id": v.id,
             "first_name": v.first_name,
@@ -2399,7 +2450,7 @@ def add_volunteer():
     last_name = request.form.get("last_name", "").strip()
     email = request.form.get("email", "").strip().lower()
     phone = request.form.get("phone", "").strip()
-    # role = request.form.get("role", "").strip().lower()
+    role = request.form.get("role", "").strip().lower()
     station_id = request.form.get("station_id", type=int)
     start_hour = request.form.get("start_hour", type=int)
     end_hour = request.form.get("end_hour", type=int)
