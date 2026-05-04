@@ -52,6 +52,7 @@
 
 <script>
 let currentVolunteer = null;
+// Connects stations to dashboard
 const stationClassMap = {
     "Setup Team": "setup",
     "Teardown Team": "teardown",
@@ -84,6 +85,7 @@ function getVolunteerDisplayName(volunteer) {
     return volunteer.name || `${volunteer.firstName || ""} ${volunteer.lastName || ""}`.trim();
 }
 
+// Seeing if volunteer is a captain
 function isCaptain(volunteer) {
     if (!volunteer || typeof volunteer === "string") return false;
 
@@ -93,12 +95,13 @@ function isCaptain(volunteer) {
     return captainStatus === "captain" || role === "captain";
 }
 
-// added for admin symbol
+// Seeing if volunteer is a admin
 function isAdmin(volunteer) {
     if (!volunteer || typeof volunteer === "string") return false;
     return (volunteer.role || "").toString().toLowerCase() === "admin";
 }
 
+// Seeing if volunteer is a tech
 function isTech(volunteer) {
     if(!volunteer || typeof volunteer === "string") return false;
     return (volunteer.role || "").toString().toLowerCase() === "tech";
@@ -113,6 +116,7 @@ function formatDatePretty(dateStr) {
     });
 }
 
+// Makes hours into AM and PM
 function formatHourPretty(h) {
     if (h === null || h === undefined) return "";
     if (h === 0) return "12 AM";
@@ -131,6 +135,7 @@ function formatPhonePretty(phone) {
     return phone;
 }
 
+// The station board, its information for each volunteer, and how it shows/looks
 function renderStationBoard(stationData) {
     currentStationData = stationData || {};
 
@@ -234,6 +239,7 @@ function renderStationBoard(stationData) {
     });
 }
 
+// Reloads station board after each update
 async function loadStationBoard() {
     try {
         const response = await fetch("/admin/debug-hourly-final");
@@ -280,6 +286,7 @@ async function loadSchedule() {
     }
 }
 
+// Opens individual volunteer panel for single volunteer edits
 function openVolunteerPanel(volunteerJson) {
     const volunteer = JSON.parse(volunteerJson);
     
@@ -301,6 +308,7 @@ function openVolunteerPanel(volunteerJson) {
     document.getElementById("detailOverlay").classList.add("open");
 }
 
+// Closes individual volunteer panel for single volunteer edits
 function closeVolunteerPanel() {
     document.getElementById("detailPanel").classList.remove("open");
     document.getElementById("detailOverlay").classList.remove("open");
